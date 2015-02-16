@@ -1,0 +1,37 @@
+
+description = 'SparqlMap Shared Resources'
+
+
+//sourceSets {
+//	sampleDb {
+//		java { 			srcDir = ['src/main/java/'] 		}
+//		resources {		srcDirs = ['src/main/resources/sample-data/db']	}
+//	}
+//}
+
+
+//		java {
+//			srcDir 'src/main/java/'
+//		}
+	
+//		resources {
+//			srcDir 'src/main/resources/sample-data/db'
+//		}
+//	}
+
+//task sampleDbJar(type: Jar){
+//	baseName "sampledb2"
+//	from  sourceSets.sampleDb.resources
+//}
+
+
+
+//task sampleDbJar(type: Jar){
+//
+//	baseName "sampledb2"
+//	from  sourceSets.sampleDb.resources
+//}
+
+//artifacts {
+//    archives sampleDbJar
+//}

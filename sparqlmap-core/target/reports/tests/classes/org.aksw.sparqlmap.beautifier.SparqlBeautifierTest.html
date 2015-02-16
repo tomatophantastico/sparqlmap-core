@@ -1,0 +1,420 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta httpEquiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Test results - Class org.aksw.sparqlmap.beautifier.SparqlBeautifierTest</title>
+<link href="css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="css/style.css" rel="stylesheet" type="text/css"/>
+<script src="js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.aksw.sparqlmap.beautifier.SparqlBeautifierTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.aksw.sparqlmap.beautifier.html">org.aksw.sparqlmap.beautifier</a> &gt; SparqlBeautifierTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">3</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">3</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.194s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox failures" id="successRate">
+<div class="percent">0%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Failed tests</a>
+</li>
+<li>
+<a href="#tab1">Tests</a>
+</li>
+<li>
+<a href="#tab2">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Failed tests</h2>
+<div class="test">
+<a name="test1"></a>
+<h3 class="failures">test1</h3>
+<span class="code">
+<pre>org.apache.jena.atlas.lib.NotImplemented: OpQuadBlock
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:278)
+	at com.hp.hpl.jena.sparql.algebra.op.OpQuadBlock.visit(OpQuadBlock.java:83)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElementGroup(OpAsQuery.java:127)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElement(OpAsQuery.java:118)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:381)
+	at com.hp.hpl.jena.sparql.algebra.op.OpFilter.visit(OpFilter.java:101)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:565)
+	at com.hp.hpl.jena.sparql.algebra.op.OpProject.visit(OpProject.java:48)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.convert(OpAsQuery.java:91)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery.asQuery(OpAsQuery.java:51)
+	at org.aksw.sparqlmap.beautifier.SparqlBeautifierTest.test1(SparqlBeautifierTest.java:81)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:47)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:44)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:271)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:70)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:50)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:238)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:63)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:236)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:53)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:229)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:309)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:86)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:49)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:69)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:50)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.messaging.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+	at org.gradle.messaging.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:103)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.messaging.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:355)
+	at org.gradle.internal.concurrent.DefaultExecutorFactory$StoppableExecutorImpl$1.run(DefaultExecutorFactory.java:64)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="testq2"></a>
+<h3 class="failures">testq2</h3>
+<span class="code">
+<pre>org.apache.jena.atlas.lib.NotImplemented: OpQuadBlock
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:278)
+	at com.hp.hpl.jena.sparql.algebra.op.OpQuadBlock.visit(OpQuadBlock.java:83)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElementGroup(OpAsQuery.java:127)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElement(OpAsQuery.java:118)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:381)
+	at com.hp.hpl.jena.sparql.algebra.op.OpFilter.visit(OpFilter.java:101)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElementGroup(OpAsQuery.java:127)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElement(OpAsQuery.java:118)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:314)
+	at com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin.visit(OpLeftJoin.java:64)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElementGroup(OpAsQuery.java:127)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElement(OpAsQuery.java:118)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:314)
+	at com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin.visit(OpLeftJoin.java:64)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElementGroup(OpAsQuery.java:127)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElement(OpAsQuery.java:118)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:314)
+	at com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin.visit(OpLeftJoin.java:64)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:565)
+	at com.hp.hpl.jena.sparql.algebra.op.OpProject.visit(OpProject.java:48)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.convert(OpAsQuery.java:91)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery.asQuery(OpAsQuery.java:51)
+	at org.aksw.sparqlmap.beautifier.SparqlBeautifierTest.testq2(SparqlBeautifierTest.java:96)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:47)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:44)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:271)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:70)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:50)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:238)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:63)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:236)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:53)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:229)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:309)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:86)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:49)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:69)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:50)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.messaging.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+	at org.gradle.messaging.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:103)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.messaging.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:355)
+	at org.gradle.internal.concurrent.DefaultExecutorFactory$StoppableExecutorImpl$1.run(DefaultExecutorFactory.java:64)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="testq4"></a>
+<h3 class="failures">testq4</h3>
+<span class="code">
+<pre>org.apache.jena.atlas.lib.NotImplemented: OpQuadBlock
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:278)
+	at com.hp.hpl.jena.sparql.algebra.op.OpQuadBlock.visit(OpQuadBlock.java:83)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElementGroup(OpAsQuery.java:127)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElement(OpAsQuery.java:118)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:381)
+	at com.hp.hpl.jena.sparql.algebra.op.OpFilter.visit(OpFilter.java:101)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElementGroup(OpAsQuery.java:127)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElement(OpAsQuery.java:118)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:381)
+	at com.hp.hpl.jena.sparql.algebra.op.OpFilter.visit(OpFilter.java:101)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.asElementGroup(OpAsQuery.java:127)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:350)
+	at com.hp.hpl.jena.sparql.algebra.op.OpUnion.visit(OpUnion.java:49)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:546)
+	at com.hp.hpl.jena.sparql.algebra.op.OpOrder.visit(OpOrder.java:44)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:565)
+	at com.hp.hpl.jena.sparql.algebra.op.OpProject.visit(OpProject.java:48)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:581)
+	at com.hp.hpl.jena.sparql.algebra.op.OpDistinct.visit(OpDistinct.java:47)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.visit(OpAsQuery.java:591)
+	at com.hp.hpl.jena.sparql.algebra.op.OpSlice.visit(OpSlice.java:50)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery$Converter.convert(OpAsQuery.java:91)
+	at com.hp.hpl.jena.sparql.algebra.OpAsQuery.asQuery(OpAsQuery.java:51)
+	at org.aksw.sparqlmap.beautifier.SparqlBeautifierTest.testq4(SparqlBeautifierTest.java:110)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:47)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:44)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:271)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:70)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:50)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:238)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:63)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:236)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:53)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:229)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:309)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:86)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:49)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:69)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:50)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.messaging.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+	at org.gradle.messaging.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:103)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.messaging.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:355)
+	at org.gradle.internal.concurrent.DefaultExecutorFactory$StoppableExecutorImpl$1.run(DefaultExecutorFactory.java:64)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+</pre>
+</span>
+</div>
+</div>
+<div id="tab1" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="failures">test1</td>
+<td>0.005s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">testq2</td>
+<td>0.176s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">testq4</td>
+<td>0.013s</td>
+<td class="failures">failed</td>
+</tr>
+</table>
+</div>
+<div id="tab2" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>old:-31410404(project (?label ?comment ?producer ?productFeature ?propertyTextual1 ?propertyTextual2 ?propertyTextual3 ?propertyNumeric1 ?propertyNumeric2 ?propertyTextual4 ?propertyTextual5 ?propertyNumeric4)
+  (leftjoin
+    (leftjoin
+      (leftjoin
+        (bgp
+          (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://www.w3.org/2000/01/rdf-schema#label&gt; ?label)
+          (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://www.w3.org/2000/01/rdf-schema#comment&gt; ?comment)
+          (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer&gt; ?p)
+          (triple ?p &lt;http://www.w3.org/2000/01/rdf-schema#label&gt; ?producer)
+          (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://purl.org/dc/elements/1.1/publisher&gt; ?p)
+          (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productFeature&gt; ?f)
+          (triple ?f &lt;http://www.w3.org/2000/01/rdf-schema#label&gt; ?productFeature)
+          (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual1&gt; ?propertyTextual1)
+          (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual2&gt; ?propertyTextual2)
+          (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual3&gt; ?propertyTextual3)
+          (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyNumeric1&gt; ?propertyNumeric1)
+          (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyNumeric2&gt; ?propertyNumeric2)
+        )
+        (bgp (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual4&gt; ?propertyTextual4)))
+      (bgp (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual5&gt; ?propertyTextual5)))
+    (bgp (triple &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyNumeric4&gt; ?propertyNumeric4))))
+
+new: 1783319709(project (?label ?comment ?producer ?productFeature ?propertyTextual1 ?propertyTextual2 ?propertyTextual3 ?propertyNumeric1 ?propertyNumeric2 ?propertyTextual4 ?propertyTextual5 ?propertyNumeric4)
+  (leftjoin
+    (leftjoin
+      (leftjoin
+        (filter (exprlist (= ?0B &lt;urn:x-arq:DefaultGraphNode&gt;) (= ?1B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt;) (= ?2B &lt;http://www.w3.org/2000/01/rdf-schema#label&gt;) (= ?3B &lt;http://www.w3.org/2000/01/rdf-schema#comment&gt;) (= ?4B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer&gt;) (= ?5B &lt;http://purl.org/dc/elements/1.1/publisher&gt;) (= ?6B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productFeature&gt;) (= ?7B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual1&gt;) (= ?8B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual2&gt;) (= ?9B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual3&gt;) (= ?10B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyNumeric1&gt;) (= ?11B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyNumeric2&gt;))
+          (quadblock
+            (quad ?0B ?1B ?2B ?label)
+            (quad ?0B ?1B ?3B ?comment)
+            (quad ?0B ?1B ?4B ?p)
+            (quad ?0B ?p ?2B ?producer)
+            (quad ?0B ?1B ?5B ?p)
+            (quad ?0B ?1B ?6B ?f)
+            (quad ?0B ?f ?2B ?productFeature)
+            (quad ?0B ?1B ?7B ?propertyTextual1)
+            (quad ?0B ?1B ?8B ?propertyTextual2)
+            (quad ?0B ?1B ?9B ?propertyTextual3)
+            (quad ?0B ?1B ?10B ?propertyNumeric1)
+            (quad ?0B ?1B ?11B ?propertyNumeric2)
+          ))
+        (filter (exprlist (= ?0B &lt;urn:x-arq:DefaultGraphNode&gt;) (= ?1B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt;) (= ?12B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual4&gt;))
+          (quadblock (quad ?0B ?1B ?12B ?propertyTextual4))))
+      (filter (exprlist (= ?0B &lt;urn:x-arq:DefaultGraphNode&gt;) (= ?1B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt;) (= ?13B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual5&gt;))
+        (quadblock (quad ?0B ?1B ?13B ?propertyTextual5))))
+    (filter (exprlist (= ?0B &lt;urn:x-arq:DefaultGraphNode&gt;) (= ?1B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product1&gt;) (= ?14B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyNumeric4&gt;))
+      (quadblock (quad ?0B ?1B ?14B ?propertyNumeric4)))))
+
+old:-1879147196(slice 5 10
+  (distinct
+    (project (?product ?label ?propertyTextualWHERE)
+      (order (?label)
+        (union
+          (filter (&gt; ?p1 2)
+            (bgp
+              (triple ?product &lt;http://www.w3.org/2000/01/rdf-schema#label&gt; ?label)
+              (triple ?product &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType1&gt;)
+              (triple ?product &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productFeature&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature39&gt;)
+              (triple ?product &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productFeature&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature41&gt;)
+              (triple ?product &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual1&gt; ?propertyTextual)
+              (triple ?product &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyNumeric1&gt; ?p1)
+            ))
+          (filter (&gt; ?p2 3)
+            (bgp
+              (triple ?product &lt;http://www.w3.org/2000/01/rdf-schema#label&gt; ?label)
+              (triple ?product &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType1&gt;)
+              (triple ?product &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productFeature&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature39&gt;)
+              (triple ?product &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productFeature&gt; &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature46&gt;)
+              (triple ?product &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual1&gt; ?propertyTextual)
+              (triple ?product &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyNumeric2&gt; ?p2)
+            )))))))
+
+new: -1879147196(slice 5 10
+  (distinct
+    (project (?product ?label ?propertyTextualWHERE)
+      (order (?label)
+        (union
+          (filter (&gt; ?p1 2)
+            (filter (exprlist (= ?0B &lt;urn:x-arq:DefaultGraphNode&gt;) (= ?1B &lt;http://www.w3.org/2000/01/rdf-schema#label&gt;) (= ?2B &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt;) (= ?3B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType1&gt;) (= ?4B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productFeature&gt;) (= ?5B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature39&gt;) (= ?6B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature41&gt;) (= ?7B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual1&gt;) (= ?8B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyNumeric1&gt;))
+              (quadblock
+                (quad ?0B ?product ?1B ?label)
+                (quad ?0B ?product ?2B ?3B)
+                (quad ?0B ?product ?4B ?5B)
+                (quad ?0B ?product ?4B ?6B)
+                (quad ?0B ?product ?7B ?propertyTextual)
+                (quad ?0B ?product ?8B ?p1)
+              )))
+          (filter (&gt; ?p2 3)
+            (filter (exprlist (= ?0B &lt;urn:x-arq:DefaultGraphNode&gt;) (= ?1B &lt;http://www.w3.org/2000/01/rdf-schema#label&gt;) (= ?2B &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt;) (= ?3B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType1&gt;) (= ?4B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productFeature&gt;) (= ?5B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature39&gt;) (= ?9B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature46&gt;) (= ?7B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyTextual1&gt;) (= ?10B &lt;http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyNumeric2&gt;))
+              (quadblock
+                (quad ?0B ?product ?1B ?label)
+                (quad ?0B ?product ?2B ?3B)
+                (quad ?0B ?product ?4B ?5B)
+                (quad ?0B ?product ?4B ?9B)
+                (quad ?0B ?product ?7B ?propertyTextual)
+                (quad ?0B ?product ?10B ?p2)
+              ))))))))
+
+old:-560761544(bgp (triple &lt;http://uri1&gt; ?p &quot;1&quot;^^&lt;http://www.w3.org/2001/XMLSchema#int&gt;))
+
+new: 428471199(project (?p)
+  (filter (exprlist (= ?0B &lt;urn:x-arq:DefaultGraphNode&gt;) (= ?1B &lt;http://uri1&gt;) (= (datatype ?2B) &quot;http://www.w3.org/2001/XMLSchema#int&quot;))
+    (quadblock (quad ?0B ?1B ?p ?2B))))
+
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>Generated by 
+<a href="http://www.gradle.org">Gradle 1.10</a> at 16.02.2015 15:53:23</p>
+</div>
+</div>
+</body>

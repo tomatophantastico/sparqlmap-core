@@ -1,0 +1,39 @@
+{
+  "head": {
+    "vars": [ "o" ]
+  } ,
+  "results": {
+    "bindings": [
+      {
+        "o": { "type": "literal" , "value": "Thing" }
+      } ,
+      {
+        "o": { "type": "literal" , "value": "abaser easterly manumissions" }
+      } ,
+      {
+        "o": { "type": "literal" , "value": "abdicates" }
+      } ,
+      {
+        "o": { "type": "literal" , "value": "abhorrences" }
+      } ,
+      {
+        "o": { "type": "literal" , "value": "abjuration rationalization cudweeds" }
+      } ,
+      {
+        "o": { "type": "literal" , "value": "ablest cadaveric" }
+      } ,
+      {
+        "o": { "type": "literal" , "value": "abortionist seppukus" }
+      } ,
+      {
+        "o": { "type": "literal" , "value": "absconder staccatos" }
+      } ,
+      {
+        "o": { "type": "literal" , "value": "absurdities" }
+      } ,
+      {
+        "o": { "type": "literal" , "value": "abysm colorable histrionics" }
+      }
+    ]
+  }
+}
