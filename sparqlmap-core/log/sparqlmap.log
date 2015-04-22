@@ -1,8 +1,0 @@
-15:53:21,500 INFO  Logger: Checkpoint start
-15:53:21,502 INFO  Logger: checkpointClose start
-15:53:21,510 INFO  Logger: checkpointClose end
-15:53:21,511 INFO  Logger: Checkpoint end - txts: 1
-15:53:22,379 INFO  Logger: Checkpoint start
-15:53:22,380 INFO  Logger: checkpointClose start
-15:53:22,385 INFO  Logger: checkpointClose end
-15:53:22,385 INFO  Logger: Checkpoint end - txts: 1
