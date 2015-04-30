@@ -1,11 +1,11 @@
-#SparqlMap
+# SparqlMap
 
 
 SparqlMap - A SPARQL to SQL rewriter based on [R2RML](http://www.w3.org/TR/r2rml/) specification.
 
 It can be used in allows both extracting RDF from an relational database and rewrite SPARQL queries into SQL.
 
-##Current Status
+## Current Status
 
 We have refactored SparqlMap in the last few months a lot.
 The current master branch is not yet ready for prime time, thus no binary release are out yet.
@@ -14,7 +14,7 @@ If you want to try out SparqlMap, best use a binary distribution from our [old w
 
 
 
-##Convert Relational Database into RDF
+## Convert Relational Database into RDF
 
 Most of the time, dump creation will take place on the command line.
 In the binary distributions these can be found in the _bin_ folder.
