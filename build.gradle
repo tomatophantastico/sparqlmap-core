@@ -2,6 +2,8 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
+
+
 // We use Java 7
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -27,8 +29,8 @@ publishing {
 
 // In this section you declare where to find the dependencies of your project
 repositories {
-    jcenter()
     mavenLocal()
+    jcenter()
     maven { url "http://repo.maven.apache.org/maven2" }
     maven { url "http://download.java.net/maven/2/" }
     maven { url "https://repository.apache.org/content/repositories/releases/" }
