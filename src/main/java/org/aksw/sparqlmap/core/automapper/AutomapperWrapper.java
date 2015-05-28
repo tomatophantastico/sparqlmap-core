@@ -3,6 +3,7 @@ package org.aksw.sparqlmap.core.automapper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -10,10 +11,14 @@ import javax.annotation.PostConstruct;
 
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
+import org.apache.metamodel.DataContext;
+import org.apache.metamodel.MetaModelException;
+import org.apache.metamodel.jdbc.JdbcDataContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import com.google.common.net.UrlEscapers;
 import com.hp.hpl.jena.rdf.model.Model;
 
 /**
@@ -51,17 +56,26 @@ public class AutomapperWrapper {
    * @return the model with the R2RML mapping
    * @throws SQLException thrown, if the db exploration fails
    * @throws FileNotFoundException thrown, if the file cold not be written.
+   * @throws MetaModelException 
+   * @throws UnsupportedEncodingException 
    */
-  public Model automap() throws SQLException, FileNotFoundException {
+  public Model automap() throws SQLException, FileNotFoundException, UnsupportedEncodingException, MetaModelException {
     Connection conn = this.dbaccess.getConnection();
+    
+    DataContext con = new  JdbcDataContext(conn);
+    
+    
+    MappingGenerator gen = new MappingGenerator(baseUri, baseUri, baseUri, ";");
 
-    Automapper automapper = new Automapper(conn, baseUri, baseUri, baseUri, ";");
-    Model dmR2rml = automapper.getMydbData(conn.getCatalog(),conn.getSchema());
+    Model dmR2rml = gen.generateMapping(con.getDefaultSchema());
     if (dmR2rmlDump != null && !dmR2rml.isEmpty()) {
       dmR2rml.write(new FileOutputStream(new File(dbconf.getDBName() + "-dm.ttl")), "TTL");
     }
     conn.close();
     return dmR2rml;
   }
+  
+  
+
 
 }
