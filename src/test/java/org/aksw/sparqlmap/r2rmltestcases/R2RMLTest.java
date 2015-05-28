@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,12 +18,13 @@ import java.util.List;
 import java.util.Properties;
 
 import org.aksw.sparqlmap.core.SparqlMap;
-import org.aksw.sparqlmap.core.automapper.Automapper;
-import org.aksw.sparqlmap.core.automapper.AutomapperWrapper;
+import org.aksw.sparqlmap.core.automapper.MappingGenerator;
 import org.aksw.sparqlmap.core.db.Connector;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.WebContent;
+import org.apache.metamodel.DataContext;
+import org.apache.metamodel.MetaModelException;
+import org.apache.metamodel.jdbc.JdbcDataContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -213,14 +215,15 @@ public abstract class R2RMLTest {
 	
 	
 	
-	public void createDM(String wheretowrite) throws ClassNotFoundException, SQLException, FileNotFoundException{
+	public void createDM(String wheretowrite) throws ClassNotFoundException, SQLException, FileNotFoundException, UnsupportedEncodingException, MetaModelException{
 		Connection conn = getConnector().getConnection();
 		
 		
 		
-		Automapper db2r2rml = new Automapper(conn, "http://example.com/base/", "http://example.com/base/", "http://example.com/base/",";");
+		MappingGenerator db2r2rml = new MappingGenerator( "http://example.com/base/", "http://example.com/base/", "http://example.com/base/",";");
 		
-		Model mapping = db2r2rml.getMydbData(conn.getCatalog(),conn.getSchema());
+		DataContext con = new JdbcDataContext(conn);
+		Model mapping = db2r2rml.generateMapping(con.getDefaultSchema());
 		conn.close();
 		mapping.write(new FileOutputStream(new File(wheretowrite)), "TTL", null);
 		

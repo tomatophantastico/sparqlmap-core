@@ -47,11 +47,11 @@ public class OracleR2RMLTestCase extends R2RMLTest{
 		
 	}
 	
-	public static String getTestCaseLocations() {
-		
-		return "./testcases/oracle/";
-	}
-	
+  public static String getTestCaseLocations() {
+    
+    return "./src/test/resources/testcases/oracle/";
+  }
+  
 	@Override
 	public List<String> getTablesInDb() throws SQLException {
 		List<String> names = Lists.newArrayList();
