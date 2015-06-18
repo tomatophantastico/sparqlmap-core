@@ -636,7 +636,7 @@ public class R2RMLModel {
 		List<TermMap> graphMaps = new ArrayList<TermMap>();
 		if (graphMapStmts == null || graphMapStmts.isEmpty()) {
 			graphMaps = Arrays.asList(this.tfac
-					.createTermMap(Quad.defaultGraphIRI));
+					.createTermMap(Quad.defaultGraphNodeGenerated));
 		} else {
 			for (Statement graphMapStmt : graphMapStmts) {
 				List<Expression> graph;
