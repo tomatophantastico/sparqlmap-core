@@ -23,12 +23,19 @@ public class BasicSparqlTestOnHSQL extends BSBMTestOnHSQL {
 	}
 	
 	@Test
-	public void simpleJoin(){
+	public void simpleSelfJoin(){
 		
 		String query = prefixes 
 				+ "SELECT ?product ?label ?value1 {?product rdfs:label ?label .?product bsbm:productPropertyNumeric1 ?value1 } order by ?label limit 10";
 		executeAndCompareSelect(query, new File(
-				"./src/test/resources/bsbm/simpleJoin.qres"));
+				"./src/test/resources/bsbm/simpleSelfJoin.qres"));
 	}
-
+  @Test
+  public void simpleJoin(){
+    
+    String query = prefixes 
+        + "SELECT ?product ?label ?value1 {?product rdfs:label ?label .?product bsbm:productFeature ?value1 } order by ?label limit 10";
+    executeAndCompareSelect(query, new File(
+        "./src/test/resources/bsbm/simpleJoin.qres"));
+  }
 }

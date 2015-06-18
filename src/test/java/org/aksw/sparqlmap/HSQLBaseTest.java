@@ -123,8 +123,24 @@ public abstract class HSQLBaseTest {
 		
 		ResultSet result;
 		try {
-			result = sm.executeSelect(sparqlSelect);
-			assertTrue(ResultSetCompare.equalsByTermAndOrder(result, expectedRS));
+			result = ResultSetFactory.makeRewindable(sm.executeSelect(sparqlSelect)); 
+			boolean isEqual  = ResultSetCompare.equalsByTerm(result, expectedRS);
+      StringBuffer comparison =new StringBuffer();
+
+			if(!isEqual){
+		    
+			  comparison.append("Actual result is :\n");
+			  comparison.append("=============================");
+		   
+		    comparison.append(ResultSetFormatter.asText(result));
+		    comparison.append("=======================\nExpected was: ");
+		   
+		    comparison.append(ResultSetFormatter.asText(expectedRS));
+		    comparison.append("=============================");
+		    
+			}
+			
+			assertTrue(comparison.toString(),isEqual);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

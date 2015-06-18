@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 public class PostgreSQLDataTypeHelper extends DataTypeHelper {
 	
 	
-	static public String getDBName() {
-		return PostgeSQLConnector.POSTGRES_DBNAME;
+	public String getDBName() {
+		return PostgreSQLConnector.POSTGRES_DBNAME;
 	}
 
 	@Override

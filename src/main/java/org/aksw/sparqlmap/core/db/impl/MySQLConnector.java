@@ -16,18 +16,7 @@ public class MySQLConnector extends Connector {
 	public static final String MYSQL_DBNAME = "MySQL";
 	private static Logger log = LoggerFactory.getLogger(MySQLConnector.class);
 	
-	
-	{
-		try{
-			Class.forName("com.mysql.jdbc.Driver" ); 
-		} catch (Exception e) {
-			LoggerFactory.getLogger(MySQLConnector.class).info("MySQL driver not present",e);
-		}
-			
 		
-	}
-
-
 	@PostConstruct
 	public void validateDB(){
 		
@@ -52,6 +41,12 @@ public class MySQLConnector extends Connector {
 	@Override
 	public String getDBName() {
 		return MYSQL_DBNAME;
+	}
+
+	@Override
+	public String getDriverVersion() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 		

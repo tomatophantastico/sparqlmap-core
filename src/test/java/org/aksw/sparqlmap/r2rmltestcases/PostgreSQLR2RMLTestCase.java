@@ -6,7 +6,7 @@ import java.util.Properties;
 
 import org.aksw.sparqlmap.core.db.Connector;
 import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
-import org.aksw.sparqlmap.core.db.impl.PostgeSQLConnector;
+import org.aksw.sparqlmap.core.db.impl.PostgreSQLConnector;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,7 +23,7 @@ public class PostgreSQLR2RMLTestCase extends R2RMLTest {
 				dbFileLocation, createDM);
 	}
 
-	PostgeSQLConnector connector;
+	PostgreSQLConnector connector;
 	
 	@Parameters(name="{0}")
 	public static Collection<Object[]> data() {
@@ -51,7 +51,7 @@ public class PostgreSQLR2RMLTestCase extends R2RMLTest {
 				DBAccessConfigurator.createConfig(
 						getDBProperties().getProperty("jdbc.url"), getDBProperties().getProperty("jdbc.username"), getDBProperties().getProperty("jdbc.password"), 1, 2));
 		
-		PostgeSQLConnector conn = new PostgeSQLConnector();
+		PostgreSQLConnector conn = new PostgreSQLConnector();
 		conn.setDs(ds);
 		
 		connector = conn;

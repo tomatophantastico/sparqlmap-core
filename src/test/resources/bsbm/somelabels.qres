@@ -1,39 +1,70 @@
-{
-  "head": {
-    "vars": [ "o" ]
-  } ,
-  "results": {
-    "bindings": [
-      {
-        "o": { "type": "literal" , "value": "Thing" }
-      } ,
-      {
-        "o": { "type": "literal" , "value": "abaser easterly manumissions" }
-      } ,
-      {
-        "o": { "type": "literal" , "value": "abdicates" }
-      } ,
-      {
-        "o": { "type": "literal" , "value": "abhorrences" }
-      } ,
-      {
-        "o": { "type": "literal" , "value": "abjuration rationalization cudweeds" }
-      } ,
-      {
-        "o": { "type": "literal" , "value": "ablest cadaveric" }
-      } ,
-      {
-        "o": { "type": "literal" , "value": "abortionist seppukus" }
-      } ,
-      {
-        "o": { "type": "literal" , "value": "absconder staccatos" }
-      } ,
-      {
-        "o": { "type": "literal" , "value": "absurdities" }
-      } ,
-      {
-        "o": { "type": "literal" , "value": "abysm colorable histrionics" }
-      }
-    ]
-  }
-}
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rs="http://www.w3.org/2001/sw/DataAccess/tests/result-set#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+  <rs:ResultSet>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>absconder staccatos</rs:value>
+        <rs:variable>o</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>abaser easterly manumissions</rs:value>
+        <rs:variable>o</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>abysm colorable histrionics</rs:value>
+        <rs:variable>o</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:size rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >10</rs:size>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>ablest cadaveric</rs:value>
+        <rs:variable>o</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>abhorrences</rs:value>
+        <rs:variable>o</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>abortionist seppukus</rs:value>
+        <rs:variable>o</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:resultVariable>o</rs:resultVariable>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>absurdities</rs:value>
+        <rs:variable>o</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>Thing</rs:value>
+        <rs:variable>o</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>abjuration rationalization cudweeds</rs:value>
+        <rs:variable>o</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>abdicates</rs:value>
+        <rs:variable>o</rs:variable>
+      </rs:binding>
+    </rs:solution>
+  </rs:ResultSet>
+</rdf:RDF>

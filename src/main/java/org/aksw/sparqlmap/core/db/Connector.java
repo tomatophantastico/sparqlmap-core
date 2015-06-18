@@ -30,6 +30,7 @@ import com.jolbox.bonecp.BoneCPDataSource;
  */
 public abstract class Connector {
 	
+	public static final String DRIVER_NA = "Driver not avalilable";
 	private static Logger log = LoggerFactory.getLogger(Connector.class);
 
 	public Connector( ){
@@ -95,6 +96,8 @@ public abstract class Connector {
 	}
 	
 	public abstract String getDBName();
+	
+	public abstract String getDriverVersion();
 
 
 	public Map<String,Integer> getDataTypeForTable(Table table){
@@ -125,6 +128,15 @@ public abstract class Connector {
 
 	public void close(){
 		connectionPool.close();
+	}
+	
+	
+	public String getSchema(){
+		return null;
+	}
+	
+	public String getCatalogue(){
+		return null;
 	}
 
 

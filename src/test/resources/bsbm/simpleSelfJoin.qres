@@ -3,108 +3,73 @@
     xmlns:rs="http://www.w3.org/2001/sw/DataAccess/tests/result-set#"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
   <rs:ResultSet>
+    <rs:size rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >10</rs:size>
     <rs:solution rdf:parseType="Resource">
       <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature1063"/>
+        <rs:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+        >465</rs:value>
         <rs:variable>value1</rs:variable>
       </rs:binding>
       <rs:binding rdf:parseType="Resource">
-        <rs:value>abysm colorable histrionics</rs:value>
+        <rs:value>amazement weightless jeweller</rs:value>
         <rs:variable>label</rs:variable>
       </rs:binding>
       <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer4/Product175"/>
-        <rs:variable>product</rs:variable>
-      </rs:binding>
-    </rs:solution>
-    <rs:solution rdf:parseType="Resource">
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature1057"/>
-        <rs:variable>value1</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value>abysm colorable histrionics</rs:value>
-        <rs:variable>label</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer4/Product175"/>
-        <rs:variable>product</rs:variable>
-      </rs:binding>
-    </rs:solution>
-    <rs:solution rdf:parseType="Resource">
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature105"/>
-        <rs:variable>value1</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value>abysm colorable histrionics</rs:value>
-        <rs:variable>label</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer4/Product175"/>
-        <rs:variable>product</rs:variable>
-      </rs:binding>
-    </rs:solution>
-    <rs:solution rdf:parseType="Resource">
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature1047"/>
-        <rs:variable>value1</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value>abysm colorable histrionics</rs:value>
-        <rs:variable>label</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer4/Product175"/>
-        <rs:variable>product</rs:variable>
-      </rs:binding>
-    </rs:solution>
-    <rs:solution rdf:parseType="Resource">
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature106"/>
-        <rs:variable>value1</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value>abysm colorable histrionics</rs:value>
-        <rs:variable>label</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer4/Product175"/>
-        <rs:variable>product</rs:variable>
-      </rs:binding>
-    </rs:solution>
-    <rs:solution rdf:parseType="Resource">
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature1049"/>
-        <rs:variable>value1</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value>abysm colorable histrionics</rs:value>
-        <rs:variable>label</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer4/Product175"/>
-        <rs:variable>product</rs:variable>
-      </rs:binding>
-    </rs:solution>
-    <rs:solution rdf:parseType="Resource">
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature1050"/>
-        <rs:variable>value1</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value>abysm colorable histrionics</rs:value>
-        <rs:variable>label</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer4/Product175"/>
+        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer1/Product35"/>
         <rs:variable>product</rs:variable>
       </rs:binding>
     </rs:solution>
     <rs:resultVariable>value1</rs:resultVariable>
     <rs:solution rdf:parseType="Resource">
       <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature1061"/>
+        <rs:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+        >302</rs:value>
+        <rs:variable>value1</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>acquiescence photocomposes rewire</rs:value>
+        <rs:variable>label</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer5/Product181"/>
+        <rs:variable>product</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+        >316</rs:value>
+        <rs:variable>value1</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>arguing upsweeps</rs:value>
+        <rs:variable>label</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer6/Product239"/>
+        <rs:variable>product</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+        >1242</rs:value>
+        <rs:variable>value1</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>adiposity</rs:value>
+        <rs:variable>label</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer1/Product12"/>
+        <rs:variable>product</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+        >956</rs:value>
         <rs:variable>value1</rs:variable>
       </rs:binding>
       <rs:binding rdf:parseType="Resource">
@@ -113,38 +78,83 @@
       </rs:binding>
       <rs:binding rdf:parseType="Resource">
         <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer4/Product175"/>
+        <rs:variable>product</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:resultVariable>label</rs:resultVariable>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+        >1567</rs:value>
+        <rs:variable>value1</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>aerometer preaccepted neurologies</rs:value>
+        <rs:variable>label</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer1/Product7"/>
+        <rs:variable>product</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+        >1085</rs:value>
+        <rs:variable>value1</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>animadverted burweed nonforfeiture</rs:value>
+        <rs:variable>label</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer7/Product280"/>
+        <rs:variable>product</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+        >751</rs:value>
+        <rs:variable>value1</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>acknowledging</rs:value>
+        <rs:variable>label</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer3/Product112"/>
+        <rs:variable>product</rs:variable>
+      </rs:binding>
+    </rs:solution>
+    <rs:solution rdf:parseType="Resource">
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+        >957</rs:value>
+        <rs:variable>value1</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value>aerosolize apartmental</rs:value>
+        <rs:variable>label</rs:variable>
+      </rs:binding>
+      <rs:binding rdf:parseType="Resource">
+        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer4/Product142"/>
         <rs:variable>product</rs:variable>
       </rs:binding>
     </rs:solution>
     <rs:resultVariable>product</rs:resultVariable>
-    <rs:resultVariable>label</rs:resultVariable>
     <rs:solution rdf:parseType="Resource">
       <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature100"/>
+        <rs:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+        >1103</rs:value>
         <rs:variable>value1</rs:variable>
       </rs:binding>
       <rs:binding rdf:parseType="Resource">
-        <rs:value>abysm colorable histrionics</rs:value>
+        <rs:value>aetheric</rs:value>
         <rs:variable>label</rs:variable>
       </rs:binding>
       <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer4/Product175"/>
-        <rs:variable>product</rs:variable>
-      </rs:binding>
-    </rs:solution>
-    <rs:size rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-    >10</rs:size>
-    <rs:solution rdf:parseType="Resource">
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature1056"/>
-        <rs:variable>value1</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value>abysm colorable histrionics</rs:value>
-        <rs:variable>label</rs:variable>
-      </rs:binding>
-      <rs:binding rdf:parseType="Resource">
-        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer4/Product175"/>
+        <rs:value rdf:resource="http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer4/Product164"/>
         <rs:variable>product</rs:variable>
       </rs:binding>
     </rs:solution>

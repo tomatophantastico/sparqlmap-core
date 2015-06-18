@@ -18,6 +18,12 @@ public class OracleConnector extends Connector  {
 	}
 
 
+	@Override
+	public String getDriverVersion() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	
 	
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class MySQLDataTypeHelper extends DataTypeHelper {
 	
 	
-	public static  String getDBName() {
+	public  String getDBName() {
 		return MySQLConnector.MYSQL_DBNAME;
 	}
 

@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.CastExpression;
 import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.DoubleValue;
@@ -33,6 +32,9 @@ import com.hp.hpl.jena.sparql.algebra.op.OpSlice;
 
 public abstract  class DataTypeHelper {
 	
+	
+	public abstract String getDBName();
+	
 	static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DataTypeHelper.class);
 	
 	@Autowired
@@ -50,8 +52,6 @@ public abstract  class DataTypeHelper {
 		constantValueExpressions.add(LongValue.class);
 		constantValueExpressions.add(DoubleValue.class);
 		constantValueExpressions.add(NullValue.class);
-		
-		
 	}
 		
 	Map<String,String> suffix2datatype = new HashMap<String, String>();

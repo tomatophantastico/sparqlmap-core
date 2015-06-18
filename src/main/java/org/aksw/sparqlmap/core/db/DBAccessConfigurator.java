@@ -2,15 +2,18 @@ package org.aksw.sparqlmap.core.db;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 import javax.annotation.PostConstruct;
 
 import org.aksw.sparqlmap.core.ImplementationException;
+import org.aksw.sparqlmap.core.SystemInitializationError;
 import org.aksw.sparqlmap.core.db.impl.HSQLDBConnector;
 import org.aksw.sparqlmap.core.db.impl.HSQLDBDataTypeHelper;
 import org.aksw.sparqlmap.core.db.impl.MySQLConnector;
 import org.aksw.sparqlmap.core.db.impl.MySQLDataTypeHelper;
-import org.aksw.sparqlmap.core.db.impl.PostgeSQLConnector;
+import org.aksw.sparqlmap.core.db.impl.PostgreSQLConnector;
 import org.aksw.sparqlmap.core.db.impl.PostgreSQLDataTypeHelper;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,78 +87,60 @@ public class DBAccessConfigurator {
 	static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DBAccessConfigurator.class);
 	
 	
-	public  DBAccessConfigurator() {
-	}
-	
-//    public DBAccessConfigurator(File databaseConfFileName) throws FileNotFoundException, IOException {
-//		
-//		Properties props = new Properties();
-//		props.load(new FileInputStream(databaseConfFileName));
-//		init(props);
-//		
-//	}
-//	public DBAccessConfigurator(Properties props){
-//		
-//		init(props);
-//		
-//	}
 
 	@Bean
 	public DataTypeHelper getDataTypeHelper() {
 		
+		Iterator<DataTypeHelper> dthi =  ServiceLoader.load(DataTypeHelper.class).iterator();
+		DataTypeHelper dthToUse = null;
 		
-		if(dbname.equals(HSQLDBDataTypeHelper.getDBName())){
-			return new HSQLDBDataTypeHelper();
-		}else if(dbname.equals(MySQLDataTypeHelper.getDBName())){
-			return new MySQLDataTypeHelper();
-		}else if(dbname.equals(PostgreSQLDataTypeHelper.getDBName())){
-			return new PostgreSQLDataTypeHelper();
+		while(dthi.hasNext()){
+			DataTypeHelper dth = dthi.next();
+			
+			
+			if(dbname.equals(dth.getDBName())){
+				dthToUse = dth;
+			}
+		}
+
+		if(dthToUse==null){
+			throw new SystemInitializationError("Unknown Database " + dbname + " encountered");
 		}
 		
-		
-		throw new ImplementationException("Unknown Database " + dbname + " encountered");
+		return dthToUse;
 
 	}
 	
 	@Bean
 	public DBAccess getDBAccess(){
 		
-		if(dbname.equals(PostgeSQLConnector.POSTGRES_DBNAME)){
-				PostgeSQLConnector conn = new PostgeSQLConnector();
-				conn.setDs(bcp);
-				return new DBAccess(conn);
-		}else if(dbname.equals(MySQLConnector.MYSQL_DBNAME)){
-			MySQLConnector conn = new MySQLConnector();
-			conn.setDs(bcp);
-			return new DBAccess(conn);
-		}else if(dbname.equals(HSQLDBConnector.HSQLDB_NAME)){
-			HSQLDBConnector conn = new HSQLDBConnector();
-			conn.setDs(bcp);
-			return new DBAccess(conn);
+		Iterator<Connector> conns =  ServiceLoader.load(Connector.class).iterator();
+		Connector connToUse = null;
+		
+		while(conns.hasNext()){
+			Connector conn = conns.next();
+			
+			if(log.isInfoEnabled()){
+				log.info("Detected :" + conn.getDBName() + " Module, Driver: " +  conn.getDriverVersion());
+			}
+			
+			if(dbname.equals(conn.getDBName())){
+				connToUse = conn;
+			}
+		}
+
+		if(connToUse==null){
+			throw new SystemInitializationError("Unknown Database " + dbname + " encountered");
 		}
 		
-		throw new ImplementationException("Unknown Database " + dbname + " encountered");
+		connToUse.setDs(bcp);
+		
+		return new DBAccess(connToUse);
 	}
-	
-	
-	
 	
 	
 	public String getDBName(){
 		return dbname;
 	}
 	
-	
-//	private void init(Properties props) {
-//		this.dbUrl = props.getProperty("jdbc.url");
-//		this.username = props.getProperty("jdbc.username");
-//		this.password = props.getProperty("jdbc.password");
-//		this.poolminconnections = props.getProperty("jdbc.poolminconnections");
-//		this.poolmaxconnections = props.getProperty("jdbc.poolmaxconnections");
-//	}
-//	
-	
-	
-	
-
-}
+}	
