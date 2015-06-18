@@ -170,69 +170,66 @@ private static BitSet RESERVED = new BitSet();
 		
 		List<Expression> eqs = new ArrayList<Expression>();
 		try{
-		
-		// and all the other fields that might be null
-//		Expression literalTypeEquality = bothNullOrBinary(left.literalType, right.literalType, test.newInstance());
-//		eqs.add(literalTypeEquality);
-		if(!isAlwaysTrue(left.literalValBinary, right.literalValBinary)){
-			Expression literalBinaryEquality = bothNullOrBinary(left.literalValBinary, right.literalValBinary, test.newInstance(),dth);
-			eqs.add(literalBinaryEquality);
-		}	
-		if(!isAlwaysTrue(left.literalValBool, left.literalValBool)){
-			Expression literalBoolEquality = bothNullOrBinary(left.literalValBool,right.literalValBool,test.newInstance(),dth);
-			eqs.add(literalBoolEquality);
-		}
-		
-		if(!isAlwaysTrue(left.literalValDate, right.literalValDate)){
-			Expression literalDateEquality = bothNullOrBinary(left.literalValDate, right.literalValDate, test.newInstance(),dth);
-			eqs.add(literalDateEquality);
-		}
-		
-		if(!isAlwaysTrue(left.literalValNumeric, right.literalValNumeric)){
-			Expression literalNumericEquality = bothNullOrBinary(left.literalValNumeric, right.literalValNumeric, test.newInstance(),dth);
-			eqs.add(literalNumericEquality);
-		}
-		
-		if(!isAlwaysTrue(left.literalValString, right.literalValString)){
-			Expression literalStringEquality = bothNullOrBinary(left.literalValString,right.literalValString, test.newInstance(),dth);
-			eqs.add(literalStringEquality);
-		}
-		
-		//and check for the resources
-		
-		if(left.resourceColSeg.size()==0&&right.resourceColSeg.size()==0){
-			//no need to do anything
-		}else{
-			if(test.equals(NotEqualsTo.class)||test.equals(EqualsTo.class)){
-				Expression resourceEquality = compareResource(left, right, test);
-				if(resourceEquality!=null){
-					eqs.add(resourceEquality);
-				}
-				
-			}else{
-				//only equals and not-equals are defined.
-				eqs.clear();
-				eqs.add(new NullValue());
-			}
-		}
-		
-		// and check that not all of any side are null
-		
-		
-		Expression leftNull = areAllNull(left.getExpressions());
-		Expression rightNull = areAllNull(right.getExpressions());
-		
-		if(leftNull != null && rightNull != null){
-			OrExpression anySideCompletelyNull = new OrExpression(
-					new Parenthesis(leftNull), 
-					new Parenthesis(rightNull));
 
-			Parenthesis not = new Parenthesis();
-			not.setNot();
-			not.setExpression(anySideCompletelyNull);
-			
-			eqs.add(anySideCompletelyNull);
-		}
+  		if(!isAlwaysTrue(left.literalValBinary, right.literalValBinary)){
+  			Expression literalBinaryEquality = bothNullOrBinary(left.literalValBinary, right.literalValBinary, test.newInstance(),dth);
+  			eqs.add(literalBinaryEquality);
+  		}	
+  		if(!isAlwaysTrue(left.literalValBool, left.literalValBool)){
+  			Expression literalBoolEquality = bothNullOrBinary(left.literalValBool,right.literalValBool,test.newInstance(),dth);
+  			eqs.add(literalBoolEquality);
+  		}
+  		
+  		if(!isAlwaysTrue(left.literalValDate, right.literalValDate)){
+  			Expression literalDateEquality = bothNullOrBinary(left.literalValDate, right.literalValDate, test.newInstance(),dth);
+  			eqs.add(literalDateEquality);
+  		}
+  		
+  		if(!isAlwaysTrue(left.literalValNumeric, right.literalValNumeric)){
+  			Expression literalNumericEquality = bothNullOrBinary(left.literalValNumeric, right.literalValNumeric, test.newInstance(),dth);
+  			eqs.add(literalNumericEquality);
+  		}
+  		
+  		if(!isAlwaysTrue(left.literalValString, right.literalValString)){
+  			Expression literalStringEquality = bothNullOrBinary(left.literalValString,right.literalValString, test.newInstance(),dth);
+  			eqs.add(literalStringEquality);
+  		}
+  		
+  		//and check for the resources
+  		
+  		if(left.resourceColSeg.size()==0&&right.resourceColSeg.size()==0){
+  			//no need to do anything
+  		}else{
+  			if(test.equals(NotEqualsTo.class)||test.equals(EqualsTo.class)){
+  				Expression resourceEquality = compareResource(left, right, test);
+  				if(resourceEquality!=null){
+  					eqs.add(resourceEquality);
+  				}
+  				
+  			}else{
+  				//only equals and not-equals are defined.
+  				eqs.clear();
+  				eqs.add(new NullValue());
+  			}
+  		}
+  		
+  		// and check that not all of any side are null
+  		
+  		
+  		Expression leftNull = areAllNull(left.getExpressions());
+  		Expression rightNull = areAllNull(right.getExpressions());
+  		
+  		if(leftNull != null && rightNull != null){
+  			OrExpression anySideCompletelyNull = new OrExpression(
+  					new Parenthesis(leftNull), 
+  					new Parenthesis(rightNull));
+  
+  			Parenthesis not = new Parenthesis();
+  			not.setNot();
+  			not.setExpression(anySideCompletelyNull);
+  			
+  			eqs.add(anySideCompletelyNull);
+  		}
 		
 		
 		} catch (InstantiationException | IllegalAccessException e) {
@@ -296,8 +293,9 @@ private static BitSet RESERVED = new BitSet();
 		boolean isSubsel = hasSubsel(left) || hasSubsel(right);
 
 		
-		
 		if(!optConf.shortcutFilters||isSubsel){
+	    // if it is a subselect, we cannot optimize
+
 			BinaryExpression resourceEq=  test.newInstance();
 			
 			resourceEq.setLeftExpression(FilterUtil.concat(left.resourceColSeg.toArray(new Expression[0])));
@@ -306,7 +304,8 @@ private static BitSet RESERVED = new BitSet();
 			Expression resourceEquality = bothNullOrBinary(FilterUtil.concat(left.resourceColSeg.toArray(new Expression[0])), FilterUtil.concat(right.resourceColSeg.toArray(new Expression[0])),resourceEq,dth);
 			return resourceEquality;
 		}else{
-			
+		   // no subselect involved, here we go
+
 			Iterator<Expression> leftExprIter = left.getResourceColSeg().iterator();
 			Iterator<Expression> rightExprIter = right.getResourceColSeg().iterator();
 			Object currentLeft = null;
@@ -418,14 +417,7 @@ private static BitSet RESERVED = new BitSet();
 					}
 					
 				}
-				
-				
-				
-				
-
-			}
-			
-						
+			}		
 			return FilterUtil.conjunct(tests);
 		}
 	}
