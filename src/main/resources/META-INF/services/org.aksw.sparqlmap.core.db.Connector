@@ -2,3 +2,5 @@ org.aksw.sparqlmap.core.db.impl.HSQLDBConnector
 org.aksw.sparqlmap.core.db.impl.PostgreSQLConnector
 org.aksw.sparqlmap.core.db.impl.MySQLConnector
 org.aksw.sparqlmap.core.db.impl.OracleConnector
+org.aksw.sparqlmap.core.db.impl.SqlServerConnector
+
