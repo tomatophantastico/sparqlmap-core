@@ -2,6 +2,7 @@ package org.aksw.sparqlmap.core.db;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Driver;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -97,7 +98,7 @@ public abstract class Connector {
 	
 	public abstract String getDBName();
 	
-	public abstract String getDriverVersion();
+	public abstract String getDriverClassString();
 
 
 	public Map<String,Integer> getDataTypeForTable(Table table){
@@ -138,6 +139,22 @@ public abstract class Connector {
 	public String getCatalogue(){
 		return null;
 	}
+	
+	 public String getDriverVersion() {
+	    String result = null;
+	    
+	    try {
+	      Driver driver =(Driver)  Class.forName(getDriverClassString()).newInstance();
+	      
+	      result  = driver.getClass().getName() +  driver.getMajorVersion() + "." + driver.getMinorVersion();
+	    } catch (InstantiationException | IllegalAccessException
+	        | ClassNotFoundException e) {
+	      result  = Connector.DRIVER_NA;
+	    } 
+	    
+	    return result;
+	  }
+
 
 
 }

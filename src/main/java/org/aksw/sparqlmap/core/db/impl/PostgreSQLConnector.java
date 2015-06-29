@@ -22,6 +22,7 @@ public class PostgreSQLConnector extends Connector {
 	
 	
 	public static final String POSTGRES_DBNAME = "PostgreSQL";
+	public static final String POSTGRES_DRIVER = "org.postgresql.Driver";
 
 
 	{
@@ -94,17 +95,15 @@ public class PostgreSQLConnector extends Connector {
 	}
 	
 
-@Override
-public String getDBName() {
-	return POSTGRES_DBNAME;
-}
+  @Override
+  public String getDBName() {
+    return POSTGRES_DBNAME;
+  }
 
-
-@Override
-public String getDriverVersion() {
-	// TODO Auto-generated method stub
-	return null;
-}
+  @Override
+  public String getDriverClassString() {
+    return POSTGRES_DRIVER;
+  }
 	
 	
 }

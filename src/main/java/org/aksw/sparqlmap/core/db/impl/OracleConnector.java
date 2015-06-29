@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 public class OracleConnector extends Connector  {
 	
 	public static final String ORACLE_DB_NAME = "Oracle";
+	public static final String ORACLE_DRIVER = "oracle.jdbc.driver.OracleDriver";
 	
 	
 	private static Logger log = LoggerFactory.getLogger(OracleConnector.class);
@@ -17,13 +18,10 @@ public class OracleConnector extends Connector  {
 		return ORACLE_DB_NAME;
 	}
 
-
-	@Override
-	public String getDriverVersion() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
+@Override
+public String getDriverClassString() {
+  return ORACLE_DRIVER;
+}
 	
 	
 }

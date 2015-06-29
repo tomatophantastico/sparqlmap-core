@@ -34,26 +34,13 @@ public class HSQLDBConnector extends Connector {
 	@Override
 	public String getDBName() {
 		return HSQLDB_NAME;
-	}
-
-
+	}	
+	
 	@Override
-	public String getDriverVersion() {
-		String result = null;
-		
-		try {
-			Driver driver =(Driver)  Class.forName(driverClass).newInstance();
-			
-			result  = driver.getClass().getName() +  driver.getMajorVersion() + "." + driver.getMinorVersion();
- 		} catch (InstantiationException | IllegalAccessException
-				| ClassNotFoundException e) {
-			result  = Connector.DRIVER_NA;
-		} 
-		
-		return result;
+	public String getDriverClassString() {
+	 
+	  return driverClass;
 	}
+	
 
-	
-	
-	
 }
