@@ -45,7 +45,7 @@ task testJar(type: Jar) {
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.5'
-    compile "org.apache.jena:jena-arq:2.11.1"
+    compile "org.apache.jena:jena-arq:2.12.1"
     compile "com.google.guava:guava:18.0"
     compile "net.sf.jsqlparser:jsqlparser:0.8.1.SPARQLMAP-SNAPSHOT"
     compile 'org.hsqldb:hsqldb:2.3.2'
@@ -60,4 +60,7 @@ dependencies {
     
     testCompile 'junit:junit:4.11'
     testCompile 'org.hsqldb:sqltool:2.3.2'
+    testCompile "org.apache.jena:jena-tdb:1.1.1"
+
+
 }
