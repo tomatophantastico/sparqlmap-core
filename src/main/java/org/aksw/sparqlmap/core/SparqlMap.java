@@ -16,6 +16,7 @@ import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLModel;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.mapper.Mapper;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.LangBuilder;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFLanguages;
@@ -30,6 +31,7 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -161,44 +163,7 @@ public class SparqlMap {
       }
       if (context.getQuery().isDescribeType()) {
 
-        if (context.getTargetContentType() == null) {
-          context.setTargetContentType(Lang.TURTLE);
-        }
-
-        Model model = ModelFactory.createDefaultModel();
-        List<Node> iris = context.getQuery().getResultURIs();
-        if ((iris == null || iris.isEmpty())) {
-          Var var = context.getQuery().getProjectVars().get(0);
-
-          // hacky, hacky, hacky
-
-          ResultSet rs = executeSelect(context);
-          while (rs.hasNext()) {
-            iris.add(rs.next().get(var.getName()).asNode());
-          }
-
-        }
-
-        for (Node node : iris) {
-          String con1 =
-            "CONSTRUCT {?s_sm ?p_sm <" + node.getURI() + "> } WHERE { ?s_sm ?p_sm <" + node.getURI() + "> }";
-          TranslationContext subCon1 = new TranslationContext();
-          subCon1.setTargetContentType(context.getTargetContentType());
-          subCon1.setQueryString(con1);
-          subCon1.setQueryName("construct incoming query");
-          subCon1.setQuery(QueryFactory.create(con1));
-
-          model.add(executeConstruct(subCon1));
-          String con2 = "CONSTRUCT { <" + node.getURI() + "> ?p_sm ?o_sm} WHERE { <" + node.getURI() + "> ?p_sm ?o_sm}";
-          TranslationContext subCon2 = new TranslationContext();
-          subCon2.setTargetContentType(context.getTargetContentType());
-          subCon2.setQueryString(con2);
-          subCon2.setQuery(QueryFactory.create(con2));
-          subCon2.setQueryName("construct outgoing query");
-
-          model.add(executeConstruct(subCon2));
-
-        }
+       Model model = executeDescribe(context);
 
         RDFDataMgr.write(out, model, (Lang) context.getTargetContentType());
 
@@ -287,12 +252,86 @@ public class SparqlMap {
       }
 
       if (++i % 1000 != 0) {
-        RDFDataMgr.write(out, graph, WebContent.contentTypeToLang(context.getTargetContentType().toString()));
+        RDFDataMgr.write(out, graph, LangBuilder.create().contentType(context.getTargetContentType().toString()).build());
       }
     }
-    RDFDataMgr.write(out, graph, WebContent.contentTypeToLang(context.getTargetContentType().toString()));
+    RDFDataMgr.write(out, graph, LangBuilder.create().contentType(context.getTargetContentType().toString()).build());
 
   }
+  
+  
+  public Model executeDescribe(String query) throws SQLException{
+    TranslationContext context = new TranslationContext();
+    context.setQueryString(query);
+    try {
+
+      context.setQuery(QueryFactory.create(query));
+      return executeDescribe(context);
+    } catch (SQLException e) {
+      context.setProblem(e);
+      log.error(context.toString());
+      throw e;
+    }
+    
+  }
+  
+  /**
+   * 
+   * Executes the describe query, in three steps. First, the list of resources to be describes is created. This is the case when the describe query contains a pattern.
+   * Second, a construct query that queries for all triples, where the resources is in the subject positions and third in the object position is executed. The unioned result is then reutrned.
+   *
+   * 
+   * @param context
+   * @return
+   * @throws SQLException
+   */
+  public Model executeDescribe(TranslationContext context) throws SQLException{
+    if (context.getTargetContentType() == null) {
+      context.setTargetContentType(Lang.TURTLE);
+    }
+
+    Model model = ModelFactory.createDefaultModel();
+    List<Node> iris = context.getQuery().getResultURIs();
+    if ((iris == null || iris.isEmpty())) {
+      Var var = context.getQuery().getProjectVars().get(0);
+
+
+      ResultSet rs = executeSelect(context);
+      while (rs.hasNext()) {
+        QuerySolution qs = rs.next();
+        if(qs.contains(var.getName())){
+          iris.add(qs.get(var.getName()).asNode());
+        }
+      }
+
+    }
+
+    for (Node node : iris) {
+      String con1 =
+        "CONSTRUCT {?s_sm ?p_sm <" + node.getURI() + "> } WHERE { ?s_sm ?p_sm <" + node.getURI() + "> }";
+      TranslationContext subCon1 = new TranslationContext();
+      subCon1.setTargetContentType(context.getTargetContentType());
+      subCon1.setQueryString(con1);
+      subCon1.setQueryName("construct incoming query");
+      subCon1.setQuery(QueryFactory.create(con1));
+
+      model.add(executeConstruct(subCon1));
+      String con2 = "CONSTRUCT { <" + node.getURI() + "> ?p_sm ?o_sm} WHERE { <" + node.getURI() + "> ?p_sm ?o_sm}";
+      TranslationContext subCon2 = new TranslationContext();
+      subCon2.setTargetContentType(context.getTargetContentType());
+      subCon2.setQueryString(con2);
+      subCon2.setQuery(QueryFactory.create(con2));
+      subCon2.setQueryName("construct outgoing query");
+
+      model.add(executeConstruct(subCon2));
+
+    }
+    
+    return model;
+    
+  }
+
+  
 
   /**
    * dumps into the whole config into the writer.
