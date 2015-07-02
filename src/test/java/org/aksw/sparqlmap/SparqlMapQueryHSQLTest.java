@@ -1,18 +1,13 @@
 package org.aksw.sparqlmap;
 
 import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.aksw.sparqlmap.bsbmtestcases.BSBMHSQLDBTest;
 import org.aksw.sparqlmap.core.SparqlMap;
 import org.aksw.sparqlmap.core.db.Connector;
 import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
@@ -22,14 +17,9 @@ import org.hsqldb.Server;
 import org.hsqldb.cmdline.SqlFile;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import com.google.common.io.PatternFilenameFilter;
 import com.jolbox.bonecp.BoneCPDataSource;
 
 
@@ -49,7 +39,8 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
 
 
 
-  public static String hsqldbFileLocation = "./target/hsqldbfiles/db";
+  public static String hsqldbFileLocationprefix = "./build/hsqldbfiles/";
+  
   private Server server;
   private SparqlMap r2r;
   private ApplicationContext con;
@@ -63,13 +54,13 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
 
   @After
   public void close() {
-//    try {
-//      Thread.sleep(3600000);
-//    } catch (InterruptedException e) {
-//      // TODO Auto-generated catch block
-//      e.printStackTrace();
-//    }
+
     server.shutdown();
+  }
+  
+  
+  private String  hsqlFileLocation(){
+    return hsqldbFileLocationprefix + this.dsName +"/db";
   }
 
   public void setupSparqlMap() {
@@ -92,9 +83,9 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
     server = new Server();
     server.setSilent(true);
     server.setDatabaseName(0, "bsbm2-100k");
-    server.setDatabasePath(0, "file:" + hsqldbFileLocation);
+    server.setDatabasePath(0, "file:" + this.hsqlFileLocation());
 
-    File hsqlFolder = new File(hsqldbFileLocation +".tmp");
+    File hsqlFolder = new File(this.hsqlFileLocation() +".tmp");
     if (hsqlFolder.exists()) {
       server.start();
     } else {
@@ -142,7 +133,7 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
     props.put("sm.mappingfile", this.mappingFile.getPath());
 
     // replicating the values from initDatabase
-    props.put("jdbc.url","jdbc:hsqldb:file:" + hsqldbFileLocation);
+    props.put("jdbc.url","jdbc:hsqldb:file:" + this.hsqlFileLocation());
     props.put("jdbc.username","sa");
     props.put("jdbc.password","");
     
@@ -153,6 +144,11 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
   @Override
   public SparqlMap getSparqlMap() {
     return r2r;
+  }
+  
+  @Override
+  public boolean canConnect() {
+    return true;
   }
 
   

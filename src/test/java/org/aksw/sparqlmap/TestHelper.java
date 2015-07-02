@@ -13,8 +13,11 @@ import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.SparqlMap;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 
+import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
@@ -36,6 +39,7 @@ import com.hp.hpl.jena.tdb.sys.TDBMaker;
 
 public class TestHelper {
   
+  private static Logger log = LoggerFactory.getLogger(TestHelper.class);
   
   public void executeAndCompareConstruct(SparqlMap sm, String sparqlConstruct, String resultmodelLocation) throws SQLException{
     Model expectedResult = ModelFactory.createDefaultModel();
@@ -94,12 +98,11 @@ public class TestHelper {
 
   public static void executeAndCompare(SparqlMap sm, String sparql,
 
-      String tbdname) {
+      String tbdname, String queryname) throws SQLException {
     
     String tdbDir = "./build/tdbs/";
     
     
-    try {
       
       File tdbDirFile = new File(tdbDir);
       Dataset refDs;
@@ -108,13 +111,26 @@ public class TestHelper {
         
         refDs = TDBFactory.createDataset(tdbDir);
         DatasetGraph refDsg = refDs.asDatasetGraph();
-        Iterator<Quad> dumpDsgIter =  sm.dump().find();
         
-        while(dumpDsgIter.hasNext()){
-          refDsg.add(dumpDsgIter.next());
+        DatasetGraph dump = sm.dump();
+        Iterator<Quad> dumpIter = dump.find();
+       
+       
+        while(dumpIter.hasNext()){
+          Quad quad = dumpIter.next();
+          refDsg.add(quad);
+         
         }
-      }else {
-        refDs = TDBFactory.createDataset(tdbDir);
+        refDsg.close();
+      }
+      refDs = TDBFactory.createDataset(tdbDir);
+       
+      
+      
+      if(refDs.asDatasetGraph().isEmpty()){
+        log.warn("Loaded empty dataset");
+      }else{
+        log.info("Loaded dataset of size:" + refDs.asDatasetGraph().size());
       }
       
       Query query = QueryFactory.create(sparql);
@@ -152,13 +168,7 @@ public class TestHelper {
       
  
         
-    } catch (BeansException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+ 
     
   }
 

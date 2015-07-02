@@ -83,29 +83,7 @@ public class MySQLR2RMLTestCase extends R2RMLTest {
 		return connector;
 	}
 	
-	
-	@Override
-	public void flushDatabase() throws ClassNotFoundException, SQLException {
-		
-		Connection conn = getConnector().getConnection();
-		
-		
-		Statement fk_off = conn.createStatement();
-		fk_off.execute("SET FOREIGN_KEY_CHECKS = 0;");
-		fk_off.close();
-		
-		for(String table : getTablesInDb()){
-			Statement del = conn.createStatement();
-			del.execute("drop table \"" + table+"\";");
-			del.close();
-		}
-		Statement fk_on = conn.createStatement();
-		fk_on.execute("SET FOREIGN_KEY_CHECKS = 1;");
-		fk_on.close();
-		
-		
 
-	}
 	
 	
 

@@ -1,0 +1,1 @@
+SELECT COUNT(distinct ?o) AS ?no { ?s rdf:type ?o }

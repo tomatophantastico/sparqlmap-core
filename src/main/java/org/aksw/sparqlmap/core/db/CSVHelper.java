@@ -61,7 +61,7 @@ public class CSVHelper {
             .format(
               "Inconsistent col count detected. row: %d has has %d cols. As separator '%s' was used. If the file has varying col count use the appropriate option.",
               rowCount, colCountMax, csvconf.fs);
-
+        reader.close();
         throw new SystemInitializationError(message);
       }
 

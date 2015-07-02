@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -91,15 +92,19 @@ public abstract class SparqlMapQueryBaseTest {
   }
   
   @Test
-  public void runTest(){
+  public void runTest() throws SQLException{
     
-    TestHelper.executeAndCompare(getSparqlMap(), query, this.dsName);
+    TestHelper.executeAndCompare(getSparqlMap(), query, this.dsName, testname);
     
   }
   
   
-  
-  
+  /**
+   * Indicates wether the subclassing test can exeute SQL commands on the database.
+   * 
+   * @return true, if the configured database is reachable.
+   */
+  public abstract boolean canConnect();
   
   public abstract SparqlMap getSparqlMap();
 

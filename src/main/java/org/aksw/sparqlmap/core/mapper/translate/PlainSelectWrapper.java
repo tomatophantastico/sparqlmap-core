@@ -62,7 +62,7 @@ public class PlainSelectWrapper implements Wrapper{
 		plainSelect = new PlainSelect();
 		
 		plainSelect.setSelectItems(new ArrayList<SelectItem>());
-		plainSelect.setJoins(new ArrayList());
+		plainSelect.setJoins(new ArrayList<Join>());
 		registerTo.put(plainSelect, this);
 			
 		

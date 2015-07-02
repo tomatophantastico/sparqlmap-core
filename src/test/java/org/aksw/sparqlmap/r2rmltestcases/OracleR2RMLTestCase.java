@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
+import org.aksw.sparqlmap.DBHelper;
 import org.aksw.sparqlmap.core.db.Connector;
 import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
 import org.aksw.sparqlmap.core.db.impl.OracleConnector;
@@ -52,42 +53,14 @@ public class OracleR2RMLTestCase extends R2RMLTest{
     return "./src/test/resources/testcases/oracle/";
   }
   
-	@Override
-	public List<String> getTablesInDb() throws SQLException {
-		List<String> names = Lists.newArrayList();
-		
-		String selectUserTables = "select TABLE_NAME from user_tables";
-		
-		ResultSet rs = getConnector().getConnection().createStatement().executeQuery(selectUserTables);
-		
-		while(rs.next()){
-			names.add(rs.getString(1));
-		}
-		
-		
-		return names;
-	}
-	
+
 
 	
 	@Override
 	public void flushDatabase() throws ClassNotFoundException, SQLException {
-		List<String> tablesToDelete = getTablesInDb();
 		Connection conn = getConnector().getConnection();
-
-		// brute force delete of the tables int there
-		for (String table : tablesToDelete) {
-
-			try {
-
-				java.sql.Statement stmt = conn.createStatement();
-				stmt.execute("DROP TABLE \"" + table + "\" CASCADE CONSTRAINTS");
-				stmt.close();
-
-			} catch (SQLException e) {
-				log.info("brute force delete threw error, nothing unusual");
-			}
-		}
+		
+		DBHelper.flushDbOracle(conn);
 
 		conn.close();
 	}

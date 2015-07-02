@@ -201,10 +201,11 @@ public abstract  class DataTypeHelper {
 			Scanner scanner = new Scanner(((StringValue) expr).getValue());
 
 			if(scanner.hasNextBigDecimal()){
+			  scanner.close();
 				return this.getNumericCastType();
 			}
 			
-			
+			scanner.close();
 			return this.getStringCastType();
 		}
 

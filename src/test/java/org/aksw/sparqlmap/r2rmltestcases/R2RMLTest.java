@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import org.aksw.sparqlmap.DBHelper;
 import org.aksw.sparqlmap.core.SparqlMap;
 import org.aksw.sparqlmap.core.automapper.MappingGenerator;
 import org.aksw.sparqlmap.core.db.Connector;
@@ -262,7 +263,7 @@ public abstract class R2RMLTest {
 	 * @param conn
 	 */
 	public void closeConnection(Connection conn){
-		//crappy connection handling is ok here.
+		//makeshift connection handling is ok here.
 		try {
 			conn.close();
 		} catch (SQLException e) {
@@ -281,13 +282,11 @@ public abstract class R2RMLTest {
 	 * @throws IOException 
 	 */
 	public void loadFileIntoDB(String file) throws ClassNotFoundException, SQLException, IOException{
-		ResourceDatabasePopulator rdp = new ResourceDatabasePopulator();
-		
-		rdp.addScript(new FileSystemResource(file));
-		Connection conn = getConnector().getConnection();
-		conn.setAutoCommit(true);
-		rdp.populate(conn);
-		conn.close();
+	  
+	   Connection conn = getConnector().getConnection();
+	   DBHelper.loadSqlFile(conn, file);
+	   
+	   conn.close();
 
 //		String sql2Execute = FileUtils.readFileToString(new File(file));
 //		loadStringIntoDb(sql2Execute);
@@ -296,20 +295,6 @@ public abstract class R2RMLTest {
 	}
 
 
-	public void loadStringIntoDb(String sql2Execute)
-			throws ClassNotFoundException, SQLException {
-		Connection conn = getConnector().getConnection();
-		conn.setAutoCommit(true);
-	
-		
-		java.sql.Statement stmt = conn.createStatement();
-		stmt.execute(sql2Execute);
-		
-		stmt.close();
-		conn.close();
-	}
-	
-	
 	/**
 	 * deletes all tables of the database
 	 * @return true if delete was successfull
@@ -317,42 +302,14 @@ public abstract class R2RMLTest {
 	 * @throws ClassNotFoundException 
 	 */
 	public void flushDatabase() throws ClassNotFoundException, SQLException{
-		List<String> tablesToDelete = getTablesInDb();
 		Connection conn = getConnector().getConnection();
 
-		// brute force delete of the tables int there
-		for (String table : tablesToDelete) {
-
-			try {
-
-				java.sql.Statement stmt = conn.createStatement();
-				stmt.execute("DROP TABLE \"" + table + "\" CASCADE");
-				stmt.close();
-
-			} catch (SQLException e) {
-				log.info("brute force delete threw error, nothing unusual");
-			}
-		}
+		DBHelper.flushDb(conn);
 
 		conn.close();
 		
 	}
 	
-	public List<String> getTablesInDb() throws SQLException {
-		List<String> tables = new ArrayList<String>(); 
-		Connection conn = getConnector().getConnection();
-		ResultSet res =  conn.getMetaData().getTables(null, null, null, new String[] {"TABLE"});
-		while(res.next()){
-			String tcat  = res.getString("TABLE_CAT"); 
-	          String tschem =res.getString("TABLE_SCHEM");
-	           String tname = res.getString("TABLE_NAME");
-	           String ttype = res.getString("TABLE_TYPE");
-	           String tremsarks = res.getString("REMARKS");
-	           tables.add(tname);
-		}
-		conn.close();
-		return tables;
-	}
 
 
 	/**

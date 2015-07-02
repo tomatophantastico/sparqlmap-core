@@ -1,10 +1,7 @@
 package org.aksw.sparqlmap.core.automapper;
 
 import java.io.UnsupportedEncodingException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RML;
 import org.apache.metamodel.schema.Column;
@@ -13,15 +10,12 @@ import org.apache.metamodel.schema.Schema;
 import org.apache.metamodel.schema.Table;
 
 import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.net.UrlEscapers;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
  * Creates a Direct Mapping for the given schema
