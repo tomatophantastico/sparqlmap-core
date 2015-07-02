@@ -15,7 +15,6 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import org.aksw.sparqlmap.core.db.Connector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 
 public class PostgreSQLConnector extends Connector {

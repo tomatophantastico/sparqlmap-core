@@ -1,7 +1,6 @@
 package org.aksw.sparqlmap.core.db;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,8 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.aksw.sparqlmap.core.SystemInitializationError;
-import org.apache.jena.atlas.logging.Log;
-import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ParseDouble;

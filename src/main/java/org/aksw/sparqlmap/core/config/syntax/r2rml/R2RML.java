@@ -3,7 +3,6 @@ package org.aksw.sparqlmap.core.config.syntax.r2rml;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.vocabulary.RDF;
 /**
  * This class encapsulates the R2RML vocabulary.
  * @author joerg

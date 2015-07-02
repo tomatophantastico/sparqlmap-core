@@ -7,14 +7,7 @@ import java.util.ServiceLoader;
 
 import javax.annotation.PostConstruct;
 
-import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.SystemInitializationError;
-import org.aksw.sparqlmap.core.db.impl.HSQLDBConnector;
-import org.aksw.sparqlmap.core.db.impl.HSQLDBDataTypeHelper;
-import org.aksw.sparqlmap.core.db.impl.MySQLConnector;
-import org.aksw.sparqlmap.core.db.impl.MySQLDataTypeHelper;
-import org.aksw.sparqlmap.core.db.impl.PostgreSQLConnector;
-import org.aksw.sparqlmap.core.db.impl.PostgreSQLDataTypeHelper;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

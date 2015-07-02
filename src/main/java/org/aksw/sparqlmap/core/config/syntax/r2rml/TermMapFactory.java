@@ -2,26 +2,21 @@ package org.aksw.sparqlmap.core.config.syntax.r2rml;
 
 import java.sql.Timestamp;
 
-import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.TimestampValue;
 
-import com.hp.hpl.jena.datatypes.BaseDatatype;
+import org.aksw.sparqlmap.core.ImplementationException;
+import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.impl.LiteralLabel;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 

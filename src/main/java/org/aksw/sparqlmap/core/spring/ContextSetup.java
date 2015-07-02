@@ -1,8 +1,6 @@
 package org.aksw.sparqlmap.core.spring;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;

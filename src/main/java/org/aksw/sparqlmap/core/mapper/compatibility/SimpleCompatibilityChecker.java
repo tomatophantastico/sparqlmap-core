@@ -17,9 +17,7 @@ import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
-import org.aksw.sparqlmap.core.mapper.translate.FilterUtil;
 import org.apache.commons.lang3.math.NumberUtils;
-
 
 import com.google.common.base.Splitter;
 import com.hp.hpl.jena.graph.Node;

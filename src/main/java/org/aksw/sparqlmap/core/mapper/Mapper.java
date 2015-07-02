@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.aksw.sparqlmap.core.TranslationContext;
 
-import com.hp.hpl.jena.query.Query;
-
 public interface Mapper {
 
 

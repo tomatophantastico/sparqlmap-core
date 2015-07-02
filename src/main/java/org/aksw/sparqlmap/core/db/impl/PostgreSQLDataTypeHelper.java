@@ -10,7 +10,6 @@ import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
-import org.springframework.stereotype.Component;
 
 
 public class PostgreSQLDataTypeHelper extends DataTypeHelper {

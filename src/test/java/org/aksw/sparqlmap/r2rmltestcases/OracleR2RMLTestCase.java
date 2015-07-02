@@ -2,10 +2,8 @@ package org.aksw.sparqlmap.r2rmltestcases;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Properties;
 
 import org.aksw.sparqlmap.DBHelper;
@@ -18,9 +16,7 @@ import org.junit.Before;
 import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.spi.LoggerFactoryBinder;
 
-import com.google.common.collect.Lists;
 import com.jolbox.bonecp.BoneCPDataSource;
 
 public class OracleR2RMLTestCase extends R2RMLTest{

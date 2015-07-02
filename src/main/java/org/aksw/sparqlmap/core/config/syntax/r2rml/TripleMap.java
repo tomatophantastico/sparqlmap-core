@@ -4,11 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.FromItem;
-import net.sf.jsqlparser.statement.select.SubSelect;
-
-import org.aksw.sparqlmap.core.ImplementationException;
 
 public class TripleMap {
 	

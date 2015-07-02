@@ -1,13 +1,8 @@
 package org.aksw.sparqlmap.core.db.impl;
 
-import java.sql.Driver;
-
 import org.aksw.sparqlmap.core.db.Connector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import com.jolbox.bonecp.BoneCPDataSource;
 
 public class HSQLDBConnector extends Connector {
 	

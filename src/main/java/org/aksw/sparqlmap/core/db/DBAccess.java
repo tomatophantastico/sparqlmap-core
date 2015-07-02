@@ -1,14 +1,11 @@
 package org.aksw.sparqlmap.core.db;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PreDestroy;
 
@@ -20,21 +17,13 @@ import net.sf.jsqlparser.statement.select.SubJoin;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.util.deparser.AnsiQuoteExpressionDeParser;
 import net.sf.jsqlparser.util.deparser.AnsiQuoteSelectDeparser;
-import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLValidationException;
-import org.aksw.sparqlmap.core.db.CSVHelper.CSVTableConfig;
-import org.aksw.sparqlmap.core.db.impl.HSQLDBConnector;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import com.google.common.base.Stopwatch;
-import com.google.common.collect.Multimap;
 
 /**
  * A small wrapper around the connection pool that provides allows the execution of the translated SQL.

@@ -3,10 +3,7 @@ package org.aksw.sparqlmap;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.apache.metamodel.UpdateCallback;
-import org.apache.metamodel.UpdateScript;
 import org.apache.metamodel.UpdateableDataContext;
-import org.apache.metamodel.drop.DropTable;
 import org.apache.metamodel.jdbc.JdbcDataContext;
 import org.apache.metamodel.schema.Table;
 import org.slf4j.Logger;

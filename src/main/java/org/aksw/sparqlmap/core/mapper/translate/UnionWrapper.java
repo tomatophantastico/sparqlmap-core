@@ -26,7 +26,6 @@ import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 

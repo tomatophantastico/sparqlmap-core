@@ -3,7 +3,6 @@ package org.aksw.sparqlmap.core.db.impl;
 import net.sf.jsqlparser.expression.Expression;
 
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
-import org.springframework.stereotype.Component;
 
 public class HSQLDBDataTypeHelper extends DataTypeHelper {
 	
