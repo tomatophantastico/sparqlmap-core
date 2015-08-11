@@ -7,8 +7,8 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.Iterator;
 
-import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.SparqlMap;
+import org.aksw.sparqlmap.core.exception.ImplementationException;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.junit.Assert;
@@ -59,8 +59,6 @@ public class TestHelper {
     models.append("=============================");
     
     assertTrue(models.toString(), result.isIsomorphicWith(expectedresult));
-  
-    
   }
   
  

@@ -8,11 +8,12 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLModel;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap.PO;
+import org.aksw.sparqlmap.core.mapper.compatibility.CompatibilityChecker;
 import org.aksw.sparqlmap.core.mapper.translate.QuadVisitorBase;
+import org.aksw.sparqlmap.core.r2rml.R2RMLModel;
+import org.aksw.sparqlmap.core.r2rml.TermMap;
+import org.aksw.sparqlmap.core.r2rml.TripleMap;
+import org.aksw.sparqlmap.core.r2rml.TripleMap.PO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,11 +40,13 @@ public class Binder {
 	
 	private TranslationContext tc;
 	private R2RMLModel mapconf;
+	private CompatibilityChecker cchecker;
 
 	
-	public Binder(R2RMLModel mappingConf, TranslationContext tc) {
+	public Binder(R2RMLModel mappingConf, TranslationContext tc, CompatibilityChecker checker) {
 		this.mapconf = mappingConf;
 		this.tc = tc;
+		this.cchecker  = checker;
 	}
 
 
@@ -212,10 +215,10 @@ public class Binder {
 			// compatible
 			for (TripleMap tripleMap : new HashSet<TripleMap>(trms)) {
 				
-				if(!tripleMap.getGraph().getCompChecker().isCompatible(gname,gxprs)){
+				if(!cchecker.isCompatible(tripleMap.getGraph(),gname,gxprs)){
 					trms.remove(tripleMap);
 					
-				}else if (!tripleMap.getSubject().getCompChecker().isCompatible(sname,sxprs)) {
+				}else if (! cchecker.isCompatible(tripleMap.getSubject(),sname,sxprs)) {
 					trms.remove(tripleMap);
 //					if (log.isDebugEnabled()) {
 //						log.debug("Removing triple map because of subject compatibility:"
@@ -224,14 +227,13 @@ public class Binder {
 				} else {
 					// we can now check for PO
 					for (PO po : new HashSet<PO>(tripleMap.getPos())) {
-						if (!po.getPredicate().getCompChecker().isCompatible(pname,pxprs)) {
+						if (! cchecker.isCompatible(po.getPredicate(),pname,pxprs)) {
 							tripleMap.getPos().remove(po);
 //							if (log.isDebugEnabled()) {
 //								log.debug("Removing PO  because of predicate compatibility:"
 //										+ tripleMap.getSubject() + " " + po);
 //							}
-						} else if (!po.getObject().getCompChecker()
-								.isCompatible(oname,oxprs)) {
+						} else if (! cchecker.isCompatible( po.getObject(),oname,oxprs)) {
 							tripleMap.getPos().remove(po);
 //							if (log.isDebugEnabled()) {
 //								log.debug("Removing PO because of object compatibility:"
@@ -305,9 +307,9 @@ public class Binder {
 								Node n2 = getField(quad2, f2);
 								Collection<TripleMap> triplemaps1 = binding1
 										.get(quad1);
-								Collection<TripleMap> triplemaps1_copy= null;
+								Collection<TripleMap> triplemaps1Copy= null;
 								if(log.isDebugEnabled()){
-									triplemaps1_copy = new HashSet<TripleMap>(binding1
+									triplemaps1Copy = new HashSet<TripleMap>(binding1
 											.get(quad1));
 								}
 										
@@ -325,8 +327,8 @@ public class Binder {
 											log.debug("Merged on t1: " + quad1.toString() + " x t2:" + quad2.toString());
 											log.debug("Removed the following triple maps:");
 											
-											triplemaps1_copy.removeAll(triplemaps1);
-											for (TripleMap tripleMap : triplemaps1_copy) {
+											triplemaps1Copy.removeAll(triplemaps1);
+											for (TripleMap tripleMap : triplemaps1Copy) {
 												log.debug("" +  tripleMap);
 											}
 										}else{
@@ -379,7 +381,7 @@ public class Binder {
 					for (PO po2 : triplemap2.getPos()) {
 						TermMap tm1 = getTermMap(po1, f1);
 						TermMap tm2 = getTermMap(po2, f2);
-						if (tm1.getCompChecker().isCompatible(tm2)) {
+						if (cchecker.isCompatible(tm1,tm2)) {
 							// they are compatible! we keep!
 							toRetain.add(po1);
 

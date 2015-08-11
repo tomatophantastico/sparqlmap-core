@@ -2,8 +2,9 @@ package org.aksw.sparqlmap.core.db.impl;
 
 import javax.annotation.PostConstruct;
 
-import org.aksw.sparqlmap.core.MappingException;
 import org.aksw.sparqlmap.core.db.Connector;
+import org.aksw.sparqlmap.core.exception.QueryingException;
+import org.aksw.sparqlmap.core.exception.SetupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,24 +19,20 @@ public class MySQLConnector extends Connector {
 	
 		
 	@PostConstruct
-	public void validateDB(){
-		
+	public void validateDB() throws SetupException{
+  String dbConnectionString = connectionPool.getConfig().getJdbcUrl();
+    
+    if(!dbConnectionString.contains("padCharsWithSpace")){
+      throw new SetupException("MYSQL requires padCharsWithSpace=true to be set in the jdbc url");
+    }
+    if(!dbConnectionString.contains("ANSI_QUOTES")){
+      throw new SetupException("MYSQL requires sessionVariables=sql_mode='ANSI_QUOTES' to be set in the jdbc url");
+    }
+    
+
 	}
 	
-	@Override
-	@Autowired
-	public void setDs(BoneCPDataSource ds) {
-		String dbConnectionString = ds.getConfig().getJdbcUrl();
-		
-		if(!dbConnectionString.contains("padCharsWithSpace")){
-			throw new MappingException("MYSQL requires padCharsWithSpace=true to be set in the jdbc url");
-		}
-		if(!dbConnectionString.contains("ANSI_QUOTES")){
-			throw new MappingException("MYSQL requires sessionVariables=sql_mode='ANSI_QUOTES' to be set in the jdbc url");
-		
-		}
-		this.connectionPool  = ds;
-	}
+
 	
 	
 	@Override

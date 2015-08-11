@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap.core.config.syntax.r2rml;
+package org.aksw.sparqlmap.core.mapper.translate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,9 +8,8 @@ import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 
-import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.db.DBAccess;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.aksw.sparqlmap.core.exception.ImplementationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,41 +18,41 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 @Component
 public class ColumnHelper {
 
-  public static String R2R_COL_SUFFIX = "_R2R";
+  public static final  String R2R_COL_SUFFIX = "_R2R";
 
-  public static String COL_NAME_RDFTYPE = R2R_COL_SUFFIX + "_01TP";
+  public static final String COL_NAME_RDFTYPE = R2R_COL_SUFFIX + "_01TP";
 
-  public static String COL_NAME_LITERAL_TYPE = R2R_COL_SUFFIX + "_02LITT";
+  public static final String COL_NAME_LITERAL_TYPE = R2R_COL_SUFFIX + "_02LITT";
 
-  public static String COL_NAME_LITERAL_LANG = R2R_COL_SUFFIX + "_03LITL";
+  public static final String COL_NAME_LITERAL_LANG = R2R_COL_SUFFIX + "_03LITL";
 
-  public static String COL_NAME_LITERAL_STRING = R2R_COL_SUFFIX + "_04LS";
+  public static final String COL_NAME_LITERAL_STRING = R2R_COL_SUFFIX + "_04LS";
 
-  public static String COL_NAME_LITERAL_NUMERIC = R2R_COL_SUFFIX + "_05LN";
+  public static final String COL_NAME_LITERAL_NUMERIC = R2R_COL_SUFFIX + "_05LN";
 
-  public static String COL_NAME_LITERAL_DATE = R2R_COL_SUFFIX + "_06LD";
+  public static final String COL_NAME_LITERAL_DATE = R2R_COL_SUFFIX + "_06LD";
 
-  public static String COL_NAME_LITERAL_BOOL = R2R_COL_SUFFIX + "_07LB";
+  public static final String COL_NAME_LITERAL_BOOL = R2R_COL_SUFFIX + "_07LB";
 
-  public static String COL_NAME_LITERAL_BINARY = R2R_COL_SUFFIX + "_08_LZ";
+  public static final String COL_NAME_LITERAL_BINARY = R2R_COL_SUFFIX + "_08_LZ";
 
-  public static String COL_NAME_RESOURCE_COL_SEGMENT = R2R_COL_SUFFIX + "_09R";
+  public static final String COL_NAME_RESOURCE_COL_SEGMENT = R2R_COL_SUFFIX + "_09R";
 
-  public static String COL_NAME_ORDER_BY = R2R_COL_SUFFIX + "_XXOB";
+  public static final String COL_NAME_ORDER_BY = R2R_COL_SUFFIX + "_XXOB";
 
-  public static String COL_NAME_INTERNAL = "B";
+  public static final String COL_NAME_INTERNAL = "B";
 
-  public static Integer COL_VAL_TYPE_RESOURCE = 1;
+  public static final Integer COL_VAL_TYPE_RESOURCE = 1;
 
-  public static Integer COL_VAL_TYPE_LITERAL = 2;
+  public static final Integer COL_VAL_TYPE_LITERAL = 2;
 
-  public static Integer COL_VAL_TYPE_BLANK = 3;
+  public static final Integer COL_VAL_TYPE_BLANK = 3;
 
-  public static Integer COL_VAL_SQL_TYPE_RESOURCE = -9999;
+  public static final Integer COL_VAL_SQL_TYPE_RESOURCE = -9999;
 
-  public static Integer COL_VAL_SQL_TYPE_CONSTLIT = -9998;
+  public static final Integer COL_VAL_SQL_TYPE_CONSTLIT = -9998;
 
-  public static Integer COL_VAL_RES_LENGTH_LITERAL = 0;
+  public static final Integer COL_VAL_RES_LENGTH_LITERAL = 0;
 
 
 

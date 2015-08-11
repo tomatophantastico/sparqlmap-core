@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap.core.config.syntax.r2rml;
+package org.aksw.sparqlmap.core.r2rml;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,6 +10,8 @@ import net.sf.jsqlparser.JSQLParserException;
 
 import org.aksw.sparqlmap.core.automapper.AutomapperWrapper;
 import org.aksw.sparqlmap.core.db.DBAccess;
+import org.aksw.sparqlmap.core.exception.R2RMLValidationException;
+import org.aksw.sparqlmap.core.mapper.translate.ColumnHelper;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -38,8 +40,10 @@ public class R2RMLModelConfigurator {
 	
 	@Autowired
 	DBAccess dbaccess;
-	@Autowired
-	private ColumnHelper columnhelper;
+	
+
+	
+	
 	@Autowired
 	private DataTypeHelper dth;
 	

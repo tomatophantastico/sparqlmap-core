@@ -25,10 +25,10 @@ import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 
-import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMapFactory;
 import org.aksw.sparqlmap.core.db.DBAccess;
+import org.aksw.sparqlmap.core.exception.ImplementationException;
+import org.aksw.sparqlmap.core.r2rml.TermMap;
+import org.aksw.sparqlmap.core.r2rml.TermMapFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -58,9 +58,9 @@ public class FilterUtil {
 		return optConf;
 	}
 	
-public static String CONCAT = "CONCAT";
+public final static String CONCAT = "CONCAT";
 
-private static BitSet RESERVED = new BitSet();
+private final static BitSet RESERVED = new BitSet();
 
 	public static Expression concat(Expression... expr) {
 		

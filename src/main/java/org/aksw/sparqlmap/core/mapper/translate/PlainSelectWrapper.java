@@ -28,8 +28,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.util.BaseSelectVisitor;
 
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
+import org.aksw.sparqlmap.core.r2rml.TermMap;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.LinkedListMultimap;

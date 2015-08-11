@@ -4,8 +4,8 @@ import org.aksw.sparqlmap.core.db.Connector;
 
 public class SqlServerConnector extends Connector{
   
-  public static String SQL_SEVER_NAME = "MSSQLSERVER";
-  public static String SQL_SERVER_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+  public static final String SQL_SEVER_NAME = "MSSQLSERVER";
+  public static final String SQL_SERVER_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
   @Override
   public String getDBName() {

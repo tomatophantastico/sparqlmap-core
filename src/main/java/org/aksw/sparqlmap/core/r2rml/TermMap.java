@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap.core.config.syntax.r2rml;
+package org.aksw.sparqlmap.core.r2rml;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,8 +28,9 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SubJoin;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
-import org.aksw.sparqlmap.core.ImplementationException;
+import org.aksw.sparqlmap.core.exception.ImplementationException;
 import org.aksw.sparqlmap.core.mapper.compatibility.CompatibilityChecker;
+import org.aksw.sparqlmap.core.mapper.translate.ColumnHelper;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.aksw.sparqlmap.core.mapper.translate.FilterUtil;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -51,7 +52,6 @@ public class TermMap{
 	
 	protected TripleMap trm;
 		
-	private CompatibilityChecker cchecker;
 
 	public Expression termType;
 	public Expression literalType;
@@ -286,7 +286,6 @@ public class TermMap{
 	public TermMap clone(String suffix) {
 		
 		TermMap clone = new TermMap(this.dth);
-		clone.cchecker = cchecker;
 		clone.termType = cloneExpression(termType, suffix);
 		clone.literalLang = cloneExpression(literalLang, suffix);
 		clone.literalType = cloneExpression(literalType, suffix);
@@ -383,15 +382,7 @@ public class TermMap{
 		return trm;
 	}
 	
-	
-	public CompatibilityChecker getCompChecker() {
-		return cchecker;
-	}
-	
 
-	public void setCompChecker(CompatibilityChecker cchecker) {
-		this.cchecker = cchecker;
-	}
 	
 	public static TermMap createNullTermMap(DataTypeHelper dth){
 		TermMap nullTm = new TermMap(dth);
@@ -451,9 +442,9 @@ public class TermMap{
 	public void setTermTyp(Resource tt){
 		if(tt.equals(R2RML.IRI)){
 			termType =dth.asNumeric(ColumnHelper.COL_VAL_TYPE_RESOURCE);
-		}else if (tt.equals(R2RML.BlankNode)) {
+		}else if (tt.equals(R2RML.BLANKNODE)) {
 			termType = dth.asNumeric(ColumnHelper.COL_VAL_TYPE_BLANK);
-		} else if (tt.equals(R2RML.Literal)) {
+		} else if (tt.equals(R2RML.LITERAL)) {
 			termType = dth.asNumeric(ColumnHelper.COL_VAL_TYPE_LITERAL);
 		}
 	}
@@ -467,9 +458,9 @@ public class TermMap{
 		if(tt.equals(ColumnHelper.COL_VAL_TYPE_RESOURCE.toString())){
 			return R2RML.IRI;
 		}else if (tt.equals(ColumnHelper.COL_VAL_TYPE_BLANK.toString())) {
-			return R2RML.BlankNode;
+			return R2RML.BLANKNODE;
 		} else{
-			return R2RML.Literal;
+			return R2RML.LITERAL;
 		}
 	}
 	

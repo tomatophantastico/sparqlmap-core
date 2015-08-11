@@ -21,7 +21,7 @@ public class DeUnionResultWrapper implements ResultSet{
 //	Multimap<String, String> var2duvar = LinkedHashMultimap.create();
 //	Map<String,String> duvar2var = new HashMap<String, String>();
 	Multimap<String,String> suffix2duvar = TreeMultimap.create();
-	List<String> non_du_var = new ArrayList<String>();
+	List<String> nonDuVar = new ArrayList<String>();
 	List<String> vars = new ArrayList<String>();
 	
 	
@@ -50,7 +50,7 @@ public class DeUnionResultWrapper implements ResultSet{
 				
 				
 			}else{
-				non_du_var.add(ovar);
+				nonDuVar.add(ovar);
 				vars.add(ovar);
 			}
 		}
@@ -112,7 +112,7 @@ public class DeUnionResultWrapper implements ResultSet{
 			if(isDuBinding){
 				//check if there is a non -du binding
 				BindingMap nDuBind = BindingFactory.create();
-				for(String nDuVar: non_du_var){
+				for(String nDuVar: nonDuVar){
 					Var nDu = Var.alloc(nDuVar);
 					if(binding.get(nDu)!=null){
 						nDuBind.add(nDu,binding.get(nDu));

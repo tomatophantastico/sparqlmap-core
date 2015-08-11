@@ -22,10 +22,10 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.Limit;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.collect.Lists;
 import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.sparql.algebra.op.OpSlice;
@@ -314,7 +314,7 @@ public abstract  class DataTypeHelper {
 	
 
 	public List<Expression> getRowIdFunction(String fromAlias) {
-		return null;
+		return Lists.newArrayList();
 	}
 
 	public PlainSelect slice(PlainSelect toModify, OpSlice slice) {

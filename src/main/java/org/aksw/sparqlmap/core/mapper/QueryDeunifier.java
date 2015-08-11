@@ -8,15 +8,15 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap.PO;
 import org.aksw.sparqlmap.core.mapper.finder.FilterFinder;
 import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
 import org.aksw.sparqlmap.core.mapper.finder.QueryInformation;
+import org.aksw.sparqlmap.core.mapper.translate.ColumnHelper;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.aksw.sparqlmap.core.mapper.translate.ExpressionConverter;
 import org.aksw.sparqlmap.core.mapper.translate.OptimizationConfiguration;
+import org.aksw.sparqlmap.core.r2rml.TripleMap;
+import org.aksw.sparqlmap.core.r2rml.TripleMap.PO;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;

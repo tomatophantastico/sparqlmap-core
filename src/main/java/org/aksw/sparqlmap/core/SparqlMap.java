@@ -12,9 +12,9 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLModel;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.mapper.Mapper;
+import org.aksw.sparqlmap.core.r2rml.R2RMLModel;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.LangBuilder;
 import org.apache.jena.riot.RDFDataMgr;
@@ -307,41 +307,43 @@ public class SparqlMap {
 
     Model model = ModelFactory.createDefaultModel();
     List<Node> iris = context.getQuery().getResultURIs();
-    if ((iris == null || iris.isEmpty())) {
-      Var var = context.getQuery().getProjectVars().get(0);
-
-
-      ResultSet rs = executeSelect(context);
-      while (rs.hasNext()) {
-        QuerySolution qs = rs.next();
-        if(qs.contains(var.getName())){
-          iris.add(qs.get(var.getName()).asNode());
+    
+    if(iris != null){
+      if ( iris.isEmpty()) {
+        
+        Var var = context.getQuery().getProjectVars().get(0);
+        ResultSet rs = executeSelect(context);
+        while (rs.hasNext()) {
+          QuerySolution qs = rs.next();
+          if(qs.contains(var.getName())){
+            iris.add(qs.get(var.getName()).asNode());
+          }
         }
       }
-
+      
+      
+  
+      for (Node node : iris) {
+        String con1 =
+          "CONSTRUCT {?s_sm ?p_sm <" + node.getURI() + "> } WHERE { ?s_sm ?p_sm <" + node.getURI() + "> }";
+        TranslationContext subCon1 = new TranslationContext();
+        subCon1.setTargetContentType(context.getTargetContentType());
+        subCon1.setQueryString(con1);
+        subCon1.setQueryName("construct incoming query");
+        subCon1.setQuery(QueryFactory.create(con1));
+  
+        model.add(executeConstruct(subCon1));
+        String con2 = "CONSTRUCT { <" + node.getURI() + "> ?p_sm ?o_sm} WHERE { <" + node.getURI() + "> ?p_sm ?o_sm}";
+        TranslationContext subCon2 = new TranslationContext();
+        subCon2.setTargetContentType(context.getTargetContentType());
+        subCon2.setQueryString(con2);
+        subCon2.setQuery(QueryFactory.create(con2));
+        subCon2.setQueryName("construct outgoing query");
+  
+        model.add(executeConstruct(subCon2));
+  
+      }
     }
-
-    for (Node node : iris) {
-      String con1 =
-        "CONSTRUCT {?s_sm ?p_sm <" + node.getURI() + "> } WHERE { ?s_sm ?p_sm <" + node.getURI() + "> }";
-      TranslationContext subCon1 = new TranslationContext();
-      subCon1.setTargetContentType(context.getTargetContentType());
-      subCon1.setQueryString(con1);
-      subCon1.setQueryName("construct incoming query");
-      subCon1.setQuery(QueryFactory.create(con1));
-
-      model.add(executeConstruct(subCon1));
-      String con2 = "CONSTRUCT { <" + node.getURI() + "> ?p_sm ?o_sm} WHERE { <" + node.getURI() + "> ?p_sm ?o_sm}";
-      TranslationContext subCon2 = new TranslationContext();
-      subCon2.setTargetContentType(context.getTargetContentType());
-      subCon2.setQueryString(con2);
-      subCon2.setQuery(QueryFactory.create(con2));
-      subCon2.setQueryName("construct outgoing query");
-
-      model.add(executeConstruct(subCon2));
-
-    }
-    
     return model;
     
   }

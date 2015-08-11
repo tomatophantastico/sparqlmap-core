@@ -16,6 +16,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 
+import org.aksw.sparqlmap.core.exception.SetupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -37,7 +38,7 @@ public abstract class Connector {
 	
 	
 	
-	public void setDs(BoneCPDataSource ds){
+	public void setDs(BoneCPDataSource ds) {
 		this.connectionPool =ds; 
 	}
 	
@@ -129,13 +130,7 @@ public abstract class Connector {
 	}
 	
 	
-	public String getSchema(){
-		return null;
-	}
-	
-	public String getCatalogue(){
-		return null;
-	}
+
 	
 	 public String getDriverVersion() {
 	    String result = null;

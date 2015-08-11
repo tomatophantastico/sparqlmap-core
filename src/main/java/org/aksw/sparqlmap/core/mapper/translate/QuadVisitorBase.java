@@ -1,6 +1,6 @@
 package org.aksw.sparqlmap.core.mapper.translate;
 
-import org.aksw.sparqlmap.core.ImplementationException;
+import org.aksw.sparqlmap.core.exception.ImplementationException;
 
 import com.hp.hpl.jena.sparql.algebra.OpVisitorBase;
 import com.hp.hpl.jena.sparql.algebra.op.OpBGP;

@@ -54,13 +54,13 @@ public abstract class SparqlMapQueryBaseTest {
   }
 
   //TODO optional: read drom classpath
-  static final File testRootFolder = new File("./src/test/resources/query-test/");
+  static final File TESTROOTFOLDER = new File("./src/test/resources/query-test/");
 
   
   public static Collection<Object[]> data(String dbname) {
     Collection<Object[]> testCases = new ArrayList<Object[]>();
     
-    for(File dataSetFolder : testRootFolder.listFiles()){
+    for(File dataSetFolder : TESTROOTFOLDER.listFiles()){
       String dsname = dataSetFolder.getName();
       
       if(dataSetFolder.isDirectory()){

@@ -14,20 +14,21 @@ import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.beautifier.SparqlBeautifier;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLModel;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap.PO;
 import org.aksw.sparqlmap.core.db.DBAccess;
+import org.aksw.sparqlmap.core.mapper.compatibility.CompatibilityChecker;
 import org.aksw.sparqlmap.core.mapper.finder.Binder;
 import org.aksw.sparqlmap.core.mapper.finder.FilterFinder;
 import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
 import org.aksw.sparqlmap.core.mapper.finder.QueryInformation;
+import org.aksw.sparqlmap.core.mapper.translate.ColumnHelper;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.aksw.sparqlmap.core.mapper.translate.ExpressionConverter;
 import org.aksw.sparqlmap.core.mapper.translate.FilterUtil;
 import org.aksw.sparqlmap.core.mapper.translate.OptimizationConfiguration;
 import org.aksw.sparqlmap.core.mapper.translate.QueryBuilderVisitor;
+import org.aksw.sparqlmap.core.r2rml.R2RMLModel;
+import org.aksw.sparqlmap.core.r2rml.TripleMap;
+import org.aksw.sparqlmap.core.r2rml.TripleMap.PO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +69,9 @@ public class AlgebraMapper implements Mapper {
 	@Autowired
 	private OptimizationConfiguration fopt;
 	
+	@Autowired
+	private CompatibilityChecker cchecker;
+	
 	private SparqlBeautifier beautifier = new SparqlBeautifier();
 	
 	public SparqlBeautifier getBeautifier() {
@@ -99,7 +103,7 @@ public class AlgebraMapper implements Mapper {
 
 		context.setQueryInformation(FilterFinder.getQueryInformation(context.getBeautifiedQuery()));
 		
-		Binder binder = new Binder(this.mappingConf,context);
+		Binder binder = new Binder(this.mappingConf,context, cchecker);
 		
 		context.setQueryBinding(binder.bind(context.getBeautifiedQuery()));
 		if(log.isDebugEnabled()){

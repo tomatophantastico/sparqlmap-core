@@ -9,9 +9,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
+import org.aksw.sparqlmap.core.exception.ImplementationException;
+import org.aksw.sparqlmap.core.mapper.translate.ColumnHelper;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.jena.iri.IRIException;
@@ -89,7 +89,7 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
    * 
    * @throws SQLException
    */
-  public void initVars() throws SQLException {
+  public final void initVars() throws SQLException {
 
     for (Var var : tcontext.getQuery().getProjectVars()) {
       this.vars.add(var.getName());
@@ -177,7 +177,7 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
           if (type.equals(ColumnHelper.COL_VAL_TYPE_RESOURCE)
             || type.equals(ColumnHelper.COL_VAL_TYPE_BLANK)) {
             node = createResource(var, type);
-          } else if (type == ColumnHelper.COL_VAL_TYPE_LITERAL) {
+          } else if (type.equals(ColumnHelper.COL_VAL_TYPE_LITERAL)) {
             node = createLiteral(var);
           }
           if (node != null) {

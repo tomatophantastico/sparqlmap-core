@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap.core.config.syntax.r2rml;
+package org.aksw.sparqlmap.core.r2rml;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -7,11 +7,9 @@ import java.util.Set;
 import net.sf.jsqlparser.statement.select.FromItem;
 
 public class TripleMap {
-	
-	static int nameCounter = 1;
-	
+
 	private String uri;
-	public FromItem from;
+	private FromItem from;
 	private TermMap subject;
 	private Set<PO> pos = new LinkedHashSet<PO>();
 	private TermMap graph;

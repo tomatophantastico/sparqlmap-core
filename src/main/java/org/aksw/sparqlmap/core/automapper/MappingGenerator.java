@@ -3,7 +3,7 @@ package org.aksw.sparqlmap.core.automapper;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RML;
+import org.aksw.sparqlmap.core.r2rml.R2RML;
 import org.apache.metamodel.schema.Column;
 import org.apache.metamodel.schema.Relationship;
 import org.apache.metamodel.schema.Schema;
@@ -50,32 +50,32 @@ public class MappingGenerator {
      
      //add the logical Table statment
      Resource rrTableName = r2r.createResource();
-     r2r.add(triplesMap,R2RML.logicalTable,rrTableName);
-     r2r.add(rrTableName,R2RML.tableName, escapeName(table.getName()));
+     r2r.add(triplesMap,R2RML.HASLOGICALTABLE,rrTableName);
+     r2r.add(rrTableName,R2RML.HASTABLENAME, escapeName(table.getName()));
      
      //add the subject map
      
      String subjectTemplate = generateSubjectTemplate(table);
      Resource subjectMap = r2r.createResource();
-     r2r.add(triplesMap, R2RML.subjectMap, subjectMap);
-     r2r.add(subjectMap,R2RML.template,subjectTemplate);
+     r2r.add(triplesMap, R2RML.HASSUBJECTMAP, subjectMap);
+     r2r.add(subjectMap,R2RML.HASTEMPLATE,subjectTemplate);
      
      //if no primary present, generate a blank node
      if(table.getPrimaryKeys().length==0){
-       subjectMap.addProperty(R2RML.termType,R2RML.BlankNode);
+       subjectMap.addProperty(R2RML.TERMTYPE,R2RML.BLANKNODE);
 
      }
      
      
      // and the class statement
-     r2r.add(subjectMap,R2RML.hasClass,r2r.createResource(vocabularyPrefix + ues(table.getName())));
+     r2r.add(subjectMap,R2RML.HASCLASS,r2r.createResource(vocabularyPrefix + ues(table.getName())));
      
      
      // map all relations 
      for(Relationship relationship: table.getForeignKeyRelationships() ){
 
        Resource pomap  = r2r.createResource();
-       triplesMap.addProperty(R2RML.predicateObjectMap,pomap);
+       triplesMap.addProperty(R2RML.HASPREDICATEOBJECTMAP,pomap);
        
        // generate the property
        List<String> cols = Lists.transform(Lists.newArrayList(relationship.getForeignColumns()), new Function<Column,String>(){
@@ -85,30 +85,30 @@ public class MappingGenerator {
         }
        });
        String refMapPropertySuffix = Joiner.on(this.primaryKeySeparator).join(cols);
-       pomap.addProperty(R2RML.predicate, r2r.createResource(vocabularyPrefix +ues(relationship.getForeignTable().getName()) +"#ref-"+ refMapPropertySuffix));
+       pomap.addProperty(R2RML.HASPREDICATE, r2r.createResource(vocabularyPrefix +ues(relationship.getForeignTable().getName()) +"#ref-"+ refMapPropertySuffix));
        
        // generate the object triple map condition
        Resource objectMap = r2r.createResource();
-       pomap.addProperty(R2RML.objectMap, objectMap);
+       pomap.addProperty(R2RML.HASOBJECTMAP, objectMap);
        
-       objectMap.addProperty(R2RML.parentTriplesMap, r2r.createResource(mappingPrefix + "mapping/" + ues(relationship.getPrimaryTable().getName())));
+       objectMap.addProperty(R2RML.HASPARENTTRIPLESMAP, r2r.createResource(mappingPrefix + "mapping/" + ues(relationship.getPrimaryTable().getName())));
        
        for(int i = 0; i<relationship.getForeignColumns().length;i++  ){
          Resource joinCondition = r2r.createResource();
-         objectMap.addProperty(R2RML.joinCondition,joinCondition);
-         joinCondition.addLiteral(R2RML.parent, this.escapeName(relationship.getPrimaryColumns()[i].getName()));
-         joinCondition.addLiteral(R2RML.child, this.escapeName(relationship.getForeignColumns()[i].getName()));
+         objectMap.addProperty(R2RML.HASJOINCONDITION,joinCondition);
+         joinCondition.addLiteral(R2RML.HASPARENT, this.escapeName(relationship.getPrimaryColumns()[i].getName()));
+         joinCondition.addLiteral(R2RML.HASCHILD, this.escapeName(relationship.getForeignColumns()[i].getName()));
        }
      }
      
      // map all data columns 
      for(Column column : table.getColumns()){
        Resource pomap  = r2r.createResource();
-       triplesMap.addProperty(R2RML.predicateObjectMap,pomap);
-       pomap.addProperty(R2RML.predicate, r2r.createResource(vocabularyPrefix +ues(column.getTable().getName()) +"#"+ ues(column.getName())));       
+       triplesMap.addProperty(R2RML.HASPREDICATEOBJECTMAP,pomap);
+       pomap.addProperty(R2RML.HASPREDICATE, r2r.createResource(vocabularyPrefix +ues(column.getTable().getName()) +"#"+ ues(column.getName())));       
        Resource objectMap = r2r.createResource();
-       pomap.addProperty(R2RML.objectMap, objectMap);
-       objectMap.addProperty(R2RML.column, escapeName(column.getName()));
+       pomap.addProperty(R2RML.HASOBJECTMAP, objectMap);
+       objectMap.addProperty(R2RML.HASCOLUMN, escapeName(column.getName()));
      }
     
      

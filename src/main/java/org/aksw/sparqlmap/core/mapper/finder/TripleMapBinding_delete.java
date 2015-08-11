@@ -2,8 +2,8 @@ package org.aksw.sparqlmap.core.mapper.finder;
 
 import java.util.Set;
 
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
+import org.aksw.sparqlmap.core.r2rml.TermMap;
+import org.aksw.sparqlmap.core.r2rml.TripleMap;
 
 import com.hp.hpl.jena.graph.Triple;
 

@@ -23,12 +23,11 @@ import net.sf.jsqlparser.statement.select.SelectVisitor;
 import net.sf.jsqlparser.statement.select.SetOperationList;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
-import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap.PO;
+import org.aksw.sparqlmap.core.exception.ImplementationException;
+import org.aksw.sparqlmap.core.r2rml.TermMap;
+import org.aksw.sparqlmap.core.r2rml.TripleMap;
+import org.aksw.sparqlmap.core.r2rml.TripleMap.PO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +74,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	private boolean pushFilters = true;
 	
 
-	private static Logger log = LoggerFactory
+	private static final Logger log = LoggerFactory
 			.getLogger(QueryBuilderVisitor.class);
 	
 	private Map<PlainSelect, PlainSelectWrapper> selectBody2Wrapper = new HashMap<PlainSelect, PlainSelectWrapper>();
@@ -416,12 +415,14 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 		
 		if(sb instanceof SetOperationList){
 			
-		
+		  //TODO this does not work, check if still neccessary
 			PlainSelectWrapper wrap = new PlainSelectWrapper(selectBody2Wrapper,dataTypeHelper,exprconv,filterUtil, translationContext);
 			
 			wrap.addSubselect(this.selectBody2Wrapper
 					.get(sb), false);
 			sb = wrap.getSelectBody();
+		
+			
 		}
 		
 		

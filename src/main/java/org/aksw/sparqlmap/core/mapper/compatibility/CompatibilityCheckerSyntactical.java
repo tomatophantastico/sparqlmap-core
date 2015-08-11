@@ -10,14 +10,17 @@ import java.util.Map;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.FromItem;
 
-import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
 import org.aksw.sparqlmap.core.db.DBAccess;
+import org.aksw.sparqlmap.core.exception.ImplementationException;
+import org.aksw.sparqlmap.core.mapper.translate.ColumnHelper;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.aksw.sparqlmap.core.r2rml.TermMap;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.metamodel.DataContext;
+import org.apache.metamodel.schema.ColumnType;
 
 import com.google.common.base.Splitter;
 import com.hp.hpl.jena.graph.Node;
@@ -26,49 +29,20 @@ import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.expr.ExprVar;
 import com.hp.hpl.jena.sparql.expr.NodeValue;
 import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueNode;
+import com.sun.org.apache.bcel.internal.generic.IUSHR;
 
-public class SimpleCompatibilityChecker implements CompatibilityChecker{
-	
-	private TermMap termMap;
-	private DataTypeHelper dth;
-	//contains the cast type of the column, that would naturally be used (e.g. an tinyint will get for postgres NUMERIC)
-	private Map<String,String> colname2castType = new HashMap<String, String>(); 
-	
-	public SimpleCompatibilityChecker(TermMap tm, DBAccess dba, DataTypeHelper dth) {
-		this.termMap = tm;
-		this.dth = dth;
-		
-		//we now create the colname2castType
-		for(Expression expression: tm.getExpressions()){
-			if(DataTypeHelper.uncast(expression) instanceof Column){
-				Column column = (Column) DataTypeHelper.uncast(expression);
-				String columnName = column.getColumnName();
-				FromItem fi =null;
-				
-				for(FromItem fiToCheck : tm.getFromItems()){
-					if(fiToCheck.getAlias().equals(column.getTable().getAlias())){
-						fi = fiToCheck;
-					}
-				}
-				Integer dt = dba.getDataType(fi, columnName);
-				 
-				 colname2castType.put( columnName ,dth.getCastTypeString(dt));
-			}
-		}
-		
-		
-	}
+public class CompatibilityCheckerSyntactical implements CompatibilityChecker  {
+
 	
 
-	@Override
-	public boolean isCompatible(TermMap termMap2) {
-		
-		
-		boolean compatibleType = false;
-		
+	
+
+
+	public boolean isCompatible(TermMap termMap, TermMap termMap2) {
+			
 		ColumnHelper.getResourceExpressions(termMap.getExpressions());
 		
-		Expression termMapType = ColumnHelper.getTermType(this.termMap.getExpressions());
+		Expression termMapType = ColumnHelper.getTermType(termMap.getExpressions());
 		Expression termMap2Type = ColumnHelper.getTermType(termMap2.getExpressions());
 
 		if(isCompatible(termMapType, termMap2Type)){
@@ -136,7 +110,7 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 			
 			if(current1 instanceof String && current2 instanceof String){
 				//check if is the same separator
-				if(!((String)current1).equals(((String)current1))){
+				if(!((String)current1).equals(((String)current2))){
 					return false;
 				}
 			} else if(current1 instanceof List<?> && current2 instanceof List<?>){
@@ -260,98 +234,98 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 	}
 			
 
-		
-		
-
-
-	@Override
-	public boolean isCompatible(Node n) {
-		if(n.isVariable()){
+	public boolean isCompatible(TermMap tm, Node n2 ) {
+		if(n2.isVariable()){
 			return true;
 			
-		}else if(n.isLiteral()){
+		}else if(n2.isLiteral()){
 			
 		
 			
-			return isCompatibleLiteral(n);
+			return isCompatibleLiteral(tm, n2);
 			
-		}else if(n.isURI()){
-			return isCompatibleUri(n);
+		}else if(n2.isURI()){
+			return isCompatibleUri(tm, n2);
 
 			
 		}else {
-			throw new ImplementationException("Node type not supported, how did it get in there anyway? : " + n.toString());
+			throw new ImplementationException("Node type not supported, how did it get in there anyway? : " + n2.toString());
 		}
 	}
 
 
-	private boolean isCompatibleUri(Node n) {
-		List<Expression> tmExprs = termMap.getResourceColSeg();
+	private boolean isCompatibleUri(TermMap tm1, Node n2) {
+	  boolean isCompatible = true;
+	  
+	  
+		List<Expression> tmExprs = tm1.getResourceColSeg();
 		
 		if(tmExprs.isEmpty()){
-			return false;
-		}
-		
-		String nodeUri = n.getURI();
-		int i = 0;
-		while (nodeUri.length()>0&&i<tmExprs.size()){
-			if(i%2==0){
-				if(DataTypeHelper.uncast(tmExprs.get(i)) instanceof StringValue){
-					String tmString = ((net.sf.jsqlparser.expression.StringValue)DataTypeHelper.uncast(tmExprs.get(i))).getNotExcapedValue(); 
-					if(nodeUri.startsWith(tmString)){
-						nodeUri = nodeUri.substring(tmString.length());
-					}else{
-						return false;
-					}
-				}else{
-					//as it is not a Stringvalue, it must be a column, which is allowed here for values not to be encoded
-					//we can return true
-					
-					return true;
-				}
-			}else{
-				//here be a column
-				Column column = ((Column)DataTypeHelper.uncast(tmExprs.get(i))); 
+			isCompatible =  false;
+		}else {
 
-				String potentialColContent; 
-				if(tmExprs.size()>(i+2)){
-					String nextString = ((net.sf.jsqlparser.expression.StringValue)DataTypeHelper.uncast(tmExprs.get(i+1))).getNotExcapedValue();
-					if(!nodeUri.contains(nextString)){
-						return false;
-					}
-					
-					potentialColContent = nodeUri.substring(0,nodeUri.indexOf(nextString));
-				}else{
-					potentialColContent = nodeUri; 
-				}
-				// do some col schema testing here
-		
-				//check if  col is a number, that the string can be cast to a number 
-				String colNaturalCastType = colname2castType.get(column.getColumnName());
-				if(colNaturalCastType.equals(dth.getNumericCastType())){
-					if(!NumberUtils.isNumber(potentialColContent)){
-						return false;
-					}
-				}
-				
-				if(potentialColContent.isEmpty()){
-					return false;
-				}
-				nodeUri = nodeUri.substring(potentialColContent.length());
-			}
-			i++;
+  		String nodeUri = n2.getURI();
+  		int i = 0;
+  		while (nodeUri.length()>0&&i<tmExprs.size()){
+  			if(i%2==0){
+  				if(DataTypeHelper.uncast(tmExprs.get(i)) instanceof StringValue){
+  					String tmString = ((net.sf.jsqlparser.expression.StringValue)DataTypeHelper.uncast(tmExprs.get(i))).getNotExcapedValue(); 
+  					if(nodeUri.startsWith(tmString)){
+  						nodeUri = nodeUri.substring(tmString.length());
+  					}else{
+  						isCompatible =  false;
+  						break;
+  					}
+  				}else{
+  					//as it is not a Stringvalue, it must be a column, which is allowed here for values not to be encoded
+  					//we can return true
+  
+  					break;
+  				}
+  			}else{
+  				//here be a column
+  				Column column = ((Column)DataTypeHelper.uncast(tmExprs.get(i))); 
+  
+  				String potentialColContent; 
+  				if(tmExprs.size()>(i+2)){
+  					String nextString = ((net.sf.jsqlparser.expression.StringValue)DataTypeHelper.uncast(tmExprs.get(i+1))).getNotExcapedValue();
+  					if(!nodeUri.contains(nextString)){
+  						isCompatible =  false;
+  						break;
+  					}
+  					
+  					potentialColContent = nodeUri.substring(0,nodeUri.indexOf(nextString));
+  				}else{
+  					potentialColContent = nodeUri; 
+  				}
+  				// do some col schema testing here
+  				//check if  col is a number, that the string can be cast to a number 
+  				if(!isCompatible(column, potentialColContent)){
+  				  isCompatible = false;
+  				  break;
+  				}
+  				
+  				if(potentialColContent.isEmpty()){
+  					isCompatible =  false;
+  					break;
+  				}
+  				nodeUri = nodeUri.substring(potentialColContent.length());
+  			}
+  			i++;
+  		}
+  		// could be successfully reduced
+  		
+  		if(i!=tmExprs.size()){
+  	
+  			return false;
+  		}
 		}
-		// could be successfully reduced
 		
-		if(i==tmExprs.size()){
-			return true;
-		}else{
-			return false;
-		}
+		return isCompatible;
 	}
 
 
-	private boolean isCompatibleLiteral(Node n) {
+	private boolean isCompatibleLiteral(TermMap termMap, Node n) {
 		//if the term map has no literal expressions, it cannot produce a literal
 		if(ColumnHelper.getLiteralExpression(termMap.getExpressions()).isEmpty()){
 			return false;
@@ -395,8 +369,8 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 	/**
 	 * simple implementation that checks only for simple equals statements 
 	 */
-	@Override
-	public boolean isCompatible(String var, Collection<Expr> exprs) {
+	
+	public boolean isCompatible(TermMap tm, String var, Collection<Expr> exprs) {
 		boolean isCompatible = true;
 		for(Expr expr : exprs){
 			if(expr instanceof E_Equals){
@@ -414,7 +388,7 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 				if(exprVar!=null && exprVar.getVarName().equals(var) && exprValue !=null){
 					
 					//if an equals check is not true, this term map is not compatible to the expression presented here
-					isCompatible = isCompatible && isCompatible(exprValue.asNode());
+					isCompatible = isCompatible && isCompatible(tm,exprValue.asNode());
 				}
 				
 			}
@@ -423,10 +397,19 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 		
 		
 	}
-
 	
-	
-	
-
-
+	/**
+   * Examines a column, if it is able to produces certain values.
+   * 
+   * In this impolementation without schema awareness this is always the case.
+   * 
+   * @param col
+   * @param value
+   * @return
+   */
+  public boolean isCompatible(Column col, String value){
+    
+   return true;
+    
+  }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
+import org.aksw.sparqlmap.core.mapper.translate.ColumnHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,9 +104,9 @@ public class SparqlBeautifier extends TransformCopy {
 		
 		for(Node quadNode: quadNodes){
 			if(quadNode.isVariable()&&uniqeNodes.contains(quadNode)){
-				Var var_new = Var.alloc(i++ + ColumnHelper.COL_NAME_INTERNAL);
-				uniqeNodes.add(var_new);
-				exprList.add(new E_Equals(new ExprVar(quadNode),new ExprVar(var_new)));
+				Var varNew = Var.alloc(i++ + ColumnHelper.COL_NAME_INTERNAL);
+				uniqeNodes.add(varNew);
+				exprList.add(new E_Equals(new ExprVar(quadNode),new ExprVar(varNew)));
 
 			}else{
 				uniqeNodes.add(quadNode);

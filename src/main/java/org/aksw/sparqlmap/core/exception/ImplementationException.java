@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap.core;
+package org.aksw.sparqlmap.core.exception;
 
 /**
  * This Exception is thrown when not implemented modules of SparqlMap are called.

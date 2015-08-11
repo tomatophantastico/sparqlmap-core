@@ -33,10 +33,9 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.OrderByExpressionElement;
 
-import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMapFactory;
+import org.aksw.sparqlmap.core.exception.ImplementationException;
+import org.aksw.sparqlmap.core.r2rml.TermMap;
+import org.aksw.sparqlmap.core.r2rml.TermMapFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

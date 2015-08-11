@@ -19,9 +19,9 @@ import net.sf.jsqlparser.util.deparser.AnsiQuoteExpressionDeParser;
 import net.sf.jsqlparser.util.deparser.AnsiQuoteSelectDeparser;
 import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
-import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLValidationException;
+import org.aksw.sparqlmap.core.exception.ImplementationException;
+import org.aksw.sparqlmap.core.exception.R2RMLValidationException;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -119,27 +119,35 @@ public class DBAccess {
 	
 	
 
-	public String getColumnName(FromItem fromItem, String unescapedColname) {
-		String query= null;
-		   try {
-			Connection conn = dbConnector.getConnection();
-			
-			query = dataTypeHelper.getColnameQuery(conn.getMetaData().getIdentifierQuoteString()+unescapedColname +conn.getMetaData().getIdentifierQuoteString(),  fromItemToString(fromItem) );
+  public void validateColumnName(FromItem fromItem, String unescapedColname)
+      throws R2RMLValidationException {
+    String query = null;
+    try {
+      Connection conn = dbConnector.getConnection();
 
-				ResultSet rs =  conn.createStatement().executeQuery(query);
-				String name = rs.getMetaData().getColumnName(1);
-				rs.close();
-				conn.close();
-				
-				return name;
-		} catch (SQLException e) {
-			log.error("Error validating the column name, using the query: " + query + ".\n Does this column exist?");
-			throw new R2RMLValidationException("Column name in virtual table mismatching definition in term map.",e);
-		}
-	}
+      query = dataTypeHelper.getColnameQuery(
+          conn.getMetaData().getIdentifierQuoteString()
+          + unescapedColname
+          + conn.getMetaData().getIdentifierQuoteString(),
+          fromItemToString(fromItem));
+
+      ResultSet rs = conn.createStatement().executeQuery(query);
+      String name = rs.getMetaData().getColumnName(1);
+      if(!unescapedColname.equals(name)){
+        throw new R2RMLValidationException("column name of mapping and actual schema do not match:"  + name + " vs " + unescapedColname );
+      }
+      rs.close();
+      conn.close();
+    } catch (SQLException e) {
+      log.error("Error validating the column name, using the query: " + query
+          + ".\n Does this column exist?");
+      throw new R2RMLValidationException(
+          "Column name in virtual table mismatching definition in term map.", e);
+    }
+  }
 	
-	public Map<String,Map<String,Integer>> alias_col2datatype = new HashMap<String, Map<String,Integer>>();
-	public Map<String,Map<String,Integer>> alias_col2precision = new HashMap<String, Map<String,Integer>>();
+	public Map<String,Map<String,Integer>> aliasCol2datatype = new HashMap<String, Map<String,Integer>>();
+	public Map<String,Map<String,Integer>> aliasCol2precision = new HashMap<String, Map<String,Integer>>();
 	
 	
 	/* (non-Javadoc)
@@ -147,9 +155,9 @@ public class DBAccess {
 	 */
 	
 	public Integer getDataType(String alias, String colname) {
-		if(alias_col2datatype.containsKey(alias)&&
-				alias_col2datatype.get(alias).containsKey(colname)){
-			return alias_col2datatype.get(alias).get(colname);
+		if(aliasCol2datatype.containsKey(alias)&&
+				aliasCol2datatype.get(alias).containsKey(colname)){
+			return aliasCol2datatype.get(alias).get(colname);
 		}else{
 			//throw new ImplementationException("Queried datatype for unregistered col:"  +alias + "." + colname);
 			return null;
@@ -161,10 +169,10 @@ public class DBAccess {
 	 * @see org.aksw.sparqlmap.config.syntax.IDBAccess#getDataType(net.sf.jsqlparser.statement.select.FromItem, java.lang.String)
 	 */
 	
-	public Integer getDataType(FromItem fromItem, String colname) {
-		if(alias_col2datatype.containsKey(fromItem.getAlias())&&
-				alias_col2datatype.get(fromItem.getAlias()).containsKey(colname)){
-			return alias_col2datatype.get(fromItem.getAlias()).get(colname);
+	public Integer getDataType(FromItem fromItem, String colname) throws R2RMLValidationException {
+		if(aliasCol2datatype.containsKey(fromItem.getAlias())&&
+				aliasCol2datatype.get(fromItem.getAlias()).containsKey(colname)){
+			return aliasCol2datatype.get(fromItem.getAlias()).get(colname);
 		}
 		
 		String query = dataTypeHelper.getDataTypeQuery(colname, fromItemToString(fromItem) ) ;
@@ -177,12 +185,12 @@ public class DBAccess {
 			rs.close();
 			conn.close();
 			
-			if(!alias_col2datatype.containsKey(fromItem.getAlias())){
-				alias_col2datatype.put(fromItem.getAlias(), new HashMap<String, Integer>());
-				alias_col2precision.put(fromItem.getAlias(), new HashMap<String, Integer>());
+			if(!aliasCol2datatype.containsKey(fromItem.getAlias())){
+				aliasCol2datatype.put(fromItem.getAlias(), new HashMap<String, Integer>());
+				aliasCol2precision.put(fromItem.getAlias(), new HashMap<String, Integer>());
 			}
-			alias_col2datatype.get(fromItem.getAlias()).put(colname, resInteger);
-			alias_col2precision.get(fromItem.getAlias()).put(colname, precision);
+			aliasCol2datatype.get(fromItem.getAlias()).put(colname, resInteger);
+			aliasCol2precision.get(fromItem.getAlias()).put(colname, precision);
 			
 			return  resInteger;
 		} catch (SQLException e) {
@@ -293,7 +301,7 @@ public class DBAccess {
 	
 	public Integer getPrecision(String alias, String colname) {
 		
-		return alias_col2precision.get(alias).get(colname);
+		return aliasCol2precision.get(alias).get(colname);
 	}
 
 	

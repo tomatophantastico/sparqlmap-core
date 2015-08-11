@@ -28,7 +28,7 @@ public class CSVHelper {
     throws IOException {
 
     CsvPreference prefs =
-      new CsvPreference.Builder("\"".charAt(0), csvconf.fs_interpreted, "\n")
+      new CsvPreference.Builder("\"".charAt(0), csvconf.fsInterpreted, "\n")
         .build();
 
     log.info(String.format(
@@ -233,7 +233,7 @@ public class CSVHelper {
 
     public String fs = ",";
 
-    public Character fs_interpreted;
+    public Character fsInterpreted;
 
     public String name;
 

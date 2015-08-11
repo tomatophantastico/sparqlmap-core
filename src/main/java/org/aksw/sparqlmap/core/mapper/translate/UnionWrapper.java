@@ -20,9 +20,8 @@ import net.sf.jsqlparser.statement.select.SetOperationList;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.select.UnionOp;
 
-import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
+import org.aksw.sparqlmap.core.exception.ImplementationException;
+import org.aksw.sparqlmap.core.r2rml.TermMap;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -109,8 +108,8 @@ public class UnionWrapper implements Wrapper {
 				PlainSelect ps  = (PlainSelect) obj;
 				List<SelectItem> filledUp = new ArrayList<SelectItem>();
 				Map<String,SelectExpressionItem> alias2sei4ps = new HashMap<String, SelectExpressionItem>();
-				for(Object o_sei: ps.getSelectItems()){
-					SelectExpressionItem sei  = (SelectExpressionItem) o_sei;
+				for(Object oSei: ps.getSelectItems()){
+					SelectExpressionItem sei  = (SelectExpressionItem) oSei;
 					alias2sei4ps.put(sei.getAlias(), sei);
 				}
 				for(String alias : this.seiTreeMap.keySet()){
