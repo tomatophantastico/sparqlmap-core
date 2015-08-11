@@ -129,13 +129,8 @@ public class SparqlMap {
     try {
       if (context.getQuery().isAskType()) {
 
-        context.getQuery().setLimit(1);
-        ResultSet rs = executeSelect(context);
-        if (rs.hasNext()) {
-          ResultSetFormatter.out(out, true);
-        } else {
-          ResultSetFormatter.out(out, false);
-        }
+          ResultSetFormatter.out(out, executeAsk(context));
+        
 
       }
       if (context.getQuery().isConstructType()) {
@@ -172,6 +167,27 @@ public class SparqlMap {
       throw e;
     }
 
+  }
+  
+  public boolean executeAsk(String query) throws SQLException{
+    TranslationContext context = new TranslationContext();
+    context.setQueryString(query);
+    try {
+
+      context.setQuery(QueryFactory.create(query));
+      return executeAsk(context);
+    } catch (SQLException e) {
+      context.setProblem(e);
+      log.error(context.toString());
+      throw e;
+    }
+  }
+  
+  
+  public boolean executeAsk(TranslationContext context) throws SQLException{
+    context.getQuery().setLimit(1);
+    ResultSet rs = executeSelect(context);
+    return rs.hasNext();
   }
 
   public Model executeConstruct(String query) throws SQLException {

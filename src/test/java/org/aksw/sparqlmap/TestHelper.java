@@ -11,6 +11,7 @@ import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.SparqlMap;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,12 +135,11 @@ public class TestHelper {
         
         
       }else if(query.isAskType()){
-        throw new ImplementationException("implement ASK");
-        //TODO implement ask task
-//        assertTrue(
-//            QueryExecutionFactory.create(query, refDs).execAsk()==
-//            false
-//            ); 
+        boolean expected = QueryExecutionFactory.create(query,refDs).execAsk();
+        boolean actual = sm.executeAsk(sparql);
+        
+        Assert.assertTrue(actual == expected);
+        
         
       }else if (query.isConstructType()){
         //construct query
