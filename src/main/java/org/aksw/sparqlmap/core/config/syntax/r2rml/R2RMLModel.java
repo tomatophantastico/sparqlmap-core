@@ -567,16 +567,9 @@ public class R2RMLModel {
 				
 				// get the graph statements for the po here.
 				List<Statement> graphMapStmts =  reasoningModel.listStatements(poResource, R2RML.graphMap,(RDFNode) null).toList();
-				List<TermMap> graphMaps = getGraphmapsForPO(tmUri, fromItem, graphMapStmts);
+				List<TermMap> graphMaps = getGraphmapsForPO(tmUri, triplemap, graphMapStmts);
 				
-				
-				
-				
-				
-				
-				
-				
-		
+
 
 				TermMapQueryResult p = new TermMapQueryResult(predicateMapResource,reasoningModel,
 						fromItem);
@@ -630,7 +623,7 @@ public class R2RMLModel {
 		}
 	}
 
-	public List<TermMap> getGraphmapsForPO(Resource tmUri, FromItem fromItem,
+	public List<TermMap> getGraphmapsForPO(Resource tmUri, TripleMap triplemap,
 			List<Statement> graphMapStmts) throws R2RMLValidationException {
 
 		List<TermMap> graphMaps = new ArrayList<TermMap>();
@@ -646,14 +639,14 @@ public class R2RMLModel {
 					String template = reasoningModel.getProperty(graphMap,
 							R2RML.template).getString();
 					graph = templateToResourceExpression(
-							cleanTemplate(template, fromItem), fromItem, dth);
+							cleanTemplate(template, triplemap.from), triplemap.from, dth);
 				} else if (reasoningModel.contains(graphMap, R2RML.column)) {
 					String column = reasoningModel.getProperty(graphMap,
 							R2RML.column).getString();
 					String template = "\"{"
-							+ getRealColumnName(column, fromItem) + "\"}";
+							+ getRealColumnName(column, triplemap.from) + "\"}";
 					graph = templateToResourceExpression(
-							cleanTemplate(template, fromItem), fromItem, dth);
+							cleanTemplate(template, triplemap.from), triplemap.from, dth);
 				} else if (reasoningModel.contains(graphMap, R2RML.constant)) {
 					Resource resource = reasoningModel.getProperty(graphMap,
 							R2RML.constant).getResource();
@@ -668,6 +661,12 @@ public class R2RMLModel {
 				TermMap gtm = new TermMap(dth);
 				gtm.setTermTyp(R2RML.IRI);
 				gtm.getResourceColSeg().addAll(graph);
+				gtm.trm = triplemap;
+				
+				if(!gtm.isConstant()){
+				  gtm.addFromItem(triplemap.getFrom());
+				}
+				
 
 				graphMaps.add(gtm);
 
