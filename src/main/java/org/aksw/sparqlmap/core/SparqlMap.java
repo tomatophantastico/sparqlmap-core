@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +35,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.sparql.algebra.OpVars;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.hp.hpl.jena.sparql.core.DatasetGraphFactory;
 import com.hp.hpl.jena.sparql.core.Quad;
@@ -455,7 +457,7 @@ public class SparqlMap {
 
   }
 
-  public ResultSet executeSelect(TranslationContext context) throws SQLException {
+  public ResultSet executeSelect(final TranslationContext context) throws SQLException {
 
     try {
       context.profileStartPhase("Rewriting");
@@ -470,7 +472,52 @@ public class SparqlMap {
 
         rs = dbConf.executeSQL(context, baseUri);
       }else{
-        rs = new ResultSetMem();
+        //create an empty result set with the query vars
+        rs = new ResultSet() {
+          
+          @Override
+          public QuerySolution nextSolution() {
+            return null;
+          }
+          
+          @Override
+          public Binding nextBinding() {
+            return null;
+          }
+          
+          @Override
+          public QuerySolution next() {
+            return null;
+          }
+          
+          @Override
+          public boolean hasNext() {
+            return false;
+          }
+          
+          @Override
+          public int getRowNumber() {
+            return 0;
+          }
+          
+          @Override
+          public List<String> getResultVars() {
+            
+            List<Var>  vars = context.getQueryInformation().getProject().getVars();
+            List<String> stringVars = new ArrayList<String>();
+            
+            for(Var var :vars){
+              stringVars.add(var.getName());
+            }
+
+            return stringVars;
+          }
+          
+          @Override
+          public Model getResourceModel() {
+            return null;
+          }
+        };
       }
 
      
