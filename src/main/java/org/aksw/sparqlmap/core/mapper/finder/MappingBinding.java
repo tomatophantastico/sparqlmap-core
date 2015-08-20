@@ -48,4 +48,22 @@ public class MappingBinding {
 	public Map<Quad, Collection<TripleMap>> getBindingMap() {
 		return bindingMap;
 	}
+	
+	/**
+	 * indicates, if at least one triple pattern of the query could have been bound to a triples map.
+	 * 
+	 * @return
+	 */
+	public boolean isEmpty(){
+	  boolean isEmpty = true;
+	  
+	  for(Quad quad: bindingMap.keySet()){
+	    if(!bindingMap.get(quad).isEmpty()){
+	      isEmpty = false;
+	      break;
+	    }
+	  }
+	  
+	  return isEmpty;
+	}
 }

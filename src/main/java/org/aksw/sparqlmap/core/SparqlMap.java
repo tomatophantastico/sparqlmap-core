@@ -40,6 +40,7 @@ import com.hp.hpl.jena.sparql.core.Quad;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.hp.hpl.jena.sparql.graph.GraphFactory;
+import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 import com.hp.hpl.jena.sparql.resultset.ResultsFormat;
 import com.hp.hpl.jena.sparql.syntax.Template;
 
@@ -460,10 +461,19 @@ public class SparqlMap {
       context.profileStartPhase("Rewriting");
 
       mapper.rewrite(context);
+      
+      ResultSet rs = null;
+      
+      // if we got an empty binding, we can shortcut the translation process
+      if(!context.getQueryBinding().isEmpty()){
+        LoggerFactory.getLogger("sqllog").debug("SQL " + context.getQueryName() + " " + context.getSqlQuery());
 
-      LoggerFactory.getLogger("sqllog").debug("SQL " + context.getQueryName() + " " + context.getSqlQuery());
+        rs = dbConf.executeSQL(context, baseUri);
+      }else{
+        rs = new ResultSetMem();
+      }
 
-      ResultSet rs = dbConf.executeSQL(context, baseUri);
+     
 
       return rs;
 
