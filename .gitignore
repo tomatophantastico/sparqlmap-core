@@ -10,3 +10,4 @@ target
 directGraph-sparqlmap.ttl
 dm_r2rml.ttl
 mapped?-sparqlmap.nq
+Playground.java
