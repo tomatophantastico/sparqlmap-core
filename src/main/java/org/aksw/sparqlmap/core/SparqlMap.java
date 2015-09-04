@@ -366,42 +366,19 @@ public class SparqlMap {
       log.info("SQL: " + context.getSqlQuery());
       com.hp.hpl.jena.query.ResultSet rs = dbConf.executeSQL(context, baseUri);
       DatasetGraph graph = DatasetGraphFactory.createMem();
-      boolean usesGraph = false;
       int i = 0;
       while (rs.hasNext()) {
+      
         Binding bind = rs.nextBinding();
-        if (bind.get(Var.alloc("g")) != null) {
-
-          usesGraph = true;
-        }
-        try {
-          Quad toadd =
-            new Quad(bind.get(Var.alloc("g")), bind.get(Var.alloc("s")), bind.get(Var.alloc("p")), bind.get(Var
-              .alloc("o")));
-          graph.add(toadd);
-        } catch (Exception e) {
-
-          log.error("Error:", e);
-          if (!continueWithInvalidUris) {
-            throw new RuntimeException(e);
-          }
-        }
-        if (++i % 1000 == 0) {
-          if (usesGraph) {
-            RDFDataMgr.write(out, graph, RDFFormat.NQUADS);
-            graph.deleteAny(null, null, null, null);
-          } else {
-            RDFDataMgr.write(out, graph.getDefaultGraph(), Lang.NTRIPLES);
-            graph.deleteAny(null, null, null, null);
-
-          }
+        addDumpBindingToDataset(bind, graph);
+          
+        if (++i % 10000 == 0) {
+          RDFDataMgr.write(out, graph, RDFFormat.NQUADS);
+          graph.deleteAny(null, null, null, null);
         }
       }
-      if (usesGraph) {
-        RDFDataMgr.write(out, graph, RDFFormat.NQUADS);
-      } else {
-        RDFDataMgr.write(out, graph.getDefaultGraph(), Lang.NTRIPLES);
-      }
+      RDFDataMgr.write(out, graph, RDFFormat.NQUADS);
+    
 
       writer.flush();
     }
@@ -425,26 +402,37 @@ public class SparqlMap {
 					baseUri);
 			while (rs.hasNext()) {
 				Binding bind = rs.nextBinding();
-				try {
-					Node g = bind.get(Var.alloc("g"));
-					Node s = bind.get(Var.alloc("s"));
-					Node p = bind.get(Var.alloc("p"));
-					Node o = bind.get(Var.alloc("o"));
-					if (p != null && s != null && p != null && o != null) {
-						Quad toadd = new Quad(g, s, p, o);
-						dataset.add(toadd);
-					}
-
-				} catch (Exception e) {
-
-					log.error("Error:", e);
-					if (!continueWithInvalidUris) {
-						throw new RuntimeException(e);
-					}
-				}
+				addDumpBindingToDataset(bind, dataset);
 			}
 		}
 		return dataset;
+	}
+	
+	
+	private void addDumpBindingToDataset(Binding bind, DatasetGraph dsg){
+	  
+    try {
+      Node g = bind.get(Var.alloc("g"));
+      Node s = bind.get(Var.alloc("s"));
+      Node p = bind.get(Var.alloc("p"));
+      Node o = bind.get(Var.alloc("o"));
+      if (s != null && p != null && o != null) {
+        if(g!=null&&!g.equals(Quad.defaultGraphNodeGenerated)){
+          Quad toadd = new Quad(g, s, p, o);
+          dsg.add(toadd);
+        }else{
+          Triple triple = new Triple(s, p, o);
+          dsg.getDefaultGraph().add(triple);
+        }
+       
+      }
+    } catch (Exception e) {
+
+      log.error("Error:", e);
+      if (!continueWithInvalidUris) {
+        throw new RuntimeException(e);
+      }
+    }
 	}
 
   public ResultSet executeSelect(String query) throws SQLException {

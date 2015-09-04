@@ -68,22 +68,24 @@ public class TestHelper {
   public static void assertResultSetsAreEqual(ResultSet result,
       ResultSet expectedRS) {
     result = ResultSetFactory.makeRewindable(result); 
+    expectedRS = ResultSetFactory.makeRewindable(expectedRS);
     boolean isEqual  = ResultSetCompare.equalsByTerm(result, expectedRS);
-    StringBuffer comparison =new StringBuffer();
+    StringBuffer comparison = new StringBuffer();
 
-    if(!isEqual){
+
       
-      comparison.append("Actual result is :\n");
-      comparison.append("=============================");
-     
-      comparison.append(ResultSetFormatter.asText(result));
-      comparison.append("=======================\nExpected was: ");
-     
-      comparison.append(ResultSetFormatter.asText(expectedRS));
-      comparison.append("=============================");
-      
-    }
+    comparison.append("Actual result is :\n");
+    comparison.append("=============================");
+   
+    comparison.append(ResultSetFormatter.asText(result));
+ 
+    comparison.append("\nCount: "+ result.getRowNumber()+ "=======================\nExpected was: ");
+   
+    comparison.append(ResultSetFormatter.asText(expectedRS));
+    comparison.append("\nCount:"+expectedRS.getRowNumber()+"=============================");
     
+    
+    log.debug(comparison.toString());
     assertTrue(comparison.toString(),isEqual);
     
   }
@@ -92,7 +94,7 @@ public class TestHelper {
 
       String tbdname, String queryname) throws SQLException {
     
-    String tdbDir = "./build/tdbs/";
+      String tdbDir = "./build/tdbs/" + tbdname;
     
     
       

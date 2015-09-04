@@ -13,7 +13,6 @@ import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.beautifier.SparqlBeautifier;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLModel;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
@@ -28,6 +27,7 @@ import org.aksw.sparqlmap.core.mapper.translate.ExpressionConverter;
 import org.aksw.sparqlmap.core.mapper.translate.FilterUtil;
 import org.aksw.sparqlmap.core.mapper.translate.OptimizationConfiguration;
 import org.aksw.sparqlmap.core.mapper.translate.QueryBuilderVisitor;
+import org.aksw.sparqlmap.core.normalizer.QueryNormalizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,11 +68,7 @@ public class AlgebraMapper implements Mapper {
 	@Autowired
 	private OptimizationConfiguration fopt;
 	
-	private SparqlBeautifier beautifier = new SparqlBeautifier();
 	
-	public SparqlBeautifier getBeautifier() {
-		return beautifier;
-	}
 
 
 	
@@ -88,9 +84,11 @@ public class AlgebraMapper implements Mapper {
 		}
 		
 		//first we beautify the Query
+		QueryNormalizer normalizer = new QueryNormalizer(context);
+		
+		
 
-
-		context.setBeautifiedQuery( this.beautifier.compileToBeauty(origQuery)); // new  AlgebraGenerator().compile(beautified);
+		context.setBeautifiedQuery( normalizer.compileToBeauty(origQuery)); // new  AlgebraGenerator().compile(beautified);
 		
 		
 		if(log.isDebugEnabled()){
