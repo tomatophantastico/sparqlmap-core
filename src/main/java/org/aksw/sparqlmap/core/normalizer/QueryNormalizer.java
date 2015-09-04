@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap.core.beautifier;
+package org.aksw.sparqlmap.core.normalizer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,11 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.algebra.AlgebraGenerator;
 import com.hp.hpl.jena.sparql.algebra.AlgebraQuad;
@@ -29,10 +32,13 @@ import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.E_Datatype;
 import com.hp.hpl.jena.sparql.expr.E_Equals;
 import com.hp.hpl.jena.sparql.expr.E_LangMatches;
+import com.hp.hpl.jena.sparql.expr.E_OneOf;
+import com.hp.hpl.jena.sparql.expr.E_Version;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.expr.ExprList;
 import com.hp.hpl.jena.sparql.expr.ExprVar;
 import com.hp.hpl.jena.sparql.expr.NodeValue;
+import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueNode;
 
 
 /**
@@ -42,44 +48,112 @@ import com.hp.hpl.jena.sparql.expr.NodeValue;
  * @author joerg
  * 
  */
-public class SparqlBeautifier extends TransformCopy {
+public class QueryNormalizer extends TransformCopy {
 
 	private AlgebraGenerator agen = new  AlgebraGenerator();
 	private int i = 0;
 	
-	Logger log = LoggerFactory.getLogger(SparqlBeautifier.class); 
+	private static final Logger LOG = LoggerFactory.getLogger(QueryNormalizer.class); 
 	
 
 	Map<String,Node> termToVariable = new HashMap<String, Node>();
 	
+	TranslationContext context;
 	
-	@Override
+	
+	public QueryNormalizer(TranslationContext context) {
+    super();
+    this.context = context;
+  }
+
+  @Override
 	public Op transform(OpQuadPattern quadBlock) {
 		List<Quad> patterns = quadBlock.getPattern().getList();
 		OpQuadBlock newOp = new OpQuadBlock();
 		
 		Map<String,String> var2Value = new HashMap<String, String>();
 		ExprList exprList = new ExprList();
+		List<ExprList> fromFromNamed = Lists.newArrayList();
 
 		for (Quad quad : patterns) {
 			quad = uniquefyTriple(quad, exprList); 
 			
 
 			newOp.getPattern().add(new Quad(
-					rewriteNode(quad.getGraph(), exprList, termToVariable, var2Value),
+					rewriteGraphNode(quad.getGraph(), exprList, fromFromNamed ,termToVariable, var2Value),
 					rewriteNode(quad.getSubject(), exprList, termToVariable, var2Value), 
 					rewriteNode(quad.getPredicate(), exprList, termToVariable, var2Value),
 					rewriteNode(quad.getObject(), exprList, termToVariable, var2Value)));
 		}
 
-		
-		
-		Op op = OpFilter.filter(exprList, newOp);
-
+		Op op = newOp;
+		if(!exprList.isEmpty()){
+		  op = OpFilter.filter(exprList, op);
+		} 
+		if(!fromFromNamed.isEmpty()){
+		  op = recurseFilter(op, fromFromNamed);
+		} 
+	
 		return op;
 	}
+  
+  private Op recurseFilter(Op op, List<ExprList> exprLists){
+    Op result = null;
+    if(exprLists.size()==0){
+      result = op;
+    } else if(exprLists.size()==1){
+      result = OpFilter.filter(exprLists.get(0), op);
+    } else{
+      List<ExprList> exprListsMinusOne = exprLists.subList(1,exprLists.size()+1);
+      result = OpFilter.filter(exprLists.get(0), recurseFilter(op, exprListsMinusOne));
+    }
+    
+    return result;
+  }
 	
-	@Override
+	private Node rewriteGraphNode(Node graph, ExprList exprList, List<ExprList> fromFromNamed,
+      Map<String, Node> termToVariable2, Map<String, String> var2Value) {
+	  Node result = null;
+	  
+	  if(graph.equals(Quad.defaultGraphNodeGenerated)
+	       && ! context.getQuery().getGraphURIs().isEmpty() ){
+	    Node nNew  = Var.alloc(i++ + ColumnHelper.COL_NAME_INTERNAL);
+        termToVariable.put(graph.toString(), nNew);
+   
+	      List<String> graphuris = context.getQuery().getGraphURIs();
+	      ExprList filterIn = createFilterIn(nNew, graphuris);
+	      fromFromNamed.add(filterIn);
+
+	     result = nNew; 
+	  }else if (graph.isVariable() && !context.getQuery().getNamedGraphURIs().isEmpty()) {
+      
+	    List<String> graphuris = context.getQuery().getNamedGraphURIs();
+      ExprList filterIn = createFilterIn(graph, graphuris);
+      fromFromNamed.add(filterIn);
+      result = graph;
+    }else{
+      result = rewriteNode(graph, exprList, termToVariable2, var2Value);
+    }
+	  
+	  return result;
+  }
+
+  private ExprList createFilterIn(Node nNew, List<String> graphuris) {
+    ExprList filterIn = new ExprList();
+    ExprList internal = new ExprList();
+    ExprVar nodeVar = new ExprVar(nNew);
+    
+    for(String graphuri: graphuris){
+    
+//      internal.add(new ExprVar(nNew));
+      internal.add( NodeValueNode.makeNode(NodeFactory.createURI(graphuri)));
+      
+    }
+    filterIn.add(new E_OneOf(nodeVar, internal));
+    return filterIn;
+  }
+
+  @Override
 	public Op transform(OpFilter opFilter, Op subOp) {
 
 		return opFilter.copy(subOp);
@@ -210,6 +284,9 @@ public class SparqlBeautifier extends TransformCopy {
 			
 		return newOp;
 	}
+	
+	
+	
 	
 	
 	
