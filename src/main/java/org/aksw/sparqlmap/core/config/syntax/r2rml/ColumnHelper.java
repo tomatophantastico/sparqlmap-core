@@ -1,9 +1,12 @@
 package org.aksw.sparqlmap.core.config.syntax.r2rml;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -54,8 +57,22 @@ public class ColumnHelper {
   public static Integer COL_VAL_SQL_TYPE_CONSTLIT = -9998;
 
   public static Integer COL_VAL_RES_LENGTH_LITERAL = 0;
+  
+  public static Integer COL_VAL_LITERAL_TYPE_NONE = 0;
+  
+  public static Integer COL_VAL_LITERAL_TYPE_NUM = 1;
+  
+  public static Integer COL_VAL_LITERAL_TYPE_STRING = 2;
+  
+  public static Integer COL_VAL_LITERAL_TYPE_BOOL = 3;
+  
+  public static Integer COL_VAL_LITERAL_TYPE_DATE = 4;
+  
+  public static Integer COL_VAL_LITERAL_TYPE_BINARY = 5;
 
 
+
+  
 
   @Autowired
   private DBAccess dbaccess;

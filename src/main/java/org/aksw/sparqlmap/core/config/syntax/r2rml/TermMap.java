@@ -111,14 +111,14 @@ public class TermMap{
 	
 	public TermMap(DataTypeHelper dth){
 		this.dth = dth;
-		termType = dth.castNull(dth.getNumericCastType());
-		literalType = dth.castNull(dth.getStringCastType());
-		literalLang= dth.castNull(dth.getStringCastType());
-		literalValString= dth.castNull(dth.getStringCastType());
-		literalValNumeric  = dth.castNull(dth.getNumericCastType());
-		literalValDate = dth.castNull(dth.getDateCastType());
-		literalValBool = dth.castNull(dth.getBooleanCastType());
-		literalValBinary = dth.castNull(dth.getBinaryDataType());
+		termType = dth.getIntegerDefaultExpression();
+		literalType = dth.getStringDefaultExpression();
+		literalLang= dth.getStringDefaultExpression();
+		literalValString= dth.getStringDefaultExpression();
+		literalValNumeric  =dth.getNumericDefaultExpression();
+		literalValDate = dth.getDateDefaultExpression();
+		literalValBool = dth.getBooleanDefaultExpression();
+		literalValBinary = dth.getBinaryDefaultExpression();
 		
 		resourceColSeg = new ArrayList<Expression>(); 
 	}
@@ -450,11 +450,11 @@ public class TermMap{
 	
 	public void setTermTyp(Resource tt){
 		if(tt.equals(R2RML.IRI)){
-			termType =dth.asNumeric(ColumnHelper.COL_VAL_TYPE_RESOURCE);
+			termType =dth.asInteger(ColumnHelper.COL_VAL_TYPE_RESOURCE);
 		}else if (tt.equals(R2RML.BlankNode)) {
-			termType = dth.asNumeric(ColumnHelper.COL_VAL_TYPE_BLANK);
+			termType = dth.asInteger(ColumnHelper.COL_VAL_TYPE_BLANK);
 		} else if (tt.equals(R2RML.Literal)) {
-			termType = dth.asNumeric(ColumnHelper.COL_VAL_TYPE_LITERAL);
+			termType = dth.asInteger(ColumnHelper.COL_VAL_TYPE_LITERAL);
 		}
 	}
 	

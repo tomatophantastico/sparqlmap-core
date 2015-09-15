@@ -48,7 +48,7 @@ dependencies {
     compile "org.apache.jena:jena-arq:2.12.1"
     compile "com.google.guava:guava:18.0"
     compile "net.sf.jsqlparser:jsqlparser:0.8.1.SPARQLMAP-SNAPSHOT"
-    compile 'org.hsqldb:hsqldb:2.3.2'
+    compile 'org.hsqldb:hsqldb:2.3.3'
     compile 'org.postgresql:postgresql:9.2-1002-jdbc4'
     compile 'org.springframework:spring-context:4.1.5.RELEASE'
     compile 'org.springframework:spring-jdbc:4.1.5.RELEASE'
@@ -59,7 +59,7 @@ dependencies {
 
     
     testCompile 'junit:junit:4.11'
-    testCompile 'org.hsqldb:sqltool:2.3.2'
+    testCompile 'org.hsqldb:sqltool:2.3.3'
     testCompile "org.apache.jena:jena-tdb:1.1.1"
 
 

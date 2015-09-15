@@ -357,8 +357,35 @@ public abstract  class DataTypeHelper {
 		return cast(new LongValue(intVal.toString()), getNumericCastType());
 	}
 	
+	public Expression asInteger(Integer intVal){
+    return cast(new LongValue(intVal.toString()), getIntCastType());
+  }
 	
 	
+	public Expression getStringDefaultExpression(){
+	  return cast(new StringValue("''"),getStringCastType());
+	}
+	
+	public Expression getIntegerDefaultExpression(){
+	  return cast(new LongValue("0"),getIntCastType());
+	}
+	
+	public Expression getNumericDefaultExpression(){
+	  return cast(new LongValue("0"),getNumericCastType());
+	}
+	
+	public Expression getBooleanDefaultExpression(){
+    return cast(new LongValue("0"),getBooleanCastType());
+  }
+	
+	public Expression getDateDefaultExpression(){
+	  return cast(new StringValue("'0001-1-1 00:00:00.000'"),getDateCastType());
+	}
+	
+	public Expression getBinaryDefaultExpression(){
+	  return cast(new StringValue("'0x01'"),getBinaryDataType());
+	}
+  
 
 
 }

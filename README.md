@@ -10,3 +10,13 @@ It can be used in allows both extracting RDF from an relational database and rew
 This module contains the core functionality of SparqlMap.
 
 It serves as the foundation for the [SparqlMap client](http://github.com/tomatophantastico/sparqlmap). 
+
+
+
+
+
+## DB Support
+
+
+### HSQL
+There is no support for binary data types (xsd:binary) in HSQL due to problems with the query engine.

@@ -1,6 +1,8 @@
 package org.aksw.sparqlmap.core.db.impl;
 
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.StringValue;
 
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 
@@ -13,7 +15,7 @@ public class HSQLDBDataTypeHelper extends DataTypeHelper {
 
 	@Override
 	public String getBinaryDataType() {
-		return "LONGVARBINARY";
+		return "LONGVARCHAR";
 	}
 
 	@Override
@@ -67,6 +69,9 @@ public class HSQLDBDataTypeHelper extends DataTypeHelper {
 		
 		return false;
 	}
+	
+	
+	
 
 
 
