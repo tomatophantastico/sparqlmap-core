@@ -10,7 +10,8 @@
         
    rr:logicalTable [ rr:tableName "Student" ];
 	
-    rr:subjectMap [ rr:template "http://example.com/resource/student_{\"Name\"}"; 
+    rr:subjectMap [ rr:template "http://example.com/resource/student_{\"Name\"}";
+                   rr:class foaf:Person; 
                   rr:graphMap [ rr:template  "http://example.com/resource/graph_{\"ID\"}"]; ]; 
 	
     rr:predicateObjectMap

@@ -387,13 +387,22 @@ public class R2RMLModel {
 		
 
 	private void resolveRRClassStatements() {
-		String query = "PREFIX  rr:   <http://www.w3.org/ns/r2rml#> "
-				+ "INSERT { ?tm rr:predicateObjectMap  _:newpo. "
-				+ "_:newpo rr:predicate <" + RDF.type.getURI() + ">."
-				+ "_:newpo rr:object ?class } " + "WHERE {?tm a rr:TriplesMap."
-				+ "?tm  rr:subjectMap ?sm." + "?sm rr:class ?class }";
-		UpdateExecutionFactory.create(UpdateFactory.create(query),
-				GraphStoreFactory.create(reasoningModel)).execute();
+	  
+	  for (Statement triplesMapClassStmt : reasoningModel.listStatements((Resource)null, R2RML.hasClass,(RDFNode) null).toList()){
+	    Resource subjectMap = triplesMapClassStmt.getSubject();
+	    
+	    //get all triples Maps where this is used
+	    for(Resource typedTRiplesMap : reasoningModel.listResourcesWithProperty(R2RML.subjectMap,subjectMap).toList()){
+	      Resource classResource = triplesMapClassStmt.getResource();
+	      
+	      triplesMapClassStmt.remove();
+	      
+	      Resource poBlankNode = reasoningModel.createResource();
+	      typedTRiplesMap.addProperty(R2RML.predicateObjectMap, poBlankNode);
+	      poBlankNode.addProperty(R2RML.predicate, RDF.type);
+	      poBlankNode.addProperty(R2RML.object, classResource);
+	    }
+	  }
 	}
 
 	private void loadCompatibilityChecker() throws SQLException {
