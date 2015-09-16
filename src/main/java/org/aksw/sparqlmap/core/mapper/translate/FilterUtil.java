@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.jsqlparser.expression.BinaryExpression;
-import net.sf.jsqlparser.expression.CaseExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.LongValue;
@@ -16,7 +15,6 @@ import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.StringExpression;
 import net.sf.jsqlparser.expression.StringValue;
-import net.sf.jsqlparser.expression.WhenClause;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
@@ -165,26 +163,26 @@ private static BitSet RESERVED = new BitSet();
 
   		if(!isAlwaysTrue(left.literalValBinary, right.literalValBinary)){
   			Expression literalBinaryEquality = bothNullOrBinary(left.literalValBinary, right.literalValBinary, test.newInstance(),dth);
-  			eqs.add(literalBinaryEquality);
+  			eqs.add(andTypesAreEqual(literalBinaryEquality,left,right));
   		}	
   		if(!isAlwaysTrue(left.literalValBool, left.literalValBool)){
   			Expression literalBoolEquality = bothNullOrBinary(left.literalValBool,right.literalValBool,test.newInstance(),dth);
-  			eqs.add(literalBoolEquality);
+  			eqs.add(andTypesAreEqual(literalBoolEquality,left,right));
   		}
   		
   		if(!isAlwaysTrue(left.literalValDate, right.literalValDate)){
   			Expression literalDateEquality = bothNullOrBinary(left.literalValDate, right.literalValDate, test.newInstance(),dth);
-  			eqs.add(literalDateEquality);
+  			eqs.add(andTypesAreEqual(literalDateEquality,left,right));
   		}
   		
   		if(!isAlwaysTrue(left.literalValNumeric, right.literalValNumeric)){
   			Expression literalNumericEquality = bothNullOrBinary(left.literalValNumeric, right.literalValNumeric, test.newInstance(),dth);
-  			eqs.add(literalNumericEquality);
+  			eqs.add(andTypesAreEqual(literalNumericEquality,left,right));
   		}
   		
   		if(!isAlwaysTrue(left.literalValString, right.literalValString)){
   			Expression literalStringEquality = bothNullOrBinary(left.literalValString,right.literalValString, test.newInstance(),dth);
-  			eqs.add(literalStringEquality);
+  			eqs.add(andTypesAreEqual(literalStringEquality,left,right));
   		}
   		
   		//and check for the resources
@@ -195,7 +193,7 @@ private static BitSet RESERVED = new BitSet();
   			if(test.equals(NotEqualsTo.class)||test.equals(EqualsTo.class)){
   				Expression resourceEquality = compareResource(left, right, test);
   				if(resourceEquality!=null){
-  					eqs.add(resourceEquality);
+  					eqs.add( andTypesAreEqual(resourceEquality, left, right));
   				}
   				
   			}else{
@@ -208,21 +206,7 @@ private static BitSet RESERVED = new BitSet();
   		// and check that not all of any side are null
   		
   		
-  		Expression leftNull = areAllNull(left.getExpressions());
-  		Expression rightNull = areAllNull(right.getExpressions());
-  		
-  		if(leftNull != null && rightNull != null){
-  			OrExpression anySideCompletelyNull = new OrExpression(
-  					new Parenthesis(leftNull), 
-  					new Parenthesis(rightNull));
-  
-  			Parenthesis not = new Parenthesis();
-  			not.setNot();
-  			not.setExpression(anySideCompletelyNull);
-  			
-  			eqs.add(anySideCompletelyNull);
-  		}
-		
+
 		
 		} catch (InstantiationException | IllegalAccessException e) {
 			log.error("Error creating xpathtest",e);
@@ -231,10 +215,30 @@ private static BitSet RESERVED = new BitSet();
 		if(eqs.isEmpty()){
 			return tmf.createBoolTermMap( new StringExpression("true"));
 		}else{
-			return  tmf.createBoolTermMap( conjunct(eqs));
+			return  tmf.createBoolTermMap(new Parenthesis(disjunct(eqs)));
 		}
 		
 	}
+	/**
+	 * adds the term type and literal type check to the expression.
+	 * @return
+	 */
+	private Expression andTypesAreEqual(Expression toWrap, TermMap left, TermMap right){
+	  EqualsTo termTypeEquals = new EqualsTo();
+	  termTypeEquals.setLeftExpression(left.getTermType());
+	  termTypeEquals.setRightExpression(right.getTermType());
+	  AndExpression andTermType = new AndExpression(toWrap, termTypeEquals);
+	  
+	  EqualsTo literalTypeEquals = new EqualsTo();
+	  literalTypeEquals.setLeftExpression(left.getLiteralType());
+	  literalTypeEquals.setRightExpression(right.getLiteralType());
+	  AndExpression andLiteralType = new AndExpression(andTermType,literalTypeEquals);
+	  
+	  
+	  return new Parenthesis(andLiteralType);
+	  
+	}
+	
 	
 	/**
 	 * 
@@ -580,9 +584,8 @@ private static BitSet RESERVED = new BitSet();
 		// odd, but left and right seems to be twisted
 		function.setLeftExpression(expr2);
 		function.setRightExpression(expr1);
-		Parenthesis pt = new Parenthesis( bothNullOr(expr1, expr2, function,dth));
 		
-		return pt;
+		return function;
 		
 	}
 	
@@ -613,54 +616,6 @@ private static BitSet RESERVED = new BitSet();
 		}
 		return false;
 	}
-	
-	
-	
-	
-	
-	
-	
-	private Expression bothNullOr(Expression expr1, Expression expr2, Expression function, DataTypeHelper dth){
-		Expression uncast1 = DataTypeHelper.uncast(expr1);
-		Expression uncast2 = DataTypeHelper.uncast(expr2);
-		if(optConf.isShortcutFilters()){
-			if(uncast1 instanceof NullValue && uncast2 instanceof NullValue){
-				return dth.cast(new StringExpression("true"), dth.getBooleanCastType());
-			}
-		}
-		
-		List<Expression> isNulls = Lists.newArrayList();	
-		if(!(uncast1 instanceof NullValue)|| !optConf.isShortcutFilters()){
-			IsNullExpression literalTypeLeftIsNull = new IsNullExpression();
-			literalTypeLeftIsNull.setLeftExpression(uncast1);
-			isNulls.add(literalTypeLeftIsNull);
-		}
-		if(!(uncast2 instanceof NullValue) || !optConf.isShortcutFilters() ){
-			IsNullExpression literalTypeRightIsNull = new IsNullExpression();
-			literalTypeRightIsNull.setLeftExpression(uncast2);
-			isNulls.add(literalTypeRightIsNull);
-		}
-		
-		
-		Expression isNullCheck =  FilterUtil.conjunct(isNulls);
-
-		
-		
-		WhenClause bothNull = new WhenClause();
-		bothNull.setWhenExpression(isNullCheck);
-		bothNull.setThenExpression(dth.cast(new StringValue("'true'"),dth.getBooleanCastType()));
-		
-		
-		CaseExpression caseExpr = new CaseExpression();
-		caseExpr.setWhenClauses(Arrays.asList(((Expression)bothNull)));
-		
-		caseExpr.setElseExpression(function);
-		
-		
-		return caseExpr;
-	}
-	
-	
 	
 	
 

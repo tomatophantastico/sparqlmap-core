@@ -269,7 +269,7 @@ public class QueryNormalizer extends TransformCopy {
 		if(sparql.getProject().isEmpty()){
 		
 			sparql.setQueryResultStar(false);
-			Set<Var> vars = new HashSet<Var>( OpVars.mentionedVars(query));
+			List<Var> vars = new ArrayList<Var>( OpVars.mentionedVars(query));
 			for (Var var : vars) {
 				sparql.getProject().add(var);
 
