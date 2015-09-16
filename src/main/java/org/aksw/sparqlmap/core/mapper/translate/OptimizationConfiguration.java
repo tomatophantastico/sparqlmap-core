@@ -38,15 +38,30 @@ public class OptimizationConfiguration {
 	
 	@PostConstruct
 	public void setOptimize(){
-		shortcutFilters = new Boolean(env.getProperty("sm.opt.shortcutfilter"));
-		log.info("Filter shortcutting is: " + (shortcutFilters?"on":"off"));
-		optimizeSelfJoin = new Boolean(env.getProperty("sm.opt.optimizeSelfJoin"));
+	  if(env.getProperty("sm.opt.shortcutfilter")!=null){
+	    shortcutFilters = new Boolean(env.getProperty("sm.opt.shortcutfilter"));
+
+	  }
+	   log.info("Filter shortcutting is: " + (shortcutFilters?"on":"off"));
+
+	  if(env.getProperty("sm.opt.optimizeSelfJoin")!=null){
+	    optimizeSelfJoin = new Boolean(env.getProperty("sm.opt.optimizeSelfJoin"));
+
+	  }
 		log.info("Selfjoinopt is: " + (optimizeSelfJoin?"on":"off"));
-		optimizeSelfUnion = new Boolean(env.getProperty("sm.opt.optimizeSelfUnion"));
+		if(env.getProperty("sm.opt.optimizeSelfUnion")!=null){
+	    optimizeSelfUnion = new Boolean(env.getProperty("sm.opt.optimizeSelfUnion"));
+
+		}
 		log.info("Self Union  is: " + (optimizeSelfUnion?"on":"off"));
-		optimizeSelfLeftJoin = new Boolean(env.getProperty("sm.opt.optimizeSelfLeftJoin"));
+		if(env.getProperty("sm.opt.optimizeSelfLeftJoin")!=null){
+	    optimizeSelfLeftJoin = new Boolean(env.getProperty("sm.opt.optimizeSelfLeftJoin"));
+
+		}
 		log.info("Self left join Opt is: " + (optimizeSelfLeftJoin?"on":"off"));
-		optimizeProjectPush = new Boolean(env.getProperty("sm.opt.optimizeProjectPush"));
+		if(env.getProperty("sm.opt.optimizeProjectPush")!=null){
+	    optimizeProjectPush = new Boolean(env.getProperty("sm.opt.optimizeProjectPush"));
+		}
 		log.info("Project pushing is is: " + (optimizeProjectPush?"on":"off"));
 	}
 	
