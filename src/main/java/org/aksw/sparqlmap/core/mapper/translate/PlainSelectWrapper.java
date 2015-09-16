@@ -16,6 +16,8 @@ import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.Distinct;
 import net.sf.jsqlparser.statement.select.FromItem;
@@ -30,6 +32,7 @@ import net.sf.jsqlparser.util.BaseSelectVisitor;
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
+import org.hamcrest.core.IsNull;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.LinkedListMultimap;
@@ -339,11 +342,18 @@ public class PlainSelectWrapper implements Wrapper{
 		
 		
 		
-		setFilter();
+		createFilter();
 		
 	}
 	
-	/**
+	private void createFilter() {
+	  setFilter();
+	  setNullForNonOptionals();
+    
+  }
+
+
+  /**
 	 * checks if a column aliased varnull exists. if not a null column with that
 	 * name is added. useful for aligning unions.
 	 * 
@@ -438,8 +448,7 @@ public class PlainSelectWrapper implements Wrapper{
 		
 		createJoins();
 		createSelectExpressionItems();
-		setFilter();
-		//setNullForNonOptionals();
+		createFilter();
 
 	}
 
@@ -448,7 +457,18 @@ public class PlainSelectWrapper implements Wrapper{
 		List<Expression> notnulls = new ArrayList<Expression>();
 		for (TermMap tm : var2termMap.values()) {
 			if (!optionalTermMaps.contains(tm)) {
-				notnulls.add(tm.getNotNullExpression());
+			  for(Expression tocheck: tm.getExpressions()){
+			    tocheck = DataTypeHelper.uncast(tocheck);
+			    if(tocheck instanceof Column){
+			      
+			      IsNullExpression isnull = new IsNullExpression();
+			      isnull.setNot(true);
+			      isnull.setLeftExpression(tocheck);
+			      notnulls.add(isnull);
+			    }
+			  }
+			  
+				
 			}
 		}
 		if (!notnulls.isEmpty()) {
@@ -513,68 +533,69 @@ public class PlainSelectWrapper implements Wrapper{
 		}
 	}
 	
-	public void addSubselect(Wrapper right, boolean optional) {
+  public void addSubselect(Wrapper right, boolean optional) {
 
-		// check if the subselect queries only for a single triple and is
-		// optional.
-		// then we can add it directly to the plain select.
+    // check if the subselect queries only for a single triple and is
+    // optional.
+    // then we can add it directly to the plain select.
 
-		if (filterUtil.getOptConf().optimizeSelfLeftJoin == true && right instanceof PlainSelectWrapper
-				&& ((PlainSelectWrapper) right).getVarsMentioned().size() == 3
-				&& ((PlainSelectWrapper) right).subselects.size() == 0) {
-			PlainSelectWrapper ps = (PlainSelectWrapper) right;
-			
+    if (filterUtil.getOptConf().optimizeSelfLeftJoin == true
+        && right instanceof PlainSelectWrapper
+        && ((PlainSelectWrapper) right).getVarsMentioned().size() == 4
+        && ((PlainSelectWrapper) right).subselects.size() == 0) {
+      PlainSelectWrapper ps = (PlainSelectWrapper) right;
 
-			// we require the not shared variable to be either constant resource
-			// or a literal. column generated resources can be troublesome, if
-			// generated from more than one column.
-			for (String var : ps.getVarsMentioned()) {
+      // we require the not shared variable to be either constant resource
+      // or a literal. column generated resources can be troublesome, if
+      // generated from more than one column.
+      for (String var : ps.getVarsMentioned()) {
 
-				TermMap rightVarTc = ps.getVar2TermMap().get(var);
-				// variables already there and equal can be ignored
-				// if not equal, we cannot use this optimization
-				TermMap thisVarTc = var2termMap.get( var);
-				if (thisVarTc == null) {
-				
-					// add it if all from items are already in the plain select
-					// we use the alias to check this.
-					Set<String> fiAliases = new HashSet<String>();
+        TermMap rightVarTc = ps.getVar2TermMap().get(var);
+        // variables already there and equal can be ignored
+        // if not equal, we cannot use this optimization
+        TermMap thisVarTc = var2termMap.get(var);
+        if (thisVarTc == null) {
 
-					for (FromItem fi : rightVarTc.getFromItems()) {
-						fiAliases.add(fi.getAlias());
-					}
-					
+          // add it if all from items are already in the plain select
+          // we use the alias to check this.
+          Set<String> fiAliases = new HashSet<String>();
 
-					if (getFromItemAliases().containsAll(fiAliases)) {
-						putTermMap(rightVarTc, var, true);
-					}
-				}
-			}
-		}
+          for (FromItem fi : rightVarTc.getFromItems()) {
+            fiAliases.add(fi.getAlias());
+          }
 
+          if (getFromItemAliases().containsAll(fiAliases)) {
+            putTermMap(rightVarTc, var, true);
+          }
+        }
+      }
+    } else {
 
-			// create a new subselect
-			SubSelect subsell = new SubSelect();
-			subsell.setSelectBody(right.getSelectBody());
-			subsell.setAlias(SUBSEL_SUFFIX + translationContext.getAndIncrementSubqueryCounter());
-			
-			Map<String,TermMap> rightVar2TermMap  = null;
-			
-			if(right instanceof UnionWrapper){
-				UnionWrapper rightWrapper = (UnionWrapper) right;
-				rightVar2TermMap = rightWrapper.getVar2TermMap(subsell.getAlias());
-			}else{
-				PlainSelectWrapper rightWrapper = (PlainSelectWrapper) right;
-				rightVar2TermMap = rightWrapper.getVar2TermMap();
-			}
-			
-			for(String var : rightVar2TermMap.keySet()){
-				
-				//create a new subselect term for each term map in there.
-				TermMap subselTermMap = createSubseletTermMap(rightVar2TermMap.get(var),  var, subsell);
-				putTermMap(subselTermMap, var, optional);
-			}
-		}	
+      // create a new subselect
+      SubSelect subsell = new SubSelect();
+      subsell.setSelectBody(right.getSelectBody());
+      subsell.setAlias(SUBSEL_SUFFIX
+          + translationContext.getAndIncrementSubqueryCounter());
+
+      Map<String, TermMap> rightVar2TermMap = null;
+
+      if (right instanceof UnionWrapper) {
+        UnionWrapper rightWrapper = (UnionWrapper) right;
+        rightVar2TermMap = rightWrapper.getVar2TermMap(subsell.getAlias());
+      } else {
+        PlainSelectWrapper rightWrapper = (PlainSelectWrapper) right;
+        rightVar2TermMap = rightWrapper.getVar2TermMap();
+      }
+
+      for (String var : rightVar2TermMap.keySet()) {
+
+        // create a new subselect term for each term map in there.
+        TermMap subselTermMap = createSubseletTermMap(
+            rightVar2TermMap.get(var), var, subsell);
+        putTermMap(subselTermMap, var, optional);
+      }
+    }
+  }
 	
 	
 	/**

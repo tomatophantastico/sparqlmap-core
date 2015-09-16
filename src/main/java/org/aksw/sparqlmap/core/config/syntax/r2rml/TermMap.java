@@ -562,38 +562,6 @@ public class TermMap{
 	}
 	
 	
-	/**
-	 * Creates an Expression that returns, if the Term represented here returns null.
-	 * 
-	 * In case of all null statements, it will return constant false,
-	 * in case of constant expressions, it will return constant true; 
-	 * @return
-	 */
-	public Expression getNotNullExpression(){
-	  
-	  List<Expression> toChecks = new ArrayList<Expression>( getLiteralVals());
-	  toChecks.addAll(getResourceColSeg());
-	  
-	 
-	  List<Expression> isNotNulls = new ArrayList<Expression>();
-	  for(Expression tocheck: toChecks){
-	    IsNullExpression inn = new IsNullExpression();
-	    inn.setNot(true);
-	    inn.setLeftExpression(tocheck);
-	    isNotNulls.add(inn );
-	  }
-	  
-	  
-	
-	  
-	 
-	  
-	  
-	  
-	  return  new Parenthesis(FilterUtil.disjunct(isNotNulls));
-	  
-	  
-	}
 	
 
 	
