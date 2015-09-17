@@ -156,10 +156,38 @@ private static BitSet RESERVED = new BitSet();
 	 */
 	
 	public TermMap compareTermMaps(TermMap left, TermMap right, Class<? extends BinaryExpression> test){
+	  
+	  
+	
 		
 		
 		List<Expression> eqs = new ArrayList<Expression>();
+		
+		
+	
+		
+		
 		try{
+		  
+		  if(test.equals(EqualsTo.class)){
+		    Iterator<Expression> leftI = left.getLiteralVals().iterator();
+		    Iterator<Expression> rightI = right.getLiteralVals().iterator();
+		    
+		    while(leftI.hasNext()){
+		      Expression leftExpr = leftI.next();
+		      Expression rightExpr = rightI.next();
+		      EqualsTo eq = new EqualsTo();
+		      eq.setLeftExpression(leftExpr);
+		      eq.setRightExpression(rightExpr);
+		      eqs.add(eq);
+		    }
+		    
+		    
+		    
+	      
+	    }else{
+	      
+	    
 
   		if(!isAlwaysTrue(left.literalValBinary, right.literalValBinary)){
   			Expression literalBinaryEquality = bothNullOrBinary(left.literalValBinary, right.literalValBinary, test.newInstance(),dth);
@@ -185,6 +213,8 @@ private static BitSet RESERVED = new BitSet();
   			eqs.add(andTypesAreEqual(literalStringEquality,left,right));
   		}
   		
+	    }
+  		
   		//and check for the resources
   		
   		if(left.resourceColSeg.size()==0&&right.resourceColSeg.size()==0){
@@ -205,7 +235,7 @@ private static BitSet RESERVED = new BitSet();
   		
   		// and check that not all of any side are null
   		
-  		
+	    
 
 		
 		} catch (InstantiationException | IllegalAccessException e) {
@@ -215,7 +245,7 @@ private static BitSet RESERVED = new BitSet();
 		if(eqs.isEmpty()){
 			return tmf.createBoolTermMap( new StringExpression("true"));
 		}else{
-			return  tmf.createBoolTermMap(new Parenthesis(disjunct(eqs)));
+			return  tmf.createBoolTermMap(new Parenthesis(conjunct(eqs)));
 		}
 		
 	}

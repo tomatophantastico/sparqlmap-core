@@ -14,6 +14,7 @@ import java.util.Set;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
@@ -353,29 +354,7 @@ public class PlainSelectWrapper implements Wrapper{
   }
 
 
-  /**
-	 * checks if a column aliased varnull exists. if not a null column with that
-	 * name is added. useful for aligning unions.
-	 * 
-	 * @param varNull
-	 * @return true if sth. was added, otherwise false
-	 */
-	public boolean fillWithNullColumn(String varNull, String castType) {
-		for (String var : var2termMap.keySet()) {
-			if (var.equals(varNull)) {
-				// column already present, do nothing
-				return false;
-			}
-		}
 
-		// we're here, so it is not already there
-		SelectExpressionItem sei = new SelectExpressionItem();
-		sei.setExpression(dth.cast(new NullValue(),castType));
-		sei.setAlias(varNull);
-		plainSelect.getSelectItems().add(sei);
-		return true;
-
-	}
 
 	public Map<String, TermMap> getVar2TermMap() {
 		return var2termMap;

@@ -86,8 +86,12 @@ public class ColumnHelper {
   }
 
   public static boolean isColnameResourceSegment(String colalias) {
+    
+    boolean result = false;
+    String substringToCheck = colalias.substring(colalias.indexOf(R2R_COL_SUFFIX) );
+    result = substringToCheck.startsWith(COL_NAME_RESOURCE_COL_SEGMENT);
 
-    return colalias.substring(colalias.indexOf(R2R_COL_SUFFIX) + 4).startsWith(COL_NAME_RESOURCE_COL_SEGMENT);
+    return result;
   }
   
   /*
