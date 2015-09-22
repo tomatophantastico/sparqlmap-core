@@ -93,7 +93,7 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
       Connection conn = null;
       try {
         conn = getConnector().getConnection();
-        SqlFile schemaSqlFile = new SqlFile((this.sqlFile));
+        SqlFile schemaSqlFile = new SqlFile(this.sqlFile);
         schemaSqlFile.setConnection(conn);
         schemaSqlFile.execute();
         conn.commit();

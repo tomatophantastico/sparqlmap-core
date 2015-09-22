@@ -67,7 +67,7 @@ public abstract class SparqlMapQueryBaseTest {
         File mappingFile = new File(dataSetFolder,"mapping.ttl");
  
         
-        File sqlFile = new File(dataSetFolder,"dataset-"+dbname+".sql");
+        File sqlFile = new File(dataSetFolder,"dataset-"+dbname.toLowerCase()+".sql");
         
         if(!sqlFile.exists()){
           sqlFile = new File(dataSetFolder,"dataset.sql");
