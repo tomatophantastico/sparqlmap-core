@@ -60,7 +60,7 @@ public class DBHelper {
     rdp.addScript(new FileSystemResource(file));
     conn.setAutoCommit(true);
     rdp.populate(conn);
-    conn.close();
+    
   }
 
 }

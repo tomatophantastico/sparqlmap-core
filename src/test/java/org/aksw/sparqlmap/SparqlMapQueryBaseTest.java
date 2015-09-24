@@ -39,6 +39,7 @@ public abstract class SparqlMapQueryBaseTest {
   File sqlFile;
   String query;
   
+  SparqlMap sparqlMap;
   
   
   
@@ -91,8 +92,8 @@ public abstract class SparqlMapQueryBaseTest {
   
   @Test
   public void runTest() throws SQLException{
-    
-    TestHelper.executeAndCompare(getSparqlMap(), query, this.dsName, testname);
+    sparqlMap = getSparqlMap();
+    TestHelper.executeAndCompare(sparqlMap, query, this.dsName, testname);
     
   }
   

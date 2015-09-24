@@ -3,6 +3,7 @@ package org.aksw.sparqlmap;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,9 +13,12 @@ import java.util.Properties;
 import org.aksw.sparqlmap.core.SparqlMap;
 import org.aksw.sparqlmap.core.db.impl.MySQLConnector;
 import org.aksw.sparqlmap.core.spring.ContextSetup;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.runners.Parameterized.Parameters;
 import org.springframework.context.ApplicationContext;
+
+import com.mysql.jdbc.Statement;
 
 /**
  * Test using a mysql instance the test can completely mess up. Default setup is to test against a dockerized boot to docker setup.
@@ -85,17 +89,39 @@ public class SparqlMapQueryMySQLTest  extends SparqlMapQueryBaseTest{
     return props;
   }
   
+  @After
+  public void close(){
+    sparqlMap.close();
+  }
+  
   @Before
-  public void initDB() throws SQLException{
-    Connection conn = getConnection();
+  public void initDB() throws SQLException {
+    String tablename = "sparqlmaptest_" + this.dsName;
+    String queryForTestTable = String.format("select 1 from \"%s\" limit 1;",
+        tablename);
 
-    DBHelper.flushDb(conn);
-    DBHelper.loadSqlFile(conn, sqlFile.getAbsolutePath());
-    
-    
-    
+    try (Connection conn = getConnection();
+        java.sql.Statement stmt = conn.createStatement();) {
+      boolean createNew = false;
+      try (
 
-    conn.close();
+          ResultSet rs = stmt.executeQuery(queryForTestTable);) {
+        
+       
+
+        } catch (SQLException e) {
+          createNew = true;
+        }
+      
+      if (createNew) {
+        DBHelper.flushDb(conn);
+        DBHelper.loadSqlFile(conn, sqlFile.getAbsolutePath());
+        try (java.sql.Statement stmtInsert = conn.createStatement();) {
+          stmtInsert.execute(String.format("Create table %s (id int);", tablename));
+
+        }
+      }
+    }
   }
   
   

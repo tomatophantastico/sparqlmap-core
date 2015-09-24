@@ -82,7 +82,7 @@ public abstract  class DataTypeHelper {
 		if( sdt == Types.FLOAT || sdt == Types.DOUBLE || sdt ==Types.REAL ){
 			return XSDDatatype.XSDdouble;
 		}
-		if(sdt == Types.VARCHAR || sdt == Types.CHAR || sdt == Types.CLOB){
+		if(sdt == Types.VARCHAR || sdt == Types.CHAR || sdt == Types.CLOB || sdt == Types.LONGNVARCHAR || sdt == Types.LONGVARCHAR ){
 			return null; //XSDDatatype.XSDstring;
 		}
 		if(sdt == Types.DATE ){
@@ -111,7 +111,7 @@ public abstract  class DataTypeHelper {
 			return null;
 		}
 	
-			log.info("encountered non-explicitly mapped sql type:" + sdt );
+			log.info("encountered non-explicitly mapped sql type:");
 			return null; //XSDDatatype.XSDstring;
 	
 	}
