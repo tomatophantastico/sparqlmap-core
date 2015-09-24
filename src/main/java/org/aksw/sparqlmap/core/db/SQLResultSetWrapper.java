@@ -96,7 +96,7 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
     }
 
     for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-      String colname = rs.getMetaData().getColumnName(i);
+      String colname = rs.getMetaData().getColumnLabel(i);
       colNames.add(colname);
 
       // if (colname.endsWith(ColumnHelper.COL_NAME_RDFTYPE)) {
@@ -282,21 +282,7 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
       literalValue = new String(hex);
 
     } else {
-      if (colNames.contains(var + ColumnHelper.COL_NAME_LITERAL_STRING)
-        && rs.getString(var + ColumnHelper.COL_NAME_LITERAL_STRING) != null) {
-        literalValue = rs.getString(var + ColumnHelper.COL_NAME_LITERAL_STRING);
-      } else if (colNames.contains(var + ColumnHelper.COL_NAME_LITERAL_DATE)
-        && rs.getString(var + ColumnHelper.COL_NAME_LITERAL_DATE) != null) {
-        literalValue = rs.getString(var + ColumnHelper.COL_NAME_LITERAL_DATE);
-      } else if (colNames.contains(var + ColumnHelper.COL_NAME_LITERAL_NUMERIC)
-        && rs.getString(var + ColumnHelper.COL_NAME_LITERAL_NUMERIC) != null) {
-        literalValue =
-          rs.getString(var + ColumnHelper.COL_NAME_LITERAL_NUMERIC);
-      } else {
-        // throw new
-        // ImplementationException("Should not get here, check datatypes");
-        literalValue = null;
-      }
+      literalValue = rs.getString(var + ColumnHelper.COL_NAME_LITERAL_STRING);
     }
 
     if (literalValue != null) {
