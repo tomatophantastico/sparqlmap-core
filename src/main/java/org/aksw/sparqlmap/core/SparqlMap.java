@@ -1,6 +1,8 @@
 package org.aksw.sparqlmap.core;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.sql.SQLException;
@@ -524,5 +526,11 @@ public class SparqlMap {
 
   protected Mapper getMapper() {
     return mapper;
+  }
+
+  
+  public void close(){
+    this.dbConf.close();
+    
   }
 }
