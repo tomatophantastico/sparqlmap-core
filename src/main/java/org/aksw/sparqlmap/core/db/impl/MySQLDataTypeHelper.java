@@ -75,23 +75,10 @@ public class MySQLDataTypeHelper extends DataTypeHelper {
 		
 		return false;
 	}
-	
-//	@Override
-//	public List<Expression> getRowIdFunction(String fromAlias) {
-//		List<Expression> expressions=  new ArrayList<Expression>();
-//		if(fromAlias!=null){
-//			StringValue fromAliasValue = new StringValue("\"" + fromAlias + "\"");
-//			expressions.add(cast(fromAliasValue, getStringCastType()));
-//			
-//		}else{
-//			StringValue fromAliasValue = new StringValue("\"\"");
-//			expressions.add(cast(fromAliasValue, getStringCastType()));
-//		}
-//		
-//		StringExpression rowid = new StringExpression("_rowid");
-//		expressions.add(cast(rowid, getStringCastType()));
-//		return expressions;
-//
-//	}
 
+	
+	 @Override
+	public Expression cast(Expression expr, String castTo) {
+	  return expr;
+	}
 }
