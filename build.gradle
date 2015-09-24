@@ -61,6 +61,7 @@ dependencies {
     testCompile 'junit:junit:4.11'
     testCompile 'org.hsqldb:sqltool:2.3.3'
     testCompile "org.apache.jena:jena-tdb:1.1.1"
+    testCompile 'mysql:mysql-connector-java:5.1.36'
 
 
 }
