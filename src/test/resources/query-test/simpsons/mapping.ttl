@@ -5,7 +5,7 @@
 @prefix dbpedia-owl: <http://dbpedia.org/ontology/> .
 @prefix simpsons: <http://thesimpsons.com/> .
 
-<TriplesMapPerson>
+<#TriplesMapPerson>
     rr:logicalTable [ rr:tableName "Person" ];
     rr:subjectMap [
         rr:template "http://thesimpsons.com/{id}";
@@ -26,115 +26,115 @@
     ];
     .
 
-#<TriplesMapKnows>
-#    rr:logicalTable [ rr:tableName "Knows" ];
-#    rr:subjectMap [
-#        rr:template "http://thesimpsons.com/{personId}";
-#        rr:class simpsons:Person;
-#        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
-#    ];
-#    rr:predicateObjectMap [
-#        rr:predicate foaf:knows;
-#        rr:objectMap [
-#            rr:parentTriplesMap <#TriplesMapPerson>;
-#            rr:joinCondition [
-#                rr:parent "id";
-#                rr:child "knowsId";
-#            ];
-#        ];
-#    ];
-#    .
-#
-#<TriplesMapSiblingOf>
-#    rr:logicalTable [ rr:tableName "Sibling" ];
-#    rr:subjectMap [
-#        rr:template "http://thesimpsons.com/{personId}";
-#        rr:class simpsons:Person;
-#        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
-#    ];
-#    rr:predicateObjectMap [
-#        rr:predicate simpsons:siblingOf;
-#        rr:objectMap [
-#            rr:parentTriplesMap <#TriplesMapPerson>;
-#            rr:joinCondition [
-#                rr:parent "id";
-#                rr:child "siblingId";
-#            ];
-#        ];
-#    ];
-#    .
-#
-#<TriplesMapChildOf>
-#    rr:logicalTable [ rr:tableName "Child" ];
-#    rr:subjectMap [
-#        rr:template "http://thesimpsons.com/{personId}";
-#        rr:class simpsons:Person;
-#        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
-#    ];
-#    rr:predicateObjectMap [
-#        rr:predicate simpsons:childOf;
-#        rr:objectMap [
-#            rr:parentTriplesMap <#TriplesMapPerson>;
-#            rr:joinCondition [
-#                rr:parent "id";
-#                rr:child "parentId";
-#            ];
-#        ];
-#    ];
-#    .
-#    
-#<TriplesMapStripClub>
-#    rr:logicalTable [ rr:tableName "StripClub" ];
-#    rr:subjectMap [
-#        rr:template "http://thesimpsons.com/{id}";
-#        rr:class simpsons:StripClub;
-#        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
-#    ];
-#    rr:predicateObjectMap [
-#        rr:predicate vcard:street-address;
-#        rr:objectMap [ rr:column "streetAddress" ];
-#    ];
-#    rr:predicateObjectMap [
-#        rr:predicate vcard:locality;
-#        rr:objectMap [ rr:column "locality" ];
-#    ];
-#    rr:predicateObjectMap [
-#        rr:predicate owl:sameAs;
-#        rr:objectMap [ rr:template "http://simpsons.wikia.com/wiki/{wikiaId}" ];
-#    ];
-#    .
-#    
-#<TriplesMapSupermarket>
-#    rr:logicalTable [ rr:tableName "Supermarket" ];
-#    rr:subjectMap [
-#        rr:template "http://thesimpsons.com/{id}";
-#        rr:class simpsons:Supermarket;
-#        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
-#    ];
-#    rr:predicateObjectMap [
-#        rr:predicate owl:sameAs;
-#        rr:objectMap [ rr:template "http://simpsons.wikia.com/wiki/{wikiaId}" ];
-#    ];
-#    .
-#
-#<TriplesMapClown>
-#    rr:logicalTable [ rr:tableName "Clown" ];
-#    rr:subjectMap [
-#        rr:template "http://thesimpsons.com/{personId}";
-#        rr:class simpsons:Clown;
-#        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
-#    ];
-#    .
-#
-#<TriplesMapGraffityArtirst>
-#    rr:logicalTable [ rr:tableName "GraffityArtist" ];
-#    rr:subjectMap [
-#        rr:template "http://thesimpsons.com/{personId}";
-#        rr:class simpsons:GraffityArtist;
-#        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
-#    ];
-#    rr:predicateObjectMap [
-#      rr:predicate foaf:nick;
-#        rr:objectMap [ rr:column "nick" ];
-#    ];
-#    .
+<#TriplesMapKnows>
+    rr:logicalTable [ rr:tableName "Knows" ];
+    rr:subjectMap [
+        rr:template "http://thesimpsons.com/{personId}";
+        rr:class simpsons:Person;
+        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
+    ];
+    rr:predicateObjectMap [
+        rr:predicate foaf:knows;
+        rr:objectMap [
+            rr:parentTriplesMap <#TriplesMapPerson>;
+            rr:joinCondition [
+                rr:parent "id";
+                rr:child "knowsId";
+            ];
+        ];
+    ];
+    .
+
+<#TriplesMapSiblingOf>
+    rr:logicalTable [ rr:tableName "Sibling" ];
+    rr:subjectMap [
+        rr:template "http://thesimpsons.com/{personId}";
+        rr:class simpsons:Person;
+        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
+    ];
+    rr:predicateObjectMap [
+        rr:predicate simpsons:siblingOf;
+        rr:objectMap [
+            rr:parentTriplesMap <#TriplesMapPerson>;
+            rr:joinCondition [
+                rr:parent "id";
+                rr:child "siblingId";
+            ];
+        ];
+    ];
+    .
+
+<#TriplesMapChildOf>
+    rr:logicalTable [ rr:tableName "Child" ];
+    rr:subjectMap [
+        rr:template "http://thesimpsons.com/{personId}";
+        rr:class simpsons:Person;
+        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
+    ];
+    rr:predicateObjectMap [
+        rr:predicate simpsons:childOf;
+        rr:objectMap [
+            rr:parentTriplesMap <#TriplesMapPerson>;
+            rr:joinCondition [
+                rr:parent "id";
+                rr:child "parentId";
+            ];
+        ];
+    ];
+    .
+    
+<#TriplesMapStripClub>
+    rr:logicalTable [ rr:tableName "StripClub" ];
+    rr:subjectMap [
+        rr:template "http://thesimpsons.com/{id}";
+        rr:class simpsons:StripClub;
+        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
+    ];
+    rr:predicateObjectMap [
+        rr:predicate vcard:street-address;
+        rr:objectMap [ rr:column "streetAddress" ];
+    ];
+    rr:predicateObjectMap [
+        rr:predicate vcard:locality;
+        rr:objectMap [ rr:column "locality" ];
+    ];
+    rr:predicateObjectMap [
+        rr:predicate owl:sameAs;
+        rr:objectMap [ rr:template "http://simpsons.wikia.com/wiki/{wikiaId}" ];
+    ];
+    .
+    
+<#TriplesMapSupermarket>
+    rr:logicalTable [ rr:tableName "Supermarket" ];
+    rr:subjectMap [
+        rr:template "http://thesimpsons.com/{id}";
+        rr:class simpsons:Supermarket;
+        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
+    ];
+    rr:predicateObjectMap [
+        rr:predicate owl:sameAs;
+        rr:objectMap [ rr:template "http://simpsons.wikia.com/wiki/{wikiaId}" ];
+    ];
+    .
+
+<#TriplesMapClown>
+    rr:logicalTable [ rr:tableName "Clown" ];
+    rr:subjectMap [
+        rr:template "http://thesimpsons.com/{personId}";
+        rr:class simpsons:Clown;
+        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
+    ];
+    .
+
+<#TriplesMapGraffityArtirst>
+    rr:logicalTable [ rr:tableName "GraffityArtist" ];
+    rr:subjectMap [
+        rr:template "http://thesimpsons.com/{personId}";
+        rr:class simpsons:GraffityArtist;
+        rr:graphMap [ rr:template "http://thesimpsons.com/Graph{context}" ];
+    ];
+    rr:predicateObjectMap [
+      rr:predicate foaf:nick;
+        rr:objectMap [ rr:column "nick" ];
+    ];
+    .
