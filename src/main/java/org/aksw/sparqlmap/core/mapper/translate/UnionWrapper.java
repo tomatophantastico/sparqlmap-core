@@ -126,7 +126,7 @@ public class UnionWrapper implements Wrapper {
 						if(ColumnHelper.isColnameResourceSegment(alias)){
 							emptysei.setExpression(dth.cast(new StringValue("\"\""),dth.getCastType(alias)));
 						}else{
-							emptysei.setExpression(dth.cast(new NullValue(),dth.getCastType(alias)));
+							emptysei.setExpression(dth.getDefaultValue(dth.getCastType(alias)));
 						}
 						filledUp.add(emptysei);
 

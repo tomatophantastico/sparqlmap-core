@@ -386,6 +386,28 @@ public abstract  class DataTypeHelper {
 	  return cast(new StringValue("'0x01'"),getBinaryDataType());
 	}
   
+	
+	public Expression getDefaultValue(String castType){
+	  Expression result = null;
+	  
+	  if(castType.equals(getStringCastType())){
+	    result =  getStringDefaultExpression();
+	  }else if(castType.equals(getBinaryDataType())){
+	    result = getBinaryDefaultExpression();
+	  }else if(castType.equals(getBooleanCastType())){
+	    result = getBooleanDefaultExpression();
+	  }else if(castType.equals(getDateCastType())){
+	    result = getDateDefaultExpression();
+	  }else if(castType.equals(getIntCastType())){
+	    result = getIntegerDefaultExpression();
+	  }else if(castType.equals(getNumericCastType())){
+	    result = getNumericDefaultExpression();
+	  }
+
+	  return result;
+	  
+	  
+	}
 
 
 }
