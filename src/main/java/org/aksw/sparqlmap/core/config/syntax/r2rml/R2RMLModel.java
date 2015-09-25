@@ -573,6 +573,11 @@ public class R2RMLModel {
 				Resource predicateMapResource = reasoningModel.getProperty(poResource, R2RML.predicateMap).getResource();
 				Resource objectMapResource = reasoningModel.getProperty(poResource, R2RML.objectMap).getResource();
 				
+				//check if this not a parent triple map reference, if it is ignore it
+				
+				if(!objectMapResource.hasProperty(R2RML.parentTriplesMap)){
+				  
+				
 				
 				// get the graph statements for the po here.
 				List<Statement> graphMapStmts =  reasoningModel.listStatements(poResource, R2RML.graphMap,(RDFNode) null).toList();
@@ -628,6 +633,7 @@ public class R2RMLModel {
 					graphTripleMap.addPO(ptm, otm);	
 				}				
 				this.tripleMaps.putAll(tmUri.toString(),graph2TripleMap.values());
+			}
 			}
 		}
 	}
