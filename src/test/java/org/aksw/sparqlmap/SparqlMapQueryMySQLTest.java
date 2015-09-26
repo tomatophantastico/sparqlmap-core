@@ -23,8 +23,7 @@ import com.mysql.jdbc.Statement;
 /**
  * Test using a mysql instance the test can completely mess up. Default setup is to test against a dockerized boot to docker setup.
  * 
- * e.g.:  docker run -it -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=sparqlmaptest -e MYSQL_USER=sparqlmap MYSQL_PASSWORD=sparqlmap -d mysql
- * 
+ * e.g.:  docker run --rm -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=sparqlmaptest -e MYSQL_USER=sparqlmap -e MYSQL_PASSWORD=sparqlmap -p 3306:3306 mysql
  * @author joerg
  *
  */
@@ -48,20 +47,7 @@ public class SparqlMapQueryMySQLTest  extends SparqlMapQueryBaseTest{
   private String password = "sparqlmap";
   
   
-  @Override
-  public boolean canConnect() {
-    try {
-      getConnection().close();
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      return false;
-    }
-    
-    
-    
-    
-    return true;
-  }
+ 
   @Override
   public SparqlMap getSparqlMap() {
     
@@ -88,14 +74,9 @@ public class SparqlMapQueryMySQLTest  extends SparqlMapQueryBaseTest{
     
     return props;
   }
-  
-  @After
-  public void close(){
-    sparqlMap.close();
-  }
-  
-  @Before
-  public void initDB() throws SQLException {
+
+  @Override
+  public boolean initDb() {
     String tablename = "sparqlmaptest_" + this.dsName;
     String queryForTestTable = String.format("select 1 from \"%s\" limit 1;",
         tablename);
@@ -121,7 +102,11 @@ public class SparqlMapQueryMySQLTest  extends SparqlMapQueryBaseTest{
 
         }
       }
+    } catch (SQLException e1) {
+      e1.printStackTrace();
+      return false;
     }
+    return true;
   }
   
   
@@ -131,6 +116,9 @@ public class SparqlMapQueryMySQLTest  extends SparqlMapQueryBaseTest{
 
     return DriverManager.getConnection(jdbcString,username,password);
   }
+
+
+
   
   
   

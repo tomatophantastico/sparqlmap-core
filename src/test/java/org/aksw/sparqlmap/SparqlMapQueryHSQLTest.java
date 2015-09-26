@@ -45,12 +45,6 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
   private SparqlMap r2r;
   private ApplicationContext con;
 
-  @Before
-  public void init() {
-    initDatabase();
-    setupSparqlMap();
-
-  }
 
   @After
   public void close() {
@@ -63,6 +57,7 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
     return hsqldbFileLocationprefix + this.dsName +"/db";
   }
 
+  @Before
   public void setupSparqlMap() {
     
     
@@ -78,7 +73,7 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
 
   }
 
-  public void initDatabase() {
+  public boolean initDb() {
 
     server = new Server();
     server.setSilent(true);
@@ -112,6 +107,7 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
       }
 
     }
+    return true;
 
   }
 
@@ -145,13 +141,8 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
   public SparqlMap getSparqlMap() {
     return r2r;
   }
-  
-  @Override
-  public boolean canConnect() {
-    return true;
-  }
 
-  
+
   
   
   

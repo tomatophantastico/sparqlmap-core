@@ -15,11 +15,13 @@ public class SparqlMapQuerySqlServerTest extends SparqlMapQueryBaseTest{
   public SparqlMap getSparqlMap() {
     return null;
   }
-  
+
   @Override
-  public boolean canConnect() {
+  public boolean initDb() {
     // TODO Auto-generated method stub
     return false;
   }
+  
+
 
 }

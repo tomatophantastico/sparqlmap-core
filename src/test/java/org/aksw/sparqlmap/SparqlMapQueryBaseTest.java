@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.aksw.sparqlmap.core.SparqlMap;
+import org.junit.After;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -92,20 +94,25 @@ public abstract class SparqlMapQueryBaseTest {
   
   @Test
   public void runTest() throws SQLException{
+    
+    boolean initResult = initDb();
+    Assume.assumeTrue("Could not initialize database ",initResult);
+    
     sparqlMap = getSparqlMap();
     TestHelper.executeAndCompare(sparqlMap, query, this.dsName, testname);
     
   }
   
-  
-  /**
-   * Indicates wether the subclassing test can exeute SQL commands on the database.
-   * 
-   * @return true, if the configured database is reachable.
-   */
-  public abstract boolean canConnect();
+ 
   
   public abstract SparqlMap getSparqlMap();
 
+  public abstract boolean initDb();
+  
+  
+  @After
+  public void close(){
+    sparqlMap.close();
+  }
 
 }
