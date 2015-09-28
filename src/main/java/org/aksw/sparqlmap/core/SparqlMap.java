@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
@@ -328,18 +329,19 @@ public class SparqlMap {
     for (Node node : iris) {
       String con1 =
         "CONSTRUCT {?s_sm ?p_sm <" + node.getURI() + "> } WHERE { ?s_sm ?p_sm <" + node.getURI() + "> }";
+      
       TranslationContext subCon1 = new TranslationContext();
       subCon1.setTargetContentType(context.getTargetContentType());
       subCon1.setQueryString(con1);
       subCon1.setQueryName("construct incoming query");
-      subCon1.setQuery(QueryFactory.create(con1));
+      subCon1.setQuery(copyFromAndFromNamedGraph(QueryFactory.create(con1), context.getQuery()) );
 
       model.add(executeConstruct(subCon1));
       String con2 = "CONSTRUCT { <" + node.getURI() + "> ?p_sm ?o_sm} WHERE { <" + node.getURI() + "> ?p_sm ?o_sm}";
       TranslationContext subCon2 = new TranslationContext();
       subCon2.setTargetContentType(context.getTargetContentType());
       subCon2.setQueryString(con2);
-      subCon2.setQuery(QueryFactory.create(con2));
+      subCon2.setQuery(copyFromAndFromNamedGraph(QueryFactory.create(con2),context.getQuery()));
       subCon2.setQueryName("construct outgoing query");
 
       model.add(executeConstruct(subCon2));
@@ -348,6 +350,19 @@ public class SparqlMap {
     
     return model;
     
+  }
+  
+  private Query copyFromAndFromNamedGraph(Query into, Query source){
+    
+    
+    for(String from: source.getGraphURIs()){
+      into.addGraphURI(from);
+    }
+    for(String fromNamed: source.getNamedGraphURIs()){
+      into.addNamedGraphURI(fromNamed);
+    }
+    
+    return into;
   }
 
   
