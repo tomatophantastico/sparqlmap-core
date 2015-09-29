@@ -519,7 +519,8 @@ public class PlainSelectWrapper implements Wrapper{
     // then we can add it directly to the plain select.
 
     if (filterUtil.getOptConf().optimizeSelfLeftJoin == true
-        && right instanceof PlainSelectWrapper
+        && right instanceof PlainSelectWrapper 
+        && ((PlainSelectWrapper)right).getSubselects().isEmpty()
         && ((PlainSelectWrapper) right).getVarsMentioned().size() == 4
         && ((PlainSelectWrapper) right).subselects.size() == 0) {
       PlainSelectWrapper ps = (PlainSelectWrapper) right;
@@ -552,6 +553,9 @@ public class PlainSelectWrapper implements Wrapper{
 
       // create a new subselect
       SubSelect subsell = new SubSelect();
+       //register it 
+     
+      
       subsell.setSelectBody(right.getSelectBody());
       subsell.setAlias(SUBSEL_SUFFIX
           + translationContext.getAndIncrementSubqueryCounter());
@@ -573,6 +577,7 @@ public class PlainSelectWrapper implements Wrapper{
             rightVar2TermMap.get(var), var, subsell);
         putTermMap(subselTermMap, var, optional);
       }
+      this.subselects.put(subsell, right);
     }
   }
 	

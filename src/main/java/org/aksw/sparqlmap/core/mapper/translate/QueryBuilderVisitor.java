@@ -43,6 +43,7 @@ import com.hp.hpl.jena.sparql.algebra.op.OpExt;
 import com.hp.hpl.jena.sparql.algebra.op.OpExtend;
 import com.hp.hpl.jena.sparql.algebra.op.OpFilter;
 import com.hp.hpl.jena.sparql.algebra.op.OpGraph;
+import com.hp.hpl.jena.sparql.algebra.op.OpGroup;
 import com.hp.hpl.jena.sparql.algebra.op.OpJoin;
 import com.hp.hpl.jena.sparql.algebra.op.OpLabel;
 import com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin;
@@ -153,7 +154,9 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 					.get(mainsb);
 		}
 		
-		SelectBody leftsb =selects.pop();
+    processFilterExpressions(opLeftJoin.getExprs().getList());
+		
+    SelectBody leftsb =selects.pop();
 		PlainSelectWrapper left = (PlainSelectWrapper) selectBody2Wrapper
 					.get(leftsb);
 	
@@ -176,91 +179,89 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 //        }else{
 //
 //        }
+		
 		selects.push(main.getSelectBody());
+
+	}
+	
+	private void processFilterExpressions(List<Expr> exprs){
+	  Wrapper wrap  =  this.selectBody2Wrapper.get(selects.peek());
+    
+    if(wrap instanceof UnionWrapper){
+      UnionWrapper unionWrap = (UnionWrapper) wrap;
+      boolean unpushable = true;
+      for(Expr toPush : exprs){
+        
+        Set<String> filterVars = new HashSet<String>();
+        for(Var var: toPush.getVarsMentioned()){
+          filterVars.add(var.getName());
+        }
+        unpushable = pushIntoUnion(toPush, filterVars, unionWrap);
+
+      }
+
+      if(unpushable){
+        //so the filter could not be pushed, we need to evaluate in the upper select
+        //we have to wrap the union uinto a plainselect;
+        PlainSelectWrapper ps = new PlainSelectWrapper(selectBody2Wrapper, dataTypeHelper, exprconv, filterUtil, translationContext);
+        ps.addSubselect(unionWrap, false);
+        
+        ps.addFilterExpression(new ArrayList<Expr>(exprs));
+        selects.pop();
+        selects.push(ps.getSelectBody());
+        
+      }
+      
+      
+      
+    }else{
+      PlainSelectWrapper pswrap = (PlainSelectWrapper) wrap;
+      if(this.pushFilters == true && pswrap.getSubselects().size()>0){
+        // try to stuff everything into the unions
+        for(Expr toPush : exprs){
+          
+          Set<String> filterVars = new HashSet<String>();
+          for(Var var: toPush.getVarsMentioned()){
+            filterVars.add(var.getName());
+          }
+        
+          
+          
+          boolean unpushable = false;
+          for(SubSelect subselect :pswrap.getSubselects().keySet()){
+            Wrapper subSelectWrapper = pswrap.getSubselects().get(subselect);
+            if(subSelectWrapper instanceof UnionWrapper){
+              unpushable = pushIntoUnion(toPush, filterVars,subSelectWrapper);
+              
+              
+            }else{
+              // do nothing else, here be dragons
+              unpushable = true;
+            }
+          }
+          if(unpushable){
+            //so the filter could not be pushed, we need to evaluate in the upper select
+            pswrap.addFilterExpression(new ArrayList<Expr>(Arrays.asList(toPush)));
+          }
+        }
+        
+        
+        
+        
+      }else{
+        //no filter pushing, just put it in
+        
+        pswrap.addFilterExpression(new ArrayList<Expr>(exprs));
+      }
+    }
 
 	}
 	
 	
 	@Override
 	public void visit(OpFilter opfilter){
-		Wrapper wrap  =  this.selectBody2Wrapper.get(selects.peek());
-		
-		if(wrap instanceof UnionWrapper){
-			UnionWrapper unionWrap = (UnionWrapper) wrap;
-			boolean unpushable = true;
-			for(Expr toPush : opfilter.getExprs().getList()){
+	  processFilterExpressions(opfilter.getExprs().getList());
 				
-				Set<String> filterVars = new HashSet<String>();
-				for(Var var: toPush.getVarsMentioned()){
-					filterVars.add(var.getName());
-				}
-				unpushable = pushIntoUnion(toPush, filterVars, unionWrap);
-
-			}
-
-			if(unpushable){
-				//so the filter could not be pushed, we need to evaluate in the upper select
-				//we have to wrap the union uinto a plainselect;
-				PlainSelectWrapper ps = new PlainSelectWrapper(selectBody2Wrapper, dataTypeHelper, exprconv, filterUtil, translationContext);
-				ps.addSubselect(unionWrap, false);
-				
-				ps.addFilterExpression(new ArrayList<Expr>(opfilter.getExprs().getList()));
-				selects.pop();
-				selects.push(ps.getSelectBody());
-				
-			}
-			
-			
-			
-		}else{
-			PlainSelectWrapper pswrap = (PlainSelectWrapper) wrap;
-			if(this.pushFilters == true && pswrap.getSubselects().size()>0){
-				// try to stuff everything into the unions
-				for(Expr toPush : opfilter.getExprs().getList()){
-					
-					Set<String> filterVars = new HashSet<String>();
-					for(Var var: toPush.getVarsMentioned()){
-						filterVars.add(var.getName());
-					}
-				
-					
-					
-					boolean unpushable = false;
-					for(SubSelect subselect :pswrap.getSubselects().keySet()){
-						Wrapper subSelectWrapper = pswrap.getSubselects().get(subselect);
-						if(subSelectWrapper instanceof UnionWrapper){
-							unpushable = pushIntoUnion(toPush, filterVars,subSelectWrapper);
-							
-							
-						}else{
-							// do nothing else, here be dragons
-							unpushable = true;
-						}
-					}
-					if(unpushable){
-						//so the filter could not be pushed, we need to evaluate in the upper select
-						pswrap.addFilterExpression(new ArrayList<Expr>(Arrays.asList(toPush)));
-					}
-				}
-				
-				
-				
-				
-			}else{
-				//no filter pushing, just put it in
-				
-				pswrap.addFilterExpression(new ArrayList<Expr>(opfilter.getExprs().getList()));
-			}
-		}
-		
-		
-		
-		
-		
-		
-		
-	
-		
 	}
 
 	public boolean pushIntoUnion(Expr toPush, Set<String> filterVars,
@@ -584,7 +585,17 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 
 	@Override
 	public void visit(OpExtend opExtend) {
-		throw new ImplementationException("Unimplemented Function");
+	  
+	  
+	  //opExtend.getSubOp().visit(opVisitor);
+	  
+	  //PlainSelect ps = this.selects.pop();
+	  //PlainSelectWrapper psw = this.selectBody2Wrapper.get(ps);
+	  //TermMap termMap = this.exprconv.asTermMap(opExtend.getSubOp(), psw.getVar2TermMap());
+	  
+	  //selectBody2Wrapper.get(ps).putTermMap(termMap, alias, false);
+	  
+		//throw new ImplementationException("Unimplemented Function");
 		
 	}
 
@@ -670,6 +681,15 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	public void visit(OpTopN opTop) {
 		throw new ImplementationException("Unimplemented Function");
 		
+	}
+	
+	@Override
+	public void visit(OpGroup opGroup) {
+	  
+
+	  
+    throw new ImplementationException("Unimplemented Function");
+
 	}
 
 
