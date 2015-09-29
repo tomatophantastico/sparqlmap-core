@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLModel;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
@@ -257,7 +258,13 @@ public class Binder {
 
 		}
 		
-		
+	  
+	  @Override
+    public
+	  void visit(OpTable opTable){
+	    throw new ImplementationException("Values/Table not implmeneted");
+	  }
+	  
 		
 		
 	}
@@ -428,7 +435,7 @@ public class Binder {
 		return result;
 	}
 
-	
+
 	
 
 
