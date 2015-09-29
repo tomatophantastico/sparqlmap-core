@@ -128,6 +128,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	@Override
 	public void visit(OpTable opTable){
 		selects.push(new DummyBody());
+		throw new ImplementationException("Function OpTable not implmeneted");
 
 	}
 	
@@ -153,9 +154,9 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 			main = (PlainSelectWrapper) selectBody2Wrapper
 					.get(mainsb);
 		}
-		
-    processFilterExpressions(opLeftJoin.getExprs().getList());
-		
+		if(opLeftJoin.getExprs()!=null){
+		  processFilterExpressions(opLeftJoin.getExprs().getList());
+		}
     SelectBody leftsb =selects.pop();
 		PlainSelectWrapper left = (PlainSelectWrapper) selectBody2Wrapper
 					.get(leftsb);

@@ -522,7 +522,8 @@ public class PlainSelectWrapper implements Wrapper{
         && right instanceof PlainSelectWrapper 
         && ((PlainSelectWrapper)right).getSubselects().isEmpty()
         && ((PlainSelectWrapper) right).getVarsMentioned().size() == 4
-        && ((PlainSelectWrapper) right).subselects.size() == 0) {
+        && ((PlainSelectWrapper) right).subselects.size() == 0
+        && this.getFromItemAliases().containsAll(((PlainSelectWrapper) right).getFromItemAliases())) {
       PlainSelectWrapper ps = (PlainSelectWrapper) right;
 
       // we require the not shared variable to be either constant resource
@@ -585,7 +586,7 @@ public class PlainSelectWrapper implements Wrapper{
 	/**
 	 * return all from items mentioned in this plainselectwrapper. Not including any fromitems mentioned in subqueries.
 	 */
-	private Set<String> getFromItemAliases(){
+	public Set<String> getFromItemAliases(){
 		
 		Set<String> fis = new HashSet<String>();
 		fis.add(this.plainSelect.getFromItem().getAlias());
