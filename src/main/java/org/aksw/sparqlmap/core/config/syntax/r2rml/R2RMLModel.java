@@ -192,6 +192,11 @@ public class R2RMLModel {
 							if(col.getTable().getAlias()==null){
 								col.getTable().setAlias(col.getTable().getName());
 							}
+							
+							if(((SelectExpressionItem) si).getAlias()==null){
+							  ((SelectExpressionItem) si).setAlias(col.getColumnName());
+							}
+							
 							String alias = ((SelectExpressionItem) si).getAlias();
 							projections.put( alias,col );	
 						}
