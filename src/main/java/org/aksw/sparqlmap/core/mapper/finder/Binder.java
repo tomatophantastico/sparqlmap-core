@@ -262,7 +262,14 @@ public class Binder {
 	  @Override
     public
 	  void visit(OpTable opTable){
-	    throw new ImplementationException("Values/Table not implmeneted");
+	    
+	    if(opTable.getTable() instanceof TableUnit){
+	      // do nothing here
+	    }else{
+	      throw new ImplementationException("Values/Table not implmeneted");
+
+	    }
+
 	  }
 	  
 		

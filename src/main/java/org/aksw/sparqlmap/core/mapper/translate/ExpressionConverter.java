@@ -225,6 +225,7 @@ public class ExpressionConverter {
 		
 		@Override
 		public void visit(ExprFunction1 func) {
+		  		  
 			if(func instanceof E_Bound){
 				TermMap boundCheck = tms.pop();
 				tms.push(translateIsBound(boundCheck));
@@ -533,7 +534,11 @@ public class ExpressionConverter {
 		
 		@Override
 		public void visit(ExprVar nv) {
-			tms.push( var2termMap.get( nv.asVar().getName()));
+		  TermMap value = var2termMap.get( nv.asVar().getName());
+		  if(value ==null){
+		    value = tmf.createBoolTermMap(new StringExpression("false"));
+		  }
+			tms.push(value);
 
 		}
 		

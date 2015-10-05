@@ -19,9 +19,11 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SelectVisitor;
 import net.sf.jsqlparser.statement.select.SetOperationList;
 import net.sf.jsqlparser.statement.select.SubSelect;
+import net.sf.jsqlparser.util.BaseSelectVisitor;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
@@ -29,9 +31,12 @@ import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap.PO;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.hp.hpl.jena.sparql.algebra.op.OpAssign;
 import com.hp.hpl.jena.sparql.algebra.op.OpBGP;
 import com.hp.hpl.jena.sparql.algebra.op.OpConditional;
@@ -64,6 +69,7 @@ import com.hp.hpl.jena.sparql.algebra.op.OpSlice;
 import com.hp.hpl.jena.sparql.algebra.op.OpTable;
 import com.hp.hpl.jena.sparql.algebra.op.OpTopN;
 import com.hp.hpl.jena.sparql.algebra.op.OpUnion;
+import com.hp.hpl.jena.sparql.algebra.table.TableUnit;
 import com.hp.hpl.jena.sparql.core.Quad;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.Expr;
@@ -127,8 +133,11 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	}
 	@Override
 	public void visit(OpTable opTable){
-		selects.push(new DummyBody());
-		throw new ImplementationException("Function OpTable not implmeneted");
+	  if(opTable.getTable() instanceof TableUnit){
+	    selects.push(new DummyBody());
+	  }else{
+	    throw new ImplementationException("Function OpTable not implmeneted");
+	  }
 
 	}
 	
@@ -137,6 +146,12 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 		@Override
 		public void accept(SelectVisitor selectVisitor) {
 			
+		}
+		
+		
+		@Override
+		public List<SelectItem> getSelectItems() {
+		  return Lists.newArrayList();
 		}
 		
 	}
@@ -148,7 +163,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	public void visit(OpLeftJoin opLeftJoin) {
 
 		
-		SelectBody mainsb = selects.pop();
+		PlainSelect mainsb = selects.pop();
 		PlainSelectWrapper main = null;
 		if(! (mainsb instanceof DummyBody)){
 			main = (PlainSelectWrapper) selectBody2Wrapper
@@ -161,9 +176,9 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 		PlainSelectWrapper left = (PlainSelectWrapper) selectBody2Wrapper
 					.get(leftsb);
 	
-		
-		if(left.getVar2TermMap().isEmpty()){
-			log.warn("left is empty");
+		//we check if select body has a from item
+		if(((PlainSelect)leftsb).getFromItem() == null){
+		   log.debug("ignoring unbound left join");
 		}else if(main ==null){
 			main = left;
 			main.setOptional(true);
@@ -180,8 +195,12 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 //        }else{
 //
 //        }
-		
-		selects.push(main.getSelectBody());
+		if(main==null){
+		  selects.push(mainsb);
+		}else{
+	    selects.push(main.getSelectBody());
+
+		}
 
 	}
 	
@@ -414,7 +433,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 		SelectBody sb = selects.pop();
 		PlainSelect toModify = null;
 
-		Map<String, TermMap> var2termMap;
+		Map<String, TermMap> var2termMap = Maps.newHashMap();
 		
 		if(sb instanceof SetOperationList){
 			
@@ -455,9 +474,10 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 			
 			((PlainSelect) sb).getSelectItems().removeAll(removeseis);
 			
-			
-
-			var2termMap = ((PlainSelectWrapper) selectBody2Wrapper.get(sb)).getVar2TermMap();
+			PlainSelectWrapper psw = ((PlainSelectWrapper) selectBody2Wrapper.get(sb));
+			if(psw!=null){
+		     var2termMap = psw.getVar2TermMap();
+			}
 
 
 		if (translationContext.getQueryInformation().getOrder() != null && toModify.getOrderByElements() == null) {
