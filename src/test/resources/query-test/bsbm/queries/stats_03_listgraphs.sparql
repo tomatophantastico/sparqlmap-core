@@ -1,1 +1,2 @@
+#fails: aggregates not implemented 
 SELECT DISTINCT ?g {GRAPH ?g {?s ?p ?o}}

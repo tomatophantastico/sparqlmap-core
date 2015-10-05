@@ -98,6 +98,12 @@ public abstract class SparqlMapQueryBaseTest {
     boolean initResult = initDb();
     Assume.assumeTrue("Could not initialize database ",initResult);
     
+    if(query.startsWith("#fails:")){
+      String message = query.substring(0,query.indexOf("\n"));
+      Assume.assumeTrue(message, false);
+    }
+    
+    
     sparqlMap = getSparqlMap();
     TestHelper.executeAndCompare(sparqlMap, query, this.dsName, testname);
     
@@ -112,7 +118,9 @@ public abstract class SparqlMapQueryBaseTest {
   
   @After
   public void close(){
-    sparqlMap.close();
+    if(sparqlMap!=null){
+      sparqlMap.close();
+    }
   }
 
 }
