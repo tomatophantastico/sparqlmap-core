@@ -28,6 +28,7 @@ public class OptimizationConfiguration {
 	boolean optimizeSelfLeftJoin = true;
 	boolean optimizeSelfUnion = true;
 	boolean optimizeProjectPush = true;
+	boolean decomposeVirtualTables = false;
 
 
 	@Autowired
@@ -63,6 +64,12 @@ public class OptimizationConfiguration {
 	    optimizeProjectPush = new Boolean(env.getProperty("sm.opt.optimizeProjectPush"));
 		}
 		log.info("Project pushing is is: " + (optimizeProjectPush?"on":"off"));
+		
+		if(env.getProperty("sm.opt.decomposeVirtualTables")!=null){
+      decomposeVirtualTables = new Boolean(env.getProperty("sm.opt.decomposeVirtualTables"));
+    }
+    log.info("Project pushing is is: " + (decomposeVirtualTables?"on":"off"));
+		
 	}
 	
 	private Logger log = LoggerFactory.getLogger(OptimizationConfiguration.class);
@@ -295,10 +302,12 @@ public class OptimizationConfiguration {
 	public boolean isShortcutFilters() {
 		return shortcutFilters;
 	}
-
-
 	public boolean isOptimizeProjectPush() {
 		return optimizeProjectPush;
 	}
+	public boolean isDecomposeVirtualTables(){
+	  return decomposeVirtualTables;
+	}
+	
 
 }

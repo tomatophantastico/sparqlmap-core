@@ -1,8 +1,13 @@
 package org.aksw.sparqlmap.core.db.impl;
 
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+
+import com.google.common.collect.Lists;
 
 public class OracleDataTypeHelper extends DataTypeHelper {
 	
@@ -91,5 +96,14 @@ public class OracleDataTypeHelper extends DataTypeHelper {
 				"  ) \n" + 
 				" where ROWNUM <= 1";
 
+	}
+	
+	@Override
+	public Expression getDateDefaultExpression() {
+	  
+	  Function to_date = new Function();
+	  to_date.setName("to_date");
+	  to_date.setParameters(new ExpressionList(Lists.newArrayList((Expression)new StringValue("'01-01-0001'"),new StringValue("'DD-MM-YYYY'"))));
+	  return to_date; 
 	}
 }

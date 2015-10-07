@@ -39,6 +39,7 @@ import org.aksw.sparqlmap.core.mapper.compatibility.CompatibilityChecker;
 import org.aksw.sparqlmap.core.mapper.compatibility.SimpleCompatibilityChecker;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.aksw.sparqlmap.core.mapper.translate.FilterUtil;
+import org.aksw.sparqlmap.core.mapper.translate.OptimizationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.HashMultimap;
@@ -68,6 +69,9 @@ public class R2RMLModel {
 	
 	@Autowired
 	private TermMapFactory tfac;
+	
+	@Autowired
+	private OptimizationConfiguration optConf;
 
 	private DBAccess dbconf;
 	private DataTypeHelper dth;
@@ -101,8 +105,10 @@ public class R2RMLModel {
 		
 		loadTripleMaps();
 		loadParentTripleStatements();
-		
-		decomposeVirtualTableQueries();
+		if(optConf.isDecomposeVirtualTables()){
+	    decomposeVirtualTableQueries();
+
+		}
 
 		loadCompatibilityChecker();
 		validatepost();
