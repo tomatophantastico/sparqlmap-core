@@ -616,7 +616,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	  
 	  //selectBody2Wrapper.get(ps).putTermMap(termMap, alias, false);
 	  
-		//throw new ImplementationException("Unimplemented Function");
+		throw new ImplementationException("Unimplemented Function");
 		
 	}
 
