@@ -62,7 +62,7 @@ public abstract class R2RMLTest {
 	private static Logger log = LoggerFactory.getLogger(R2RMLTest.class);
 
 
-
+	private static SQLException initException = null;
 
 
 	public R2RMLTest(String testCaseName, String r2rmlLocation,
@@ -81,12 +81,21 @@ public abstract class R2RMLTest {
 	@Test
 	public void runTestcase() throws ClassNotFoundException, SQLException, IOException{
 		
-	  try{
-      getConnector().getConnection().close();
+	  if(initException!=null){
+      Assume.assumeTrue("Database not reachable in previous test, skipping: ",false);
+	  }else{
+	    
+	    try{
+	      getConnector().getConnection().close();
 
-    }catch(SQLException e){
-      Assume.assumeTrue("Database not reachable: " + e.getMessage(),true);
-    }
+	    }catch(SQLException e){
+	      initException = e;
+	        Assume.assumeTrue("Database not reachable: " + initException.getMessage(),false);
+
+	    }
+	  }
+	  
+	
     
 	  
 	  flushDatabase();

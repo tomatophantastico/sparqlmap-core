@@ -48,8 +48,9 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
 
   @After
   public void close() {
-
-    server.shutdown();
+    if(server !=null){
+      server.shutdown();
+    }
   }
   
   
