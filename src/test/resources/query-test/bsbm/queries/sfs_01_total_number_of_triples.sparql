@@ -1,2 +1,2 @@
-#fails: aggregates not implemented 
+
 SELECT (COUNT(*) AS ?no) { ?s ?p ?o  }

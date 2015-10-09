@@ -135,6 +135,15 @@ public class TermMapFactory {
 		return tm;
 	}
 	
+	 public TermMap createNumericalTermMap(Expression numeric,XSDDatatype datatype){
+	    TermMap tm = new TermMap(dth);
+	    tm.setTermTyp(R2RML.Literal);
+	    tm.setLiteralDataType(datatype.getURI());
+	    tm.literalValNumeric = dth.cast(numeric, dth.getNumericCastType());
+	    
+	    return tm;
+	  }
+	
 	
 	
 	private Expression resourceToExpression(String uri){

@@ -12,6 +12,9 @@ import java.util.Set;
 import java.util.Stack;
 
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.statement.select.Distinct;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.OrderByExpressionElement;
@@ -29,6 +32,7 @@ import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
+import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMapFactory;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap.PO;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -37,6 +41,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.sparql.algebra.Op;
 import com.hp.hpl.jena.sparql.algebra.op.OpAssign;
 import com.hp.hpl.jena.sparql.algebra.op.OpBGP;
 import com.hp.hpl.jena.sparql.algebra.op.OpConditional;
@@ -73,6 +79,13 @@ import com.hp.hpl.jena.sparql.algebra.table.TableUnit;
 import com.hp.hpl.jena.sparql.core.Quad;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.Expr;
+import com.hp.hpl.jena.sparql.expr.ExprAggregator;
+import com.hp.hpl.jena.sparql.expr.ExprVar;
+import com.hp.hpl.jena.sparql.expr.aggregate.AggCount;
+import com.hp.hpl.jena.sparql.expr.aggregate.AggCountDistinct;
+import com.hp.hpl.jena.sparql.expr.aggregate.AggCountVar;
+import com.hp.hpl.jena.sparql.expr.aggregate.AggCountVarDistinct;
+import com.hp.hpl.jena.sparql.expr.aggregate.Aggregator;
 public class QueryBuilderVisitor extends QuadVisitorBase {
 	
 	
@@ -92,12 +105,14 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 
 	private FilterUtil filterUtil;
 	private final TranslationContext translationContext;
+  private TermMapFactory tmf;
 
-	public QueryBuilderVisitor(TranslationContext translationContext,	DataTypeHelper dataTypeHelper, ExpressionConverter expressionConverter, FilterUtil filterUtil) {
+	public QueryBuilderVisitor(TranslationContext translationContext,	DataTypeHelper dataTypeHelper, ExpressionConverter expressionConverter, FilterUtil filterUtil, TermMapFactory tmf) {
 		this.filterUtil = filterUtil;
 		this.dataTypeHelper = dataTypeHelper;
 		this.exprconv = expressionConverter;
 		this.translationContext = translationContext;
+		this.tmf = tmf;
 	}
 
 	@Override
@@ -607,16 +622,22 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	@Override
 	public void visit(OpExtend opExtend) {
 	  
+	  	  
+	  PlainSelect ps = this.selects.peek();
+	  PlainSelectWrapper psw = this.selectBody2Wrapper.get(ps);
 	  
-	  //opExtend.getSubOp().visit(opVisitor);
+	  if(opExtend.getVarExprList().size()!=1){
+	    throw new ImplementationException("Bind/extend encountered with multiple expressions, however only one is supported.");
+	  }
 	  
-	  //PlainSelect ps = this.selects.pop();
-	  //PlainSelectWrapper psw = this.selectBody2Wrapper.get(ps);
-	  //TermMap termMap = this.exprconv.asTermMap(opExtend.getSubOp(), psw.getVar2TermMap());
+	  Var var =opExtend.getVarExprList().getVars().get(0);
+	  Expr expr = opExtend.getVarExprList().getExpr(var);
+	     
 	  
-	  //selectBody2Wrapper.get(ps).putTermMap(termMap, alias, false);
+	  TermMap termMap = this.exprconv.asTermMap(expr, psw.getVar2TermMap());
 	  
-		throw new ImplementationException("Unimplemented Function");
+	  selectBody2Wrapper.get(ps).putTermMap(termMap, var.getName(), false);
+	  
 		
 	}
 
@@ -707,10 +728,56 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	@Override
 	public void visit(OpGroup opGroup) {
 	  
-
+	  PlainSelect ps = this.selects.peek();
+    PlainSelectWrapper psw = this.selectBody2Wrapper.get(ps);
+    
 	  
-    throw new ImplementationException("Unimplemented Function");
+	  if(opGroup.getAggregators().size()!=1){
+	    throw new ImplementationException("More than one aggregate expression encountered.");
+	  }
+	  
+	  ExprAggregator exprAggregate =  opGroup.getAggregators().get(0);
+	  
+	  Aggregator aggregate = exprAggregate.getAggregator();
+	  ExprVar aggVar =  exprAggregate.getAggVar();
+	  
+	  Function aggregateFunction = new Function();
+	  List<Expression> exprList = Lists.newArrayList();
+	  
+	  
+	  if(aggregate instanceof AggCountVar){
+	    AggCountVar aggCountVar = (AggCountVar) aggregate;
+	    ExprVar countVar = (ExprVar) aggCountVar.getExpr();
+	    TermMap countTermMap = psw.getVar2TermMap().get(countVar.getVarName());
+	    
+	    if(countTermMap.getColumns().isEmpty()){
+	      throw new ImplementationException("count on non-col based var needs subquery");
+	    }else{
+	      exprList.add(countTermMap.getColumns().get(0));
 
+	    }
+	    
+	    aggregateFunction.setName("count");
+	   
+	   
+	    	    
+	  }else if (aggregate instanceof AggCountVarDistinct){
+	    aggregateFunction.setName("count");
+	    aggregateFunction.setDistinct(true);
+	    
+	  }else{
+	    throw new ImplementationException("Unimplemented Aggregate Function:" + aggregate.toString());
+	  }
+	  aggregateFunction.setParameters(new ExpressionList(exprList));
+	  
+	
+	  
+	  TermMap countTm = tmf.createNumericalTermMap(aggregateFunction, XSDDatatype.XSDinteger);
+	  
+	  psw.putTermMap(countTm, aggVar.getVarName(), false);
+	  
+	  //opGroup.getAggregators()
+	 
 	}
 
 
