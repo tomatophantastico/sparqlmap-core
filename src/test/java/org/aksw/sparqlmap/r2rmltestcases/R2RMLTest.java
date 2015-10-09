@@ -24,6 +24,8 @@ import org.apache.jena.riot.WebContent;
 import org.apache.metamodel.DataContext;
 import org.apache.metamodel.MetaModelException;
 import org.apache.metamodel.jdbc.JdbcDataContext;
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -78,7 +80,16 @@ public abstract class R2RMLTest {
 
 	@Test
 	public void runTestcase() throws ClassNotFoundException, SQLException, IOException{
-		flushDatabase();
+		
+	  try{
+      getConnector().getConnection().close();
+
+    }catch(SQLException e){
+      Assume.assumeTrue("Database not reachable: " + e.getMessage(),true);
+    }
+    
+	  
+	  flushDatabase();
 		loadFileIntoDB(dbFileLocation);
 		
 		
@@ -94,7 +105,12 @@ public abstract class R2RMLTest {
 		assertTrue(compare(outputLocation,referenceOutput));
 		
 	}
-
+	
+	
+	
+	 
+	  
+	
 
 	private void map() throws SQLException, FileNotFoundException {
 		AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
