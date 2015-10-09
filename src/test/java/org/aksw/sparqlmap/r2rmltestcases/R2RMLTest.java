@@ -304,6 +304,8 @@ public abstract class R2RMLTest {
 	 */
 	public void loadFileIntoDB(String file) throws ClassNotFoundException, SQLException, IOException{
 	  
+	  log.info(String.format("Loading %s into the database",file));
+	  
 	   Connection conn = getConnector().getConnection();
 	   DBHelper.loadSqlFile(conn, file);
 	   
