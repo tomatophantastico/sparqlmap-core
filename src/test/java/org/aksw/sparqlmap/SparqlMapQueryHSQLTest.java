@@ -13,11 +13,14 @@ import org.aksw.sparqlmap.core.db.Connector;
 import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
 import org.aksw.sparqlmap.core.db.impl.HSQLDBConnector;
 import org.aksw.sparqlmap.core.spring.ContextSetup;
+import org.apache.jena.atlas.logging.Log;
 import org.hsqldb.Server;
 import org.hsqldb.cmdline.SqlFile;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.jolbox.bonecp.BoneCPDataSource;
@@ -38,7 +41,8 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
   }
 
 
-
+  private static Logger log = LoggerFactory.getLogger(SparqlMapQueryHSQLTest.class);
+  
   public static String hsqldbFileLocationprefix = "./build/hsqldbfiles/";
   
   private Server server;
@@ -77,12 +81,13 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
   public boolean initDb() {
 
     server = new Server();
-    server.setSilent(true);
+    server.setSilent(false);
     server.setDatabaseName(0, "bsbm2-100k");
     server.setDatabasePath(0, "file:" + this.hsqlFileLocation());
 
     File hsqlFolder = new File(this.hsqlFileLocation() +".tmp");
     if (hsqlFolder.exists()) {
+      log.info("Reusing existing dbfolder");
       server.start();
     } else {
       server.start();
@@ -90,6 +95,8 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
       try {
         conn = getConnector().getConnection();
         SqlFile schemaSqlFile = new SqlFile(this.sqlFile);
+        log.info("Loading sql file: " + sqlFile.getAbsolutePath() + " [" +this.hsqlFileLocation()+  "]");
+
         schemaSqlFile.setConnection(conn);
         schemaSqlFile.execute();
         conn.commit();
