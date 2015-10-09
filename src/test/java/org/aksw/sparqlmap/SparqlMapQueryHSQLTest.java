@@ -62,7 +62,6 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
     return hsqldbFileLocationprefix + this.dsName +"/db";
   }
 
-  @Before
   public void setupSparqlMap() {
     
     
@@ -77,7 +76,8 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
     r2r = (SparqlMap) con.getBean("sparqlMap");
 
   }
-
+  
+  @Override
   public boolean initDb() {
 
     server = new Server();
@@ -147,6 +147,10 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
   
   @Override
   public SparqlMap getSparqlMap() {
+    
+    if(r2r==null){
+      setupSparqlMap();
+    }
     return r2r;
   }
 
