@@ -28,6 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.graph.impl.AdhocDatatype;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.sparql.algebra.op.OpSlice;
 
 public abstract  class DataTypeHelper {
@@ -70,88 +73,88 @@ public abstract  class DataTypeHelper {
 	
 	
 	public static RDFDatatype getRDFDataType(int sdt) {
+	  
+		RDFDatatype datatype = null;
 		
-		
-		if(sdt == Types.DECIMAL || sdt == Types.NUMERIC){
-			return XSDDatatype.XSDdecimal;
-		}
-		
-		if(sdt== Types.BIGINT || sdt == Types.INTEGER || sdt == Types.SMALLINT){
-			return XSDDatatype.XSDinteger;
-		}
-		if( sdt == Types.FLOAT || sdt == Types.DOUBLE || sdt ==Types.REAL ){
-			return XSDDatatype.XSDdouble;
-		}
-		if(sdt == Types.VARCHAR || sdt == Types.CHAR || sdt == Types.CLOB || sdt == Types.LONGNVARCHAR || sdt == Types.LONGVARCHAR ){
-			return null; //XSDDatatype.XSDstring;
-		}
-		if(sdt == Types.DATE ){
-			return XSDDatatype.XSDdate;
+		if(sdt == Types.DECIMAL 
+		    || sdt == Types.NUMERIC){
+		  datatype =  XSDDatatype.XSDdecimal;
+		  
+		}else if(sdt== Types.BIGINT 
+		    || sdt == Types.INTEGER 
+		    || sdt == Types.SMALLINT){
+		  datatype =  XSDDatatype.XSDinteger;
+		  
+		}else if( sdt == Types.FLOAT 
+		    || sdt == Types.DOUBLE 
+		    || sdt ==Types.REAL ){
+		  datatype =  XSDDatatype.XSDdouble;
+		  
+		}else if(sdt == Types.VARCHAR 
+		    || sdt == Types.CHAR 
+		    || sdt == Types.CLOB 
+		    || sdt == Types.LONGNVARCHAR 
+		    || sdt == Types.LONGVARCHAR ){
+			// do nothing
+		  
+		}else if(sdt == Types.DATE ){
+		  datatype = XSDDatatype.XSDdate;
+		  
+		}else if(sdt == Types.TIME){
+		  datatype = XSDDatatype.XSDtime;
 
-		}
-		if(sdt == Types.TIME){
-			return XSDDatatype.XSDtime;
+		}else if( sdt == Types.TIMESTAMP){
+		  datatype = XSDDatatype.XSDdateTime;
 
-		}
-		if( sdt == Types.TIMESTAMP){
-			return XSDDatatype.XSDdateTime;
-
-		}
-		//the jsbc driver makes no differentiation between bit and boolean, so wetake them both here
-		if(sdt == Types.BOOLEAN || sdt == Types.BIT){
-			return XSDDatatype.XSDboolean;
+		}else if(sdt == Types.BOOLEAN 
+		    || sdt == Types.BIT){
+	    //the jsbc driver makes no differentiation between bit and boolean, so wetake them both here
+		  datatype = XSDDatatype.XSDboolean;
+		  
+		}else if(sdt == Types.BINARY 
+		    || sdt ==  Types.VARBINARY 
+		    ||sdt ==  Types.BLOB 
+		    || sdt == Types.LONGVARBINARY){
+		  datatype = XSDDatatype.XSDhexBinary;
+		  
+		}else{
+      log.info("encountered non-explicitly mapped sql type:" + sdt);
 		}
 		
-		if(sdt == Types.BINARY || sdt ==  Types.VARBINARY ||sdt ==  Types.BLOB || sdt == Types.LONGVARBINARY){
-			return XSDDatatype.XSDhexBinary;
-		}
-		
-		
-		if(sdt == ColumnHelper.COL_VAL_SQL_TYPE_CONSTLIT){
-			return null;
-		}
-	
-			log.info("encountered non-explicitly mapped sql type:");
-			return null; //XSDDatatype.XSDstring;
+		return datatype; //XSDDatatype.XSDstring;
 	
 	}
 	
 	public String getCastTypeString(int sdt){
-		return getCastTypeString(getRDFDataType(sdt));
+	   String castString = null;
+
+	  RDFDatatype dt = getRDFDataType(sdt);
+	  
+	  if(dt !=null){
+	    castString = getCastTypeString( ResourceFactory.createResource(dt.getURI()));
+	  }
+	  
+	  
+	  
+		return castString;
 	}
 	
-//	public String getColumnString(int sdt){
-//		if(sdt == Types.DECIMAL || sdt == Types.NUMERIC || sdt== Types.BIGINT || sdt == Types.INTEGER || sdt == Types.SMALLINT ||  sdt == Types.FLOAT || sdt == Types.DOUBLE  || sdt == Types.REAL){
-//			return ColumnHelper.COL_NAME_LITERAL_NUMERIC;
-//		}
-//		if(sdt == Types.VARCHAR || sdt == Types.CHAR || sdt == Types.CLOB){
-//			return ColumnHelper.COL_NAME_LITERAL_STRING;
-//		}
-//		if(sdt == Types.DATE || sdt == Types.TIME || sdt == Types.TIMESTAMP){
-//			return ColumnHelper.COL_NAME_LITERAL_DATE;
-//		}
-//		if(sdt == Types.BOOLEAN){
-//			return ColumnHelper.COL_NAME_LITERAL_BOOL;
-//		}
-//		
-//	
-//		//fallback ;-)
-//		throw new ImplementationException("Encountered unknown sql type, spec says, i sould use string, but me throw error");
-//	}
+
 	
 	
 	
 	
-	public String getCastTypeString(RDFDatatype datatype){
-		if(XSDDatatype.XSDdecimal == datatype||XSDDatatype.XSDinteger ==datatype || XSDDatatype.XSDdouble == datatype){
+	public String getCastTypeString(Resource datatype){
+	  String dtResString = datatype.getURI();
+		if(XSDDatatype.XSDdecimal.getURI().equals(dtResString)|XSDDatatype.XSDinteger.getURI().equals(dtResString) || XSDDatatype.XSDdouble.getURI().equals(dtResString)){
 			return getNumericCastType();
-		}else if(XSDDatatype.XSDstring == datatype|| datatype ==null){
+		}else if(XSDDatatype.XSDstring.getURI().equals(dtResString)|| datatype ==null){
 			return getStringCastType();
-		}else if(XSDDatatype.XSDdateTime == datatype|| XSDDatatype.XSDdate == datatype ||  XSDDatatype.XSDtime == datatype){
+		}else if(XSDDatatype.XSDdateTime.getURI().equals(dtResString)|| XSDDatatype.XSDdate.getURI().equals(dtResString) ||  XSDDatatype.XSDtime.getURI().equals(dtResString)){
 			return getDateCastType();
-		}else if(XSDDatatype.XSDboolean == datatype){
+		}else if(XSDDatatype.XSDboolean.getURI().equals(dtResString)){
 			return getBooleanCastType();
-		}else if(XSDDatatype.XSDhexBinary == datatype){
+		}else if(XSDDatatype.XSDhexBinary.getURI().equals(dtResString)){
 			return getBinaryDataType();
 		}else{
 			return getStringCastType();

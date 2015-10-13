@@ -1,3 +1,4 @@
+#fails: values not implemented
 prefix : <http://thesimpsons.com/>
 prefix owl: <http://www.w3.org/2002/07/owl#>
 SELECT ?o

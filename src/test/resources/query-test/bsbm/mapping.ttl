@@ -296,13 +296,15 @@ mapping:Offer
               ] ;
     	rr:predicateObjectMap
               [ rr:objectMap
-                        [ rr:column "validFrom"
+                        [ rr:column "validFrom";
+                          rr:datatype xsd:dateTime;
                         ] ;
                 rr:predicate bsbm-vocab:validFrom
               ] ; 
     	rr:predicateObjectMap
               [ rr:objectMap
-                        [ rr:column "validTo"
+                        [ rr:column "validTo";
+                          rr:datatype xsd:dateTime;
                         ] ;
                 rr:predicate bsbm-vocab:validTo
               ] ;                                 

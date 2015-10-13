@@ -17,6 +17,8 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.impl.LiteralLabel;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 
@@ -41,7 +43,7 @@ public class TermMapFactory {
 	
 		if(node.isLiteral()){
 			tm.setTermTyp(R2RML.Literal);
-			RDFDatatype dt = node.getLiteralDatatype();
+			Resource dt = ResourceFactory.createResource(node.getLiteralDatatype().getURI());
 			LiteralLabel constLit = node.getLiteral();
 			if(dt==null){
 				tm.setLiteralDataType(RDFS.Literal.getURI());

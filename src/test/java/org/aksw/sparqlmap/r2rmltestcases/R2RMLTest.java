@@ -24,6 +24,8 @@ import org.apache.jena.riot.WebContent;
 import org.apache.metamodel.DataContext;
 import org.apache.metamodel.MetaModelException;
 import org.apache.metamodel.jdbc.JdbcDataContext;
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -60,7 +62,7 @@ public abstract class R2RMLTest {
 	private static Logger log = LoggerFactory.getLogger(R2RMLTest.class);
 
 
-
+	private static SQLException initException = null;
 
 
 	public R2RMLTest(String testCaseName, String r2rmlLocation,
@@ -78,7 +80,25 @@ public abstract class R2RMLTest {
 
 	@Test
 	public void runTestcase() throws ClassNotFoundException, SQLException, IOException{
-		flushDatabase();
+		
+	  if(initException!=null){
+      Assume.assumeTrue("Database not reachable in previous test, skipping: ",false);
+	  }else{
+	    
+	    try{
+	      getConnector().getConnection().close();
+
+	    }catch(SQLException e){
+	      initException = e;
+	        Assume.assumeTrue("Database not reachable: " + initException.getMessage(),false);
+
+	    }
+	  }
+	  
+	
+    
+	  
+	  flushDatabase();
 		loadFileIntoDB(dbFileLocation);
 		
 		
@@ -94,7 +114,12 @@ public abstract class R2RMLTest {
 		assertTrue(compare(outputLocation,referenceOutput));
 		
 	}
-
+	
+	
+	
+	 
+	  
+	
 
 	private void map() throws SQLException, FileNotFoundException {
 		AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
@@ -278,6 +303,8 @@ public abstract class R2RMLTest {
 	 * @throws IOException 
 	 */
 	public void loadFileIntoDB(String file) throws ClassNotFoundException, SQLException, IOException{
+	  
+	  log.info(String.format("Loading %s into the database",file));
 	  
 	   Connection conn = getConnector().getConnection();
 	   DBHelper.loadSqlFile(conn, file);

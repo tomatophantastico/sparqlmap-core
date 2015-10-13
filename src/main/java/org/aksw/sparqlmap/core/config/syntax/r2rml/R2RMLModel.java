@@ -53,6 +53,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.sparql.core.Quad;
 import com.hp.hpl.jena.update.GraphStoreFactory;
@@ -760,33 +761,48 @@ public class R2RMLModel {
 			
 			if(termType.equals(R2RML.Literal)){
 				
-				int sqlType = dbconf.getDataType(fi, qr.column);
-						
-				if (tm.literalType == null && DataTypeHelper.getRDFDataType(sqlType) != null) {
-					tm.setLiteralDataType(DataTypeHelper.getRDFDataType(sqlType).getURI());	
-				}
-				RDFDatatype dt = DataTypeHelper.getRDFDataType(sqlType);
-				if(dt==null){
-					tm.setLiteralDataType(RDFS.Literal.getURI());
-				}else{
-					tm.setLiteralDataType(dt.getURI());
-				}
+			  
+			  Resource datatype = qr.datatypeuri;
+			  
+			  if(datatype==null){
+			    // get the default datatype for this sql type
+		       int sqlType = dbconf.getDataType(fi, qr.column);
+		       RDFDatatype dt = DataTypeHelper.getRDFDataType(sqlType);
+		       
+		       // set default or rdfs:Literal
+		       
+		       if(dt!=null){
+		         datatype = ResourceFactory.createResource( dt.getURI());
+		       }else{
+		         datatype = (RDFS.Literal);
+		       }
+
+			  }
+        tm.setLiteralDataType(datatype.getURI());
+
+			  
+			  
 				
 				
 				
-				if(dth.getCastTypeString(dt).equals(dth.getStringCastType())){
+				//determine the column, where to put/cast the expression to
+				
+			
+				
+				
+				if(dth.getCastTypeString(datatype).equals(dth.getStringCastType())){
 					tm.literalValString = dth.cast(col, dth.getStringCastType());
 					
-				}else if(dth.getCastTypeString(dt).equals(dth.getNumericCastType())){
+				}else if(dth.getCastTypeString(datatype).equals(dth.getNumericCastType())){
 					tm.literalValNumeric = dth.cast(col, dth.getNumericCastType());
 					
-				}else if(dth.getCastTypeString(dt).equals(dth.getBinaryDataType())){
+				}else if(dth.getCastTypeString(datatype).equals(dth.getBinaryDataType())){
 					tm.literalValBinary = dth.cast(col, dth.getBinaryDataType());
 					
-				}else if(dth.getCastTypeString(dt).equals(dth.getDateCastType())){
+				}else if(dth.getCastTypeString(datatype).equals(dth.getDateCastType())){
 					tm.literalValDate = dth.cast(col, dth.getDateCastType());
 					
-				}else if(dth.getCastTypeString(dt).equals(dth.getBooleanCastType())){
+				}else if(dth.getCastTypeString(datatype).equals(dth.getBooleanCastType())){
 					tm.literalValBool = dth.cast(col, dth.getBooleanCastType());
 				}
 
