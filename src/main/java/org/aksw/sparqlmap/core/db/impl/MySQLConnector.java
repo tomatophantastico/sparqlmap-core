@@ -25,6 +25,7 @@ public class MySQLConnector extends Connector {
 	@Override
 	@Autowired
 	public void setDs(BoneCPDataSource ds) {
+
 		String dbConnectionString = ds.getConfig().getJdbcUrl();
 		
 		if(!dbConnectionString.contains("padCharsWithSpace")){
