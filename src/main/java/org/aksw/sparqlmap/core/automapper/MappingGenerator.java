@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RML;
+import org.apache.jena.iri.IRIFactory;
+import org.apache.jena.riot.system.IRILib;
 import org.apache.metamodel.schema.Column;
 import org.apache.metamodel.schema.Relationship;
 import org.apache.metamodel.schema.Schema;
@@ -30,15 +32,25 @@ public class MappingGenerator {
   private String instancePrefix;
   private String vocabularyPrefix;
   private String primaryKeySeparator;
+  private String rowidtemplate;
   
-  
+  /**
+   * 
+   * @param mappingPrefix
+   * @param instancePrefix
+   * @param vocabularyPrefix
+   * @param primaryKeySeparator
+   * @param rowidtemplate by convetion a query that yields the all the cols of a table plus a 
+   *                column "sm_rowid" which contains the rowid.
+   */
   public MappingGenerator(String mappingPrefix, String instancePrefix,
-      String vocabularyPrefix, String primaryKeySeparator) {
+      String vocabularyPrefix, String primaryKeySeparator,String rowidtemplate) {
     super();
     this.mappingPrefix = mappingPrefix;
     this.instancePrefix = instancePrefix;
     this.vocabularyPrefix = vocabularyPrefix;
     this.primaryKeySeparator = primaryKeySeparator;
+    this.rowidtemplate = rowidtemplate;
   }
   
   
@@ -171,7 +183,9 @@ public class MappingGenerator {
   
   
   private String ues(String segment) {
-    return UrlEscapers.urlPathSegmentEscaper().escape(segment);
+    
+    return IRILib.encodeUriComponent(segment);
+    
   }
   
   private String escapeAsTemplate(String str){
