@@ -17,6 +17,7 @@ import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.jena.iri.IRIException;
+import org.apache.jena.riot.system.IRILib;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -310,13 +311,7 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
         // column derived valued
         String segment = rs.getString(colname);
         if (segment != null) {
-          try {
-            uri.append(URLEncoder.encode(segment, "US-ASCII").replaceAll("\\+",
-              "%20"));
-          } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            log.error("Error:", e);
-          }
+            uri.append(IRILib.encodeUriComponent(segment));
         }
       }
     }
@@ -382,5 +377,7 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
       log.error("Error:", e);
     }
   }
+  
+  
 
 }
