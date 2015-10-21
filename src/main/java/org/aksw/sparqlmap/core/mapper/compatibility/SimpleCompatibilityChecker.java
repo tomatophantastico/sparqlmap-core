@@ -328,7 +328,7 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 		
 				//check if  col is a number, that the string can be cast to a number 
 				String colNaturalCastType = colname2castType.get(column.getColumnName());
-				if(colNaturalCastType.equals(dth.getNumericCastType())){
+				if(colNaturalCastType!=null && colNaturalCastType.equals(dth.getNumericCastType())){
 					if(!NumberUtils.isNumber(potentialColContent)){
 						return false;
 					}
