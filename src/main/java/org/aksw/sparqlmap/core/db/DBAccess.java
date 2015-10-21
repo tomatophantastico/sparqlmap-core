@@ -74,31 +74,6 @@ public class DBAccess {
 
 
 
-
-
-	/* (non-Javadoc)
-	 * @see org.aksw.sparqlmap.config.syntax.IDBAccess#getSelectItemsForTable(net.sf.jsqlparser.schema.Table)
-	 */
-	
-	public List<SelectExpressionItem> getSelectItemsForTable(Table table) {
-		return dbConnector.getSelectItemsForTable(table);
-	}
-
-
-
-
-
-
-
-	/* (non-Javadoc)
-	 * @see org.aksw.sparqlmap.config.syntax.IDBAccess#getDataTypeForTable(net.sf.jsqlparser.schema.Table)
-	 */
-	
-	public Map<String,Integer> getDataTypeForTable(Table table) {
-		return dbConnector.getDataTypeForTable(table);
-	}
-
-
 	@PreDestroy
 	public void close() {
 		log.info("Closing the connections");
