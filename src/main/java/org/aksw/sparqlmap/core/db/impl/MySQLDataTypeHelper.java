@@ -70,11 +70,7 @@ public class MySQLDataTypeHelper extends DataTypeHelper {
 		return bytes;
 	}
 
-	@Override
-	public boolean hasRowIdFunction() {
-		
-		return false;
-	}
+
 
 	
 	 @Override

@@ -319,9 +319,7 @@ public abstract  class DataTypeHelper {
 	public abstract boolean needsSpecialCastForChar();
 	
 	public abstract Expression charCastPrep(Expression expr, Integer fieldlength);
-	
-	public abstract boolean hasRowIdFunction();
-	
+
 
 	public List<Expression> getRowIdFunction(String fromAlias) {
 		return null;
@@ -418,6 +416,11 @@ public abstract  class DataTypeHelper {
 	  
 	  
 	}
+
+
+  public String getRowIdTemplate() {
+    return null;
+  }
 
 
 }

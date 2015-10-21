@@ -64,13 +64,6 @@ public class HSQLDBDataTypeHelper extends DataTypeHelper {
 		return null;
 	}
 
-	@Override
-	public boolean hasRowIdFunction() {
-		
-		return false;
-	}
-	
-	
 	
 
 

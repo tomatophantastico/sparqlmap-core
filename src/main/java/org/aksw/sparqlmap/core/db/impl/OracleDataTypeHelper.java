@@ -71,11 +71,7 @@ public class OracleDataTypeHelper extends DataTypeHelper {
 		return bytes;
 	}
 
-	@Override
-	public boolean hasRowIdFunction() {
-		
-		return false;
-	}
+
 	
 	@Override
 	public String getValidateFromQuery(String from) {

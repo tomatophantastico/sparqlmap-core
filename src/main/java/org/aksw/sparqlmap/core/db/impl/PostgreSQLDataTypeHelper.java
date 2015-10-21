@@ -106,11 +106,14 @@ public class PostgreSQLDataTypeHelper extends DataTypeHelper {
 		return Arrays.copyOfRange(bytes, 4, bytes.length);
 	}
 
+
 	@Override
-	public boolean hasRowIdFunction() {
-		// TODO Auto-generated method stub
-		return false;
+	public String getRowIdTemplate() {
+	  
+	  return "SELECT \"%1$s\".* , row_number() OVER () as sm_rowid FROM \"%1$s\";";
 	}
+	
+	
 
 
 
