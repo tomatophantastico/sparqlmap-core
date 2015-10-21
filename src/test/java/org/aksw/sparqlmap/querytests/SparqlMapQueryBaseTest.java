@@ -1,19 +1,30 @@
-package org.aksw.sparqlmap;
+package org.aksw.sparqlmap.querytests;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
+import org.aksw.sparqlmap.DBHelper;
+import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
+import org.aksw.sparqlmap.TestHelper;
 import org.aksw.sparqlmap.core.SparqlMap;
+import org.aksw.sparqlmap.core.spring.ContextSetup;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.PatternFilenameFilter;
@@ -43,9 +54,8 @@ public abstract class SparqlMapQueryBaseTest {
   
   SparqlMap sparqlMap;
   
-  
-  
-  
+  static DBConnConfig dbconf;
+  static Boolean canConnect;
   public SparqlMapQueryBaseTest(String testname, String dsName,
       File mappingFile, File sqlFile, String query) {
     super();
@@ -95,7 +105,13 @@ public abstract class SparqlMapQueryBaseTest {
   @Test
   public void runTest() throws SQLException{
     
-    boolean initResult = initDb();
+    if(canConnect ==null){
+      canConnect = DBHelper.waitAndConnect(dbconf);
+    }
+    
+    Assume.assumeTrue("Cannot connect to the database", canConnect);  
+    
+    boolean initResult = DBHelper.initDb(dbconf,dsName,sqlFile);
     Assume.assumeTrue("Could not initialize database ",initResult);
     
     if(query.startsWith("#fails:")){
@@ -110,17 +126,47 @@ public abstract class SparqlMapQueryBaseTest {
   }
   
  
-  
-  public abstract SparqlMap getSparqlMap();
+  public SparqlMap getSparqlMap() {
+    
+    Properties props = getDBProperties();
+    
+    
+    
+    Map<String,Properties> name2props = new HashMap<String,Properties>();
+    name2props.put("test-conf", props);
+    
+    ApplicationContext con =  ContextSetup.contextFromProperties(name2props);
+    return (SparqlMap) con.getBean("sparqlMap");
+  }
 
-  public abstract boolean initDb();
+
   
   
+  
+
+
   @After
   public void close(){
     if(sparqlMap!=null){
       sparqlMap.close();
     }
   }
+  
+  
+  public Properties getDBProperties() {
+    Properties props = new Properties();
+    
+    props.put("sm.mappingfile", this.mappingFile.getPath());
+
+    // replicating the values from initDatabase
+    props.put("jdbc.url",dbconf.jdbcString);
+    props.put("jdbc.username",dbconf.username);
+    props.put("jdbc.password",dbconf.password);
+    
+    return props;
+  }
+  
+  
+  
 
 }

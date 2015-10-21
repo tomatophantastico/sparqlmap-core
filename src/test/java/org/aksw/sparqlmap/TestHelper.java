@@ -6,8 +6,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
 
-import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.SparqlMap;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -15,6 +16,7 @@ import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -28,8 +30,14 @@ import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.hp.hpl.jena.sparql.core.Quad;
 import com.hp.hpl.jena.sparql.resultset.ResultSetCompare;
 import com.hp.hpl.jena.tdb.TDBFactory;
+import com.spotify.docker.client.DockerClient;
+import com.spotify.docker.client.DockerException;
 
 public class TestHelper {
+  
+ 
+
+  
   
   private static Logger log = LoggerFactory.getLogger(TestHelper.class);
   
@@ -43,6 +51,8 @@ public class TestHelper {
   
   static public void assertModelAreEqual( Model result, Model expectedresult) throws SQLException{
     
+   
+ 
   
     StringBuffer models =new StringBuffer();
     
@@ -56,7 +66,22 @@ public class TestHelper {
     ByteArrayOutputStream expectedResBos  =new ByteArrayOutputStream();
     RDFDataMgr.write(expectedResBos, expectedresult,Lang.TURTLE);
     models.append(expectedResBos);
+    models.append("=======================\nMissing in the sparqlmap result is: ");
+    
+    Model missingInActual = expectedresult.difference(result);
+    ByteArrayOutputStream missingInActualResBos  =new ByteArrayOutputStream();
+    RDFDataMgr.write(missingInActualResBos, missingInActual,Lang.TURTLE);
+    models.append(missingInActualResBos);
+    
+    models.append("=======================\nThese triples were unexpected: ");
+    Model missingInExpected = result.difference(expectedresult);
+    ByteArrayOutputStream missingInExpectedResBos  =new ByteArrayOutputStream();
+    RDFDataMgr.write(missingInExpectedResBos, missingInExpected,Lang.TURTLE);
+    models.append(missingInExpectedResBos);
     models.append("=============================");
+
+    
+    //check if we have to deal with 
     
     assertTrue(models.toString(), result.isIsomorphicWith(expectedresult));
   
@@ -156,13 +181,6 @@ public class TestHelper {
             QueryExecutionFactory.create(query,refDs).execDescribe());
         
       }
-      
-     
-      
- 
-        
- 
-    
   }
-
+  
 }

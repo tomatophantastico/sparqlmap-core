@@ -10,12 +10,16 @@ import java.util.Properties;
 import org.aksw.sparqlmap.core.db.Connector;
 import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
 import org.aksw.sparqlmap.core.db.impl.HSQLDBConnector;
+import org.aksw.sparqlmap.core.db.impl.HSQLDBDataTypeHelper;
+import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.hsqldb.Server;
 import org.hsqldb.cmdline.SqlFile;
 import org.hsqldb.cmdline.SqlToolError;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.jolbox.bonecp.BoneCPDataSource;
@@ -48,74 +52,40 @@ public class HSQLR2RMLTestCase extends R2RMLTest{
 	}
 	
 
-	Server server = null;
+	static Server server = null;
 	
 	
-	
-	
-	
-	@Override
-	public void loadFileIntoDB(String file) throws ClassNotFoundException,
-			SQLException, IOException {
-		
-			Connection conn = getConnector().getConnection();
-			SqlFile sqlFile = new SqlFile(new File(file));
-			sqlFile.setConnection(conn);
-			try {
-				sqlFile.execute();
-			} catch (SqlToolError e) {				
-				e.printStackTrace();
-			}
-			
-			conn.close();
-		
-	}
-	
-	@Before
-	public void initServer() {
 
-		server = new Server();
-		server.setSilent(true);
-		server.setDatabaseName(0, "r2rml" );
-		server.setDatabasePath(0, "mem:r2rmldb-" + testCaseName);
-		server.start();
-	}
 	
-	@After
-	public void shutdownServer(){
-		server.signalCloseAllServerConnections();
-		server.shutdown();
-	}
+	
+
+  @BeforeClass
+  public static void startServer(){
+    server = new Server();
+    server.setSilent(false);
+    server.setDatabaseName(0, "bsbm2-100k");
+    server.setDatabasePath(0, "mem:sparqlmaptest\"");
+    server.start();
+    
+    dbconf.jdbcString = "jdbc:hsqldb:mem:sparqlmaptest/";
+    dbconf.username =  "sa";
+    dbconf.password = "";
+  }
+  
+  @AfterClass
+  public static void stopServer(){
+    server.stop();
+  }
 
 
 
-	@Override
-	public Connector getConnector(){
-		
-		BoneCPDataSource ds = new BoneCPDataSource(DBAccessConfigurator.createConfig(
-				getDBProperties().getProperty("jdbc.url"), 
-				getDBProperties().getProperty("jdbc.username"), 
-				getDBProperties().getProperty("jdbc.password"), 1, 2));
-		
-		HSQLDBConnector conn  = new HSQLDBConnector();
-		
-		conn.setDs(ds);
-		return conn;
-		
-	}
 
-	@Override
-	public Properties getDBProperties() {
-		
-		Properties properties = new Properties();
-		try {
-			properties.load(ClassLoader.getSystemResourceAsStream("r2rml-test/db-hsql.properties"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail("Unable to load properties file");
-			
-		}
-		return properties;
-	}
+
+  @Override
+  DataTypeHelper getDataTypeHelper() {
+    return new HSQLDBDataTypeHelper();
+  }
+
+
 
 }

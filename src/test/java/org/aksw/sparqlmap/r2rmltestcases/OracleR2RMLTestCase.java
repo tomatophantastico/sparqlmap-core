@@ -10,6 +10,8 @@ import org.aksw.sparqlmap.DBHelper;
 import org.aksw.sparqlmap.core.db.Connector;
 import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
 import org.aksw.sparqlmap.core.db.impl.OracleConnector;
+import org.aksw.sparqlmap.core.db.impl.OracleDataTypeHelper;
+import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,15 +54,6 @@ public class OracleR2RMLTestCase extends R2RMLTest{
 
 
 	
-	@Override
-	public void flushDatabase() throws ClassNotFoundException, SQLException {
-		Connection conn = getConnector().getConnection();
-		
-		DBHelper.flushDbOracle(conn);
-
-		conn.close();
-	}
-	
 
 	@Override
 	public Properties getDBProperties() {
@@ -98,10 +91,8 @@ public class OracleR2RMLTestCase extends R2RMLTest{
 	}
 
 
-	@Override
-	public Connector getConnector() {
-		// TODO Auto-generated method stub
-		return connector;
-	}
-
+  @Override
+  DataTypeHelper getDataTypeHelper() {
+    return new OracleDataTypeHelper();
+  }
 }

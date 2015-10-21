@@ -57,7 +57,7 @@ dependencies {
     compile 'joda-time:joda-time:2.1'
     compile 'org.apache.metamodel:MetaModel-jdbc:4.3.4'
 
-    
+    testCompile 'com.spotify:docker-client:2.7.7'
     testCompile 'junit:junit:4.11'
     testCompile 'org.hsqldb:sqltool:2.3.3'
     testCompile "org.apache.jena:jena-tdb:1.1.1"

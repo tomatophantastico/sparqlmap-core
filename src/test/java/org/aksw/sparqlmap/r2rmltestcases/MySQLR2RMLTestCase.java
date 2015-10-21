@@ -4,65 +4,51 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.aksw.sparqlmap.DockerHelper;
+import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
 import org.aksw.sparqlmap.core.db.Connector;
 import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
 import org.aksw.sparqlmap.core.db.impl.MySQLConnector;
+import org.aksw.sparqlmap.core.db.impl.MySQLDataTypeHelper;
+import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.jolbox.bonecp.BoneCPDataSource;
+import com.spotify.docker.client.DockerException;
 
 public class MySQLR2RMLTestCase extends R2RMLTest {
 
 	
-	public MySQLR2RMLTestCase(String testCaseName, String r2rmlLocation,
+
+  public MySQLR2RMLTestCase(String testCaseName, String r2rmlLocation,
 			String outputLocation, String referenceOutput,
 			String dbFileLocation, boolean createDM) {
 		super(testCaseName, r2rmlLocation, outputLocation, referenceOutput,
 				dbFileLocation, createDM);
 	}
 	
-	MySQLConnector connector;
-	
-	@After
-	public void cleanup(){
-		connector.close(); 
-		
 
+  @BeforeClass
+  public static void startMySQLDocker() throws DockerException, InterruptedException {
+   // this approach will work for most dev setups
+      dbconf =  DockerHelper.startMySQLDocker();
+  }
 
-	}
-	
-	@Before
-	public void before(){
-		
-		BoneCPDataSource ds = new BoneCPDataSource(
-				DBAccessConfigurator.createConfig(
-						getDBProperties().getProperty("jdbc.url"), 
-						getDBProperties().getProperty("jdbc.username"), 
-						getDBProperties().getProperty("jdbc.password"), 1, 2));
-		MySQLConnector conn =  new MySQLConnector();
-		conn.setDs(ds);
-		connector =conn;
-	}
+  @AfterClass
+  public static void doTeardownHost() throws DockerException, InterruptedException {
+    DockerHelper.stopMySQLDocker();
+    
+  }
 	
 
 	
 
-	@Override
-	public Properties getDBProperties() {
-		Properties properties = new Properties();
-		try {
-			properties.load(ClassLoader.getSystemResourceAsStream("r2rml-test/db-mysql.properties"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail("Unable to load properties file");
-			
-		}
-		return properties;
-	}
-	
+
 	@Parameters(name="{0}")
 	public static Collection<Object[]> data() {
 		return data(getTestCaseLocations());
@@ -71,17 +57,13 @@ public class MySQLR2RMLTestCase extends R2RMLTest {
 	
 	public static String getTestCaseLocations() {
 		
-		return "./testcases/mysql/";
+		return "./src/test/resources/testcases/mysql/";
 	}
-
 	@Override
-	public Connector getConnector() {
-		
-		return connector;
+	DataTypeHelper getDataTypeHelper() {
+	  return new MySQLDataTypeHelper();
 	}
-	
 
-	
-	
+
 
 }

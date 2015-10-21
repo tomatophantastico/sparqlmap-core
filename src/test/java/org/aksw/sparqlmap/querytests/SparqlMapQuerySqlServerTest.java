@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap;
+package org.aksw.sparqlmap.querytests;
 
 import java.io.File;
 
@@ -16,12 +16,6 @@ public class SparqlMapQuerySqlServerTest extends SparqlMapQueryBaseTest{
     return null;
   }
 
-  @Override
-  public boolean initDb() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-  
-
+ 
 
 }

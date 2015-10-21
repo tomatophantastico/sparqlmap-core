@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap;
+package org.aksw.sparqlmap.querytests;
 
 import java.io.File;
 import java.sql.Connection;
@@ -17,7 +17,9 @@ import org.apache.jena.atlas.logging.Log;
 import org.hsqldb.Server;
 import org.hsqldb.cmdline.SqlFile;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +45,11 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
 
   private static Logger log = LoggerFactory.getLogger(SparqlMapQueryHSQLTest.class);
   
-  public static String hsqldbFileLocationprefix = "./build/hsqldbfiles/";
+
   
-  private Server server;
+  
+  
+  private static Server server;
   private SparqlMap r2r;
   private ApplicationContext con;
 
@@ -58,9 +62,28 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
   }
   
   
-  private String  hsqlFileLocation(){
-    return hsqldbFileLocationprefix + this.dsName +"/db";
+  @BeforeClass
+  public static void startServer(){
+    server = new Server();
+    server.setSilent(false);
+    server.setDatabaseName(0, "bsbm2-100k");
+    server.setDatabasePath(0, "mem:sparqlmaptest\"");
+    server.start();
+    
+    dbconf.jdbcString = "jdbc:hsqldb:mem:sparqlmaptest/";
+    dbconf.username =  "sa";
+    dbconf.password = "";
   }
+  
+  @AfterClass
+  public static void stopServer(){
+    server.stop();
+  }
+  
+  
+  
+  
+  
 
   public void setupSparqlMap() {
     
@@ -77,47 +100,7 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
 
   }
   
-  @Override
-  public boolean initDb() {
-
-    server = new Server();
-    server.setSilent(false);
-    server.setDatabaseName(0, "bsbm2-100k");
-    server.setDatabasePath(0, "file:" + this.hsqlFileLocation());
-
-    File hsqlFolder = new File(this.hsqlFileLocation() +".tmp");
-    if (hsqlFolder.exists()) {
-      log.info("Reusing existing dbfolder");
-      server.start();
-    } else {
-      server.start();
-      Connection conn = null;
-      try {
-        conn = getConnector().getConnection();
-        SqlFile schemaSqlFile = new SqlFile(this.sqlFile);
-        log.info("Loading sql file: " + sqlFile.getAbsolutePath() + " [" +this.hsqlFileLocation()+  "]");
-
-        schemaSqlFile.setConnection(conn);
-        schemaSqlFile.execute();
-        conn.commit();
-      } catch (Exception e) {
-        e.printStackTrace();
-      } finally {
-        try {
-          if (conn != null) {
-            conn.close();
-          }
-
-        } catch (SQLException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-      }
-
-    }
-    return true;
-
-  }
+ 
 
   public Connector getConnector() {
     BoneCPDataSource ds = new BoneCPDataSource(
@@ -131,18 +114,7 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
 
   }
 
-  public Properties getDBProperties() {
-    Properties props = new Properties();
-    
-    props.put("sm.mappingfile", this.mappingFile.getPath());
 
-    // replicating the values from initDatabase
-    props.put("jdbc.url","jdbc:hsqldb:file:" + this.hsqlFileLocation());
-    props.put("jdbc.username","sa");
-    props.put("jdbc.password","");
-    
-    return props;
-  }
   
   
   @Override
