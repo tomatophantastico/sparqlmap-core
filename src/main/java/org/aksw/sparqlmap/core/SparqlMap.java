@@ -16,6 +16,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RML;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLModel;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.mapper.Mapper;
@@ -435,7 +436,9 @@ public class SparqlMap {
       Node p = bind.get(Var.alloc("p"));
       Node o = bind.get(Var.alloc("o"));
       if (s != null && p != null && o != null) {
-        if(g!=null&&!g.equals(Quad.defaultGraphNodeGenerated)){
+        if(g!=null
+            && !(g.equals(Quad.defaultGraphNodeGenerated)
+            || g.hasURI(R2RML.defaultGraph.getURI()))){
           Quad toadd = new Quad(g, s, p, o);
           dsg.add(toadd);
         }else{
