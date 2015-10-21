@@ -6,8 +6,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
@@ -51,9 +53,9 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
 
   private String baseUri = null;
 
-  private DecimalFormat doubleFormatter = new DecimalFormat(
-    "0.0##########################");
-
+  private static DecimalFormat doubleFormatter =  new DecimalFormat(
+      "0.0##########################E0", new DecimalFormatSymbols(Locale.ROOT));
+ 
   private ResultSet rs;
 
   private List<String> vars = new ArrayList<String>();
@@ -151,9 +153,7 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
     return new ResultBinding(null, nextBinding());
   }
 
-  int deUnionPointer = 0;
 
-  Binding deUnionBinding = null;
 
   @Override
   public Binding nextBinding() {
@@ -382,40 +382,5 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
       log.error("Error:", e);
     }
   }
-
-  // static String percentEncode(String toencode)
-  // {
-  //
-  //
-  // byte[] bytes = encodeBytes(source.getBytes("UTF-8"));
-  // return new String(bytes, "");
-  // }
-  //
-  // private static byte[] encodeBytes(byte[] source, Type type) {
-  // Assert.notNull(source, "'source' must not be null");
-  // Assert.notNull(type, "'type' must not be null");
-  //
-  // ByteArrayOutputStream bos = new ByteArrayOutputStream(source.length);
-  // for (int i = 0; i < source.length; i++) {
-  // int b = source[i];
-  // if (b < 0) {
-  // b += 256;
-  // }
-  // if (type.isAllowed(b)) {
-  // bos.write(b);
-  // }
-  // else {
-  // bos.write('%');
-  //
-  // char hex1 = Character.toUpperCase(Character.forDigit((b >> 4) & 0xF,
-  // 16));
-  // char hex2 = Character.toUpperCase(Character.forDigit(b & 0xF, 16));
-  //
-  // bos.write(hex1);
-  // bos.write(hex2);
-  // }
-  // }
-  // return bos.toByteArray();
-  // }
 
 }
