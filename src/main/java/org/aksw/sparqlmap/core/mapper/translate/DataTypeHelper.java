@@ -145,20 +145,27 @@ public abstract  class DataTypeHelper {
 	
 	
 	public String getCastTypeString(Resource datatype){
-	  String dtResString = datatype.getURI();
-		if(XSDDatatype.XSDdecimal.getURI().equals(dtResString)|XSDDatatype.XSDinteger.getURI().equals(dtResString) || XSDDatatype.XSDdouble.getURI().equals(dtResString)){
-			return getNumericCastType();
-		}else if(XSDDatatype.XSDstring.getURI().equals(dtResString)|| datatype ==null){
-			return getStringCastType();
-		}else if(XSDDatatype.XSDdateTime.getURI().equals(dtResString)|| XSDDatatype.XSDdate.getURI().equals(dtResString) ||  XSDDatatype.XSDtime.getURI().equals(dtResString)){
-			return getDateCastType();
-		}else if(XSDDatatype.XSDboolean.getURI().equals(dtResString)){
-			return getBooleanCastType();
-		}else if(XSDDatatype.XSDhexBinary.getURI().equals(dtResString)){
-			return getBinaryDataType();
-		}else{
-			return getStringCastType();
-		}
+	  String result=  null;
+	  if(datatype == null ){
+	    result = getStringCastType();
+	  }else{
+	  
+  	  String dtResString = datatype.getURI();
+  	  if(XSDDatatype.XSDstring.getURI().equals(dtResString)){
+  	    result = getStringCastType();
+      } else if(XSDDatatype.XSDdecimal.getURI().equals(dtResString)|XSDDatatype.XSDinteger.getURI().equals(dtResString) || XSDDatatype.XSDdouble.getURI().equals(dtResString)){
+        result = getNumericCastType();
+  		}else if(XSDDatatype.XSDdateTime.getURI().equals(dtResString)|| XSDDatatype.XSDdate.getURI().equals(dtResString) ||  XSDDatatype.XSDtime.getURI().equals(dtResString)){
+  		  result = getDateCastType();
+  		}else if(XSDDatatype.XSDboolean.getURI().equals(dtResString)){
+  		  result = getBooleanCastType();
+  		}else if(XSDDatatype.XSDhexBinary.getURI().equals(dtResString)){
+  		  result = getBinaryDataType();
+  		}else{
+  		  result = getStringCastType();
+  		}
+	  }
+	  return result;
 	}
 	
 //	public Expression cast(String table, String col, String castTo) {

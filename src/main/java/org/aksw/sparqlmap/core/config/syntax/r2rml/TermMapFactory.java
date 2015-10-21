@@ -43,7 +43,10 @@ public class TermMapFactory {
 	
 		if(node.isLiteral()){
 			tm.setTermTyp(R2RML.Literal);
-			Resource dt = ResourceFactory.createResource(node.getLiteralDatatype().getURI());
+			RDFDatatype dt = node.getLiteralDatatype();
+	     
+
+	
 			LiteralLabel constLit = node.getLiteral();
 			if(dt==null){
 				tm.setLiteralDataType(RDFS.Literal.getURI());
@@ -51,21 +54,25 @@ public class TermMapFactory {
 				tm.setLiteralDataType(dt.getURI());
 			}
 			
+			Resource dtResource = null;
+			if(dt!=null){
+        dtResource = ResourceFactory.createResource(dt.getURI());
+      }
 			
 			// set the value here
-			if(dth.getCastTypeString(dt).equals(dth.getStringCastType())){
+			if(dth.getCastTypeString(dtResource).equals(dth.getStringCastType())){
 				StringValue stringVal = new StringValue("'"+constLit.getLexicalForm()+"'");
 				tm.literalValString = dth.cast( stringVal, dth.getStringCastType());
 				
-			}else if(dth.getCastTypeString(dt).equals(dth.getNumericCastType())){
+			}else if(dth.getCastTypeString(dtResource).equals(dth.getNumericCastType())){
 				LongValue longValue  = new LongValue(constLit.getLexicalForm());
 				tm.literalValNumeric = dth.cast(longValue, dth.getNumericCastType());
 				
-			}else if(dth.getCastTypeString(dt).equals(dth.getBinaryDataType())){
+			}else if(dth.getCastTypeString(dtResource).equals(dth.getBinaryDataType())){
 				StringValue binVal = new StringValue("'"+constLit.getLexicalForm()+"'");
 				tm.literalValBinary = dth.cast(binVal, dth.getBinaryDataType());
 				
-			}else if(dth.getCastTypeString(dt).equals(dth.getDateCastType())){
+			}else if(dth.getCastTypeString(dtResource).equals(dth.getDateCastType())){
 				Long timestamp;
 				Object value = constLit.getValue();
 				if(value  instanceof XSDDateTime){
@@ -79,7 +86,7 @@ public class TermMapFactory {
 				TimestampValue dateValue = new TimestampValue(new Timestamp(timestamp)); 
 				tm.literalValDate = dth.cast(dateValue, dth.getDateCastType());
 				
-			}else if(dth.getCastTypeString(dt).equals(dth.getBooleanCastType())){
+			}else if(dth.getCastTypeString(dtResource).equals(dth.getBooleanCastType())){
 				StringValue bool = new StringValue("'"+constLit.getLexicalForm()+"'");
 				tm.literalValBool = dth.cast(bool, dth.getBooleanCastType());
 			}

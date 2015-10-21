@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
+import com.hp.hpl.jena.datatypes.RDFDatatype;
 
 @Component
 public class FilterUtil {
@@ -463,9 +464,9 @@ private static BitSet RESERVED = new BitSet();
 	public String removeColValue(String uripart, Column col){
 		
 		Integer colDataType =  dbaccess.getDataType(col.getTable().getName(), col.getColumnName());
+		String coldRdfDataTypeString= dth.getCastTypeString(colDataType);
 		
-		
-		if(colDataType==null || dth.getStringCastType().equals(dth.getCastTypeString(colDataType))){
+		if(coldRdfDataTypeString==null || dth.getStringCastType().equals(coldRdfDataTypeString)){
 			//we need to go to the next uri delimiter, which require going 
 			byte[] chars = uripart.getBytes();
 			int i = 0;
