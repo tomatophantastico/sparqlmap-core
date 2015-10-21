@@ -11,6 +11,7 @@ import javax.annotation.PostConstruct;
 
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
+import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.apache.metamodel.DataContext;
 import org.apache.metamodel.MetaModelException;
 import org.apache.metamodel.jdbc.JdbcDataContext;
@@ -38,6 +39,9 @@ public class AutomapperWrapper {
 
   @Autowired
   private Environment env;
+  
+  @Autowired
+  private DataTypeHelper dth;
 
   private String baseUri;
 
@@ -64,7 +68,7 @@ public class AutomapperWrapper {
     DataContext con = new  JdbcDataContext(conn);
     
     
-    MappingGenerator gen = new MappingGenerator(baseUri, baseUri, baseUri, ";");
+    MappingGenerator gen = new MappingGenerator(baseUri, baseUri, baseUri, ";",dth.getRowIdTemplate());
 
     Model dmR2rml = gen.generateMapping(con.getDefaultSchema());
     if (dmR2rmlDump != null && !dmR2rml.isEmpty()) {

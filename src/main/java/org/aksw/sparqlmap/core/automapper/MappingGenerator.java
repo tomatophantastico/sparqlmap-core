@@ -7,6 +7,7 @@ import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RML;
 import org.apache.jena.iri.IRIFactory;
 import org.apache.jena.riot.system.IRILib;
 import org.apache.metamodel.schema.Column;
+import org.apache.metamodel.schema.MutableColumn;
 import org.apache.metamodel.schema.Relationship;
 import org.apache.metamodel.schema.Schema;
 import org.apache.metamodel.schema.Table;
@@ -18,6 +19,7 @@ import com.google.common.net.UrlEscapers;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
  * Creates a Direct Mapping for the given schema
@@ -60,10 +62,7 @@ public class MappingGenerator {
    for(Table table: schema.getTables()){
      Resource triplesMap = r2r.createResource(mappingPrefix + "mapping/" + ues(table.getName()));
      
-     //add the logical Table statment
-     Resource rrTableName = r2r.createResource();
-     r2r.add(triplesMap,R2RML.logicalTable,rrTableName);
-     r2r.add(rrTableName,R2RML.tableName, escapeName(table.getName()));
+
      
      //add the subject map
      
@@ -74,9 +73,28 @@ public class MappingGenerator {
      
      //if no primary present, generate a blank node
      if(table.getPrimaryKeys().length==0){
-       subjectMap.addProperty(R2RML.termType,R2RML.BlankNode);
-
+         subjectMap.addProperty(R2RML.termType,R2RML.BlankNode);
+      
      }
+      
+     //use the rowid template or not
+     if(table.getPrimaryKeys().length==0&&rowidtemplate!=null){
+       //add the subquery statement
+       Resource rrSqlQuery = r2r.createResource();
+       r2r.add(triplesMap,R2RML.logicalTable,rrSqlQuery);
+       r2r.add(triplesMap,RDFS.comment,"Added subquery for having acccess to rowid functionality.");
+       r2r.add(rrSqlQuery,R2RML.sqlQuery,String.format(rowidtemplate, table.getName()));
+       
+       
+     }else{
+       //add the logical Table statment
+       Resource rrTableName = r2r.createResource();
+       r2r.add(triplesMap,R2RML.logicalTable,rrTableName);
+       r2r.add(rrTableName,R2RML.tableName, escapeName(table.getName()));
+     }
+    
+     
+    
      
      
      // and the class statement
@@ -153,14 +171,22 @@ public class MappingGenerator {
   
   private String generateSubjectTemplate(Table table){
     List<Column> colsOfSubject = null;
+    
 
     if(table.getPrimaryKeys().length>0){
       //join the primary keys to generate the subject pattern
       colsOfSubject= Lists.newArrayList(( table.getPrimaryKeys()));
 
     }else{
+      
+      if(rowidtemplate == null){
       //use all cols to generate subject
-      colsOfSubject= Lists.newArrayList(( table.getColumns()));
+        colsOfSubject= Lists.newArrayList(( table.getColumns()));
+      }else{
+        // we use the rowid here
+        colsOfSubject = Lists.newArrayList((Column)new MutableColumn("sm_rowid", table));
+        
+      }
     }
     
     Function<Column,String> funcCol2Colname = new Function<Column,String>() {
