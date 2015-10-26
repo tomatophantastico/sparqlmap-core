@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.aksw.sparqlmap.DBHelper;
+import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
 import org.aksw.sparqlmap.core.SparqlMap;
 import org.aksw.sparqlmap.core.db.Connector;
 import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
@@ -70,6 +72,7 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
     server.setDatabasePath(0, "mem:sparqlmaptest\"");
     server.start();
     
+    dbconf = new DBConnConfig();
     dbconf.jdbcString = "jdbc:hsqldb:mem:sparqlmaptest/";
     dbconf.username =  "sa";
     dbconf.password = "";

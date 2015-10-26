@@ -15,6 +15,7 @@ import net.sf.jsqlparser.util.deparser.SelectDeParser;
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLModel;
+import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMapFactory;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
 import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap.PO;
 import org.aksw.sparqlmap.core.db.DBAccess;
@@ -68,8 +69,9 @@ public class AlgebraMapper implements Mapper {
 	@Autowired
 	private OptimizationConfiguration fopt;
 	
+	@Autowired
+	private TermMapFactory tmf;
 	
-
 
 	
 	
@@ -123,7 +125,7 @@ public class AlgebraMapper implements Mapper {
 			}
 		}
 		
-		QueryBuilderVisitor builderVisitor = new QueryBuilderVisitor(context,dth,exprconv,filterUtil);
+		QueryBuilderVisitor builderVisitor = new QueryBuilderVisitor(context,dth,exprconv,filterUtil,tmf);
 		
 		
 		
@@ -262,7 +264,7 @@ public class AlgebraMapper implements Mapper {
         context.setQueryInformation(qi);
 
         QueryBuilderVisitor qbv =
-          new QueryBuilderVisitor(context, dth, exprconv, filterUtil);
+          new QueryBuilderVisitor(context, dth, exprconv, filterUtil,tmf);
 
         OpWalker.walk(qop, qbv);
 

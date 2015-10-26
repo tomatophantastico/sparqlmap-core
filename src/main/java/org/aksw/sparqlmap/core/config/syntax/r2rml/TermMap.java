@@ -562,6 +562,19 @@ public class TermMap{
 	}
 	
 	
+	public List<Column> getColumns(){
+	  List<Column> cols = Lists.newArrayList();
+	  for(Expression expression: getExpressions()){
+	    expression = DataTypeHelper.uncast(expression);
+	    if(expression instanceof Column){
+	      cols.add((Column) expression);
+	    }
+	  }	  
+	  
+	  return cols;
+	}
+	
+	
 	
 
 	
