@@ -68,7 +68,7 @@ public class OptimizationConfiguration {
 		if(env.getProperty("sm.opt.decomposeVirtualTables")!=null){
       decomposeVirtualTables = new Boolean(env.getProperty("sm.opt.decomposeVirtualTables"));
     }
-    log.info("Project pushing is is: " + (decomposeVirtualTables?"on":"off"));
+    log.info("Table decomposition is: " + (decomposeVirtualTables?"on":"off"));
 		
 	}
 	

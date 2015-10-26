@@ -1,5 +1,7 @@
 package org.aksw.sparqlmap.core.db.impl;
 
+import java.util.List;
+
 import net.sf.jsqlparser.expression.Expression;
 
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
@@ -77,4 +79,11 @@ public class MySQLDataTypeHelper extends DataTypeHelper {
 	public Expression cast(Expression expr, String castTo) {
 	  return expr;
 	}
+	 
+	 @Override
+	public String getRowIdTemplate() {
+	    
+	    return "";
+	}
+
 }

@@ -51,34 +51,7 @@ public class PostgreSQLDataTypeHelper extends DataTypeHelper {
 		return "BYTEA";
 	}
 
-	@Override
-	public boolean needsSpecialCastForBinary() {
-		
-		return true;
-	}
 
-	
-	@Override
-	public Expression binaryCastPrep(Expression expr) {
-		
-		CastExpression cast = new CastExpression(expr, getStringCastType());
-		
-		Function substring = new Function();
-		substring.setName("SUBSTRING");
-		ExpressionList subexprlist = new ExpressionList();
-		subexprlist.setExpressions(Arrays.asList((Expression)new ExpressionWithString(cast," FROM 3" )));
-		substring.setParameters(subexprlist);
-		
-		
-		Function upper = new Function();
-		upper.setName("UPPER");
-		
-		
-		ExpressionList upexprlist = new ExpressionList(Arrays.asList((Expression)substring));
-		upper.setParameters(upexprlist);
-		
-		return upper;
-	}
 
 	@Override
 	public boolean needsSpecialCastForChar() {
@@ -112,7 +85,8 @@ public class PostgreSQLDataTypeHelper extends DataTypeHelper {
 	  
 	  return "SELECT \"%1$s\".* , row_number() OVER () as sm_rowid FROM \"%1$s\";";
 	}
-	
+
+
 	
 
 

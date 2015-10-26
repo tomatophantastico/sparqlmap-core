@@ -310,20 +310,22 @@ public abstract  class DataTypeHelper {
 
 	public abstract String getIntCastType();
 	
-	public abstract boolean needsSpecialCastForBinary();
+	public boolean needsSpecialCastForBinary(){
+	  return false;
+	}
 	
 
 	
-	public abstract Expression binaryCastPrep(Expression expr);
+	public  Expression binaryCastPrep(Expression expr){
+	  return null;
+	}
 	
 	public abstract boolean needsSpecialCastForChar();
 	
 	public abstract Expression charCastPrep(Expression expr, Integer fieldlength);
 
 
-	public List<Expression> getRowIdFunction(String fromAlias) {
-		return null;
-	}
+
 
 	public PlainSelect slice(PlainSelect toModify, OpSlice slice) {
 		Limit limit = new Limit();

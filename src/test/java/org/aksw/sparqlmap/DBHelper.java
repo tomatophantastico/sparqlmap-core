@@ -15,10 +15,12 @@ import org.apache.metamodel.UpdateableDataContext;
 import org.apache.metamodel.drop.DropTable;
 import org.apache.metamodel.jdbc.JdbcDataContext;
 import org.apache.metamodel.schema.Table;
+import org.junit.Assume;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.jdbc.datasource.init.ScriptStatementFailedException;
 
 import com.google.common.collect.Lists;
 
@@ -75,8 +77,11 @@ public class DBHelper {
     ResourceDatabasePopulator rdp = new ResourceDatabasePopulator();
     rdp.addScript(new FileSystemResource(file));
     conn.setAutoCommit(true);
+    try{
     rdp.populate(conn);
-    
+    }catch(ScriptStatementFailedException e){
+        Assume.assumeNoException("Unable to load sql file: " + file, e);
+    }
   }
   
   public static Connection getConnection(DBConnConfig dbconf) throws SQLException {

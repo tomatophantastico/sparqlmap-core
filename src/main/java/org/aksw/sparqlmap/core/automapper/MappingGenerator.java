@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RML;
-import org.apache.jena.iri.IRIFactory;
 import org.apache.jena.riot.system.IRILib;
 import org.apache.metamodel.schema.Column;
 import org.apache.metamodel.schema.MutableColumn;
@@ -15,7 +14,6 @@ import org.apache.metamodel.schema.Table;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.net.UrlEscapers;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;

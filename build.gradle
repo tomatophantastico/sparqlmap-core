@@ -55,7 +55,7 @@ dependencies {
     compile 'com.jolbox:bonecp:0.8.0.RELEASE'
     compile 'net.sf.supercsv:super-csv:2.1.0'
     compile 'joda-time:joda-time:2.1'
-    compile 'org.apache.metamodel:MetaModel-jdbc:4.3.4'
+    compile 'org.apache.metamodel:MetaModel-jdbc:4.4.1-SNAPSHOT'
 
     testCompile 'com.spotify:docker-client:2.7.7'
     testCompile 'junit:junit:4.11'

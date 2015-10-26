@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.junit.Assume;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +112,7 @@ public class DockerHelper {
         DockerClient dockerEnv = DefaultDockerClient.builder()
             .uri(URI.create("https://192.168.59.103:2376"))
             .dockerCertificates(
-                new DockerCertificates(Paths.get(System.getProperty("user.home") +  "/.docker/boot2docker-vm/")))
+                new DockerCertificates(Paths.get(System.getProperty("user.home") +  "/.boot2docker/certs/boot2docker-vm/")))
             .build();
         dockerEnv.ping();
         docker = dockerEnv;
@@ -123,18 +124,20 @@ public class DockerHelper {
        log.error("Failed to get Docker Certificates ",e);
       }
     }
+    
     return docker;
   }
   
   public static void stopDocker(String name) throws DockerException, InterruptedException{
     DockerClient docker = acquireDocker();
+    if(docker!=null){
     
-    
-    for (Container container: docker.listContainers(ListContainersParam.allContainers())){
-      if(container.names().contains("/"+name)){
-        docker.killContainer(container.id());
-        docker.removeContainer(container.id());
-      }
+        for (Container container: docker.listContainers(ListContainersParam.allContainers())){
+          if(container.names().contains("/"+name)){
+            docker.killContainer(container.id());
+            docker.removeContainer(container.id(),true);
+          }
+        }
     }
   
 

@@ -158,15 +158,7 @@ private static BitSet RESERVED = new BitSet();
 	
 	public TermMap compareTermMaps(TermMap left, TermMap right, Class<? extends BinaryExpression> test){
 	  
-	  
-	
-		
-		
 		List<Expression> eqs = new ArrayList<Expression>();
-		
-		
-	
-		
 		
 		try{
 		  
@@ -177,13 +169,19 @@ private static BitSet RESERVED = new BitSet();
 		    while(leftI.hasNext()){
 		      Expression leftExpr = leftI.next();
 		      Expression rightExpr = rightI.next();
-		      EqualsTo eq = new EqualsTo();
-		      eq.setLeftExpression(leftExpr);
-		      eq.setRightExpression(rightExpr);
-		      eqs.add(eq);
+		      if(leftExpr.equals(rightExpr)){
+		          // are equal, we can skip this expression
+		      }else{
+		      
+		      
+    		      EqualsTo eq = new EqualsTo();
+    		      eq.setLeftExpression(leftExpr);
+    		      eq.setRightExpression(rightExpr);
+    		      eqs.add(eq);
+		      
+		      }
+		    
 		    }
-		    
-		    
 		    
 	      
 	    }else{
@@ -255,18 +253,23 @@ private static BitSet RESERVED = new BitSet();
 	 * @return
 	 */
 	private Expression andTypesAreEqual(Expression toWrap, TermMap left, TermMap right){
-	  EqualsTo termTypeEquals = new EqualsTo();
-	  termTypeEquals.setLeftExpression(left.getTermType());
-	  termTypeEquals.setRightExpression(right.getTermType());
-	  AndExpression andTermType = new AndExpression(toWrap, termTypeEquals);
+	    List<Expression> results = Lists.newArrayList();
+	    results.add(toWrap);
+	  if(!left.getTermType().equals(right.getTermType())){  
+    	  EqualsTo termTypeEquals = new EqualsTo();
+    	  termTypeEquals.setLeftExpression(left.getTermType());
+    	  termTypeEquals.setRightExpression(right.getTermType());
+    	  results.add(termTypeEquals);
+	  }
 	  
-	  EqualsTo literalTypeEquals = new EqualsTo();
-	  literalTypeEquals.setLeftExpression(left.getLiteralType());
-	  literalTypeEquals.setRightExpression(right.getLiteralType());
-	  AndExpression andLiteralType = new AndExpression(andTermType,literalTypeEquals);
+	  if(left.getLiteralType().equals(right.getLiteralType())){
+    	  EqualsTo literalTypeEquals = new EqualsTo();
+    	  literalTypeEquals.setLeftExpression(left.getLiteralType());
+    	  literalTypeEquals.setRightExpression(right.getLiteralType());
+    	  results.add( literalTypeEquals);	  
+	  }
 	  
-	  
-	  return new Parenthesis(andLiteralType);
+	  return new Parenthesis(conjunct(results));
 	  
 	}
 	
@@ -529,85 +532,6 @@ private static BitSet RESERVED = new BitSet();
 	
 	
 	}
-	
-	
-	
-	
-	//break expressions down
-	
-	
-//	String toReduce = stringOrig.getNotExcapedValue();
-//	List<Expression> parameter = new ArrayList<Expression>();
-//	for(Object oexp: func.getParameters()
-//			.getExpressions()){
-//		parameter.add(DataTypeHelper.uncast((Expression) oexp));
-//	}
-//		
-//	int psize = parameter.size();
-//	
-//	for (int i = 0; i < psize; i += 2) {
-//		if (parameter.get(i) instanceof StringValue) {
-//
-//			String value = ((StringValue) parameter.get(i))
-//					.getNotExcapedValue();
-//			Column col = null;
-//			String prereadsuffix = null;
-//			if ((i + 1 < psize)
-//					&& parameter.get(i + 1) instanceof Column) {
-//				col = (Column) parameter.get(i + 1);
-//			}
-//			if ((i + 2 < psize)
-//					&& parameter.get(i + 2) instanceof StringValue) {
-//				prereadsuffix = ((StringValue) parameter
-//						.get(i + 2)).getNotExcapedValue();
-//			}
-//
-//			if (toReduce.startsWith(value)) {
-//				// delete this part
-//				toReduce = toReduce.substring(value.length());
-//				reduced = true;
-//			}else{
-//				break;
-//			}
-//
-//			if (col != null && prereadsuffix != null &&
-//			// is the static value at the end?
-//			 
-//					toReduce.contains(prereadsuffix) ) {
-//				// no, there is a static part following
-//				String colvalue = toReduce.substring(0,
-//						toReduce.indexOf(prereadsuffix));
-//				toReduce = toReduce.substring(toReduce
-//						.indexOf(prereadsuffix));
-//				stringNew.add(new StringValue("\"" + colvalue
-//						+ "\""));
-//				compareto.add(col);
-//				reduced = true;
-//			} else if (col != null) {
-//				// yes, we are finished
-//				stringNew.add(new StringValue("\"" + toReduce
-//						+ "\""));
-//				compareto.add(col);
-//				reduced = true;
-//			}
-//		} else {
-//			
-//			
-//			log.debug("No Filtershortcutting for " + sqlExpression);
-//			//							throw new ImplementationException(
-////								"Should never come here, resource columns should always be string + col + string + col ...., but is: "
-////										+ func);
-//		}
-//	}
-//	return reduced;
-//	
-//	
-	
-	
-	
-	
-	
-	
 	
 	
 	private Expression bothNullOrBinary(Expression expr1, Expression expr2, BinaryExpression function, DataTypeHelper dth){
