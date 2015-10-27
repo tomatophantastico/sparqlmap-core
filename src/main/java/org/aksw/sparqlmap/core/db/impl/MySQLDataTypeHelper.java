@@ -83,7 +83,7 @@ public class MySQLDataTypeHelper extends DataTypeHelper {
 	 @Override
 	public String getRowIdTemplate() {
 	    
-	    return "";
+	    return "select *, @sparqlmapCurRow := @sparqlmapCurRow + 1 AS sm_rowid  from \"%1$s\",(SELECT @sparqlmapCurRow := 0) sparqlmap_rowid;";
 	}
 
 }
