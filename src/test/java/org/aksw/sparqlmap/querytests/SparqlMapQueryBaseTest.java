@@ -3,6 +3,7 @@ package org.aksw.sparqlmap.querytests;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,12 +19,15 @@ import org.aksw.sparqlmap.DBHelper;
 import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
 import org.aksw.sparqlmap.TestHelper;
 import org.aksw.sparqlmap.core.SparqlMap;
+import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.aksw.sparqlmap.core.spring.ContextSetup;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.Lists;
@@ -54,8 +58,29 @@ public abstract class SparqlMapQueryBaseTest {
   
   SparqlMap sparqlMap;
   
+  ApplicationContext context;
+  
   static DBConnConfig dbconf;
   static Boolean canConnect;
+  
+  private static Logger log = LoggerFactory.getLogger(SparqlMapQueryBaseTest.class);
+  
+  
+  private static Properties fails;
+  
+  {
+      fails = new Properties();
+        try {
+      InputStream stream = 
+                 ClassLoader.getSystemClassLoader().getResourceAsStream("query_failing.properties");
+         fails.load(stream);
+
+            stream.close();
+        } catch (IOException e) {
+            log.error("Problem loading failing test information",e);
+        }
+  }
+  
   public SparqlMapQueryBaseTest(String testname, String dsName,
       File mappingFile, File sqlFile, String query) {
     super();
@@ -104,20 +129,34 @@ public abstract class SparqlMapQueryBaseTest {
   
   @Test
   public void runTest() throws SQLException{
+    String key = testname;
+  
+   
     
     if(canConnect ==null){
       canConnect = DBHelper.waitAndConnect(dbconf);
     }
     
+    
+    
+    
     Assume.assumeTrue("Cannot connect to the database", canConnect);  
     
-    boolean initResult = DBHelper.initDb(dbconf,dsName,sqlFile);
-    Assume.assumeTrue("Could not initialize database ",initResult);
+    Assume.assumeTrue("Failure loading the database", 
+        DBHelper.initDb(dbconf,dsName,sqlFile));
     
-    if(query.startsWith("#fails:")){
-      String message = query.substring(0,query.indexOf("\n"));
-      Assume.assumeTrue(message, false);
-    }
+    initContext();
+    
+    if(fails.containsKey(key)){
+      String value = fails.getProperty(key);
+      String dbs = value.split(":")[0];
+      Assume.assumeFalse(value.split(":")[1], 
+              dbs.equals("ALL")
+              || Lists.newArrayList(dbs.split(",")).contains(getDataTypeHelper().getDBName().toLowerCase()));
+
+     }
+    
+    
     
     
     sparqlMap = getSparqlMap();
@@ -127,6 +166,11 @@ public abstract class SparqlMapQueryBaseTest {
   
  
   public SparqlMap getSparqlMap() {
+   
+    return (SparqlMap) context.getBean("sparqlMap");
+  }
+  
+  public void initContext(){
     
     Properties props = getDBProperties();
     
@@ -135,9 +179,14 @@ public abstract class SparqlMapQueryBaseTest {
     Map<String,Properties> name2props = new HashMap<String,Properties>();
     name2props.put("test-conf", props);
     
-    ApplicationContext con =  ContextSetup.contextFromProperties(name2props);
-    return (SparqlMap) con.getBean("sparqlMap");
+    context =  ContextSetup.contextFromProperties(name2props);
   }
+  
+  public DataTypeHelper getDataTypeHelper(){
+    return (DataTypeHelper) context.getBean(DataTypeHelper.class);
+  }
+  
+  
 
 
   

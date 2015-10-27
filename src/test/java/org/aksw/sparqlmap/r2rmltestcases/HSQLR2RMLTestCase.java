@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
 import org.aksw.sparqlmap.core.db.Connector;
 import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
 import org.aksw.sparqlmap.core.db.impl.HSQLDBConnector;
@@ -66,7 +67,7 @@ public class HSQLR2RMLTestCase extends R2RMLTest{
     server.setDatabaseName(0, "bsbm2-100k");
     server.setDatabasePath(0, "mem:sparqlmaptest\"");
     server.start();
-    
+    dbconf = new DBConnConfig();
     dbconf.jdbcString = "jdbc:hsqldb:mem:sparqlmaptest/";
     dbconf.username =  "sa";
     dbconf.password = "";

@@ -110,9 +110,9 @@ public class DockerHelper {
       
       try{
         DockerClient dockerEnv = DefaultDockerClient.builder()
-            .uri(URI.create("https://192.168.59.103:2376"))
+            .uri(URI.create("https://192.168.99.100:2376"))
             .dockerCertificates(
-                new DockerCertificates(Paths.get(System.getProperty("user.home") +  "/.boot2docker/certs/boot2docker-vm/")))
+                new DockerCertificates(Paths.get(System.getProperty("user.home") +  "/.docker/machine/machines/default")))
             .build();
         dockerEnv.ping();
         docker = dockerEnv;
@@ -154,7 +154,7 @@ public class DockerHelper {
    * @return
    */
   public static String getDockerHost() {
-    String host = "192.168.59.103";
+    String host = "192.168.99.100";
     try {
       if(DefaultDockerClient.fromEnv().uri() != null){
         

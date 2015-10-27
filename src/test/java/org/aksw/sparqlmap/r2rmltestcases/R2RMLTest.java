@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -72,7 +73,23 @@ public abstract class R2RMLTest {
 	
 	
 	private static Logger log = LoggerFactory.getLogger(R2RMLTest.class);
+	
+	private static Properties fails;
+	
+	{
+	    fails = new Properties();
+        try {
+	    InputStream stream = 
+	               ClassLoader.getSystemClassLoader().getResourceAsStream("bsbm_failing.properties");
+	       fails.load(stream);
 
+            stream.close();
+        } catch (IOException e) {
+            log.error("Problem loading failing test information",e);
+        }
+	}
+	
+	
 
 	private static Boolean dbIsReachable = null;
 
@@ -92,7 +109,17 @@ public abstract class R2RMLTest {
 
 	@Test
 	public void runTestcase() throws ClassNotFoundException, SQLException, IOException{
-		
+	  if(fails.containsKey(testCaseName)){
+	      String value = fails.getProperty(testCaseName);
+	      String dbs = value.split(":")[0];
+	      Assume.assumeFalse(value.split(":")[1], 
+	              dbs.equals("ALL")
+	              || Lists.newArrayList(dbs.split(",")).contains(getDataTypeHelper().getDBName().toLowerCase()));
+
+	  }
+	  
+	    
+	    
 	  if(dbIsReachable==null){
       dbIsReachable = DBHelper.waitAndConnect(dbconf);
 	  }
