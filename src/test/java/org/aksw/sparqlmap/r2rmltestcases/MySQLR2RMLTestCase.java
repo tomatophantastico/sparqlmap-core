@@ -17,6 +17,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jolbox.bonecp.BoneCPDataSource;
 import com.spotify.docker.client.DockerException;
@@ -31,17 +33,24 @@ public class MySQLR2RMLTestCase extends R2RMLTest {
 		super(testCaseName, r2rmlLocation, outputLocation, referenceOutput,
 				dbFileLocation, createDM);
 	}
-	
+  
+  
+	private static Logger log = LoggerFactory.getLogger(MySQLR2RMLTestCase.class);
 
   @BeforeClass
   public static void startMySQLDocker() throws DockerException, InterruptedException {
    // this approach will work for most dev setups
-      dbconf =  DockerHelper.startMySQLDocker();
+      try {
+        dbconf =  DockerHelper.startDirectOrDockerizedMySQL();
+      } catch (Exception e) {
+        log.error("FAiled to start Docker contaier", e);
+        dbIsReachable = false;
+      }
   }
 
   @AfterClass
   public static void doTeardownHost() throws DockerException, InterruptedException {
-    DockerHelper.stopMySQLDocker();
+    DockerHelper.stopDirectOrDockerizedMysql();
     
   }
 	

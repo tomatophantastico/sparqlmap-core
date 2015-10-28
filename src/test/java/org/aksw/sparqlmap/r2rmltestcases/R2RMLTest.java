@@ -91,7 +91,7 @@ public abstract class R2RMLTest {
 	
 	
 
-	private static Boolean dbIsReachable = null;
+	static Boolean dbIsReachable = null;
 
 
 	public R2RMLTest(String testCaseName, String r2rmlLocation,

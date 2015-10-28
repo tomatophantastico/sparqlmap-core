@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Properties;
 
 import org.aksw.sparqlmap.DBHelper;
+import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
 import org.aksw.sparqlmap.core.db.Connector;
 import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
 import org.aksw.sparqlmap.core.db.impl.OracleConnector;
@@ -15,6 +16,7 @@ import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,14 @@ public class OracleR2RMLTestCase extends R2RMLTest{
 	}
 
 	
+	@BeforeClass
+  	public static void setOracleConnection(){
+  	dbconf = new DBConnConfig();
+    dbconf.jdbcString = "jdbc:oracle:thin:@//192.168.59.104/r2rml";
+    dbconf.username =  "r2rmladmin";
+    dbconf.password = "r2rmladmin";
+  }
+	
 
 	OracleConnector connector;
 
@@ -52,43 +62,6 @@ public class OracleR2RMLTestCase extends R2RMLTest{
   }
   
 
-
-	
-
-	@Override
-	public Properties getDBProperties() {
-		
-		Properties properties = new Properties();
-		try {
-			properties.load(ClassLoader.getSystemResourceAsStream("r2rml-test/db-oracle.properties"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail("Unable to load properties file");
-			
-		}
-		return properties;
-	}
-
-
-	@After
-	public void cleanup(){
-		connector.close(); 
-		
-
-
-	}
-	
-	@Before
-	public void before(){
-		BoneCPDataSource ds = new BoneCPDataSource(
-				DBAccessConfigurator.createConfig(
-						getDBProperties().getProperty("jdbc.url"), getDBProperties().getProperty("jdbc.username"), getDBProperties().getProperty("jdbc.password"), 1, 2));
-		
-		OracleConnector conn = new OracleConnector();
-		conn.setDs(ds);
-		
-		connector = conn;
-	}
 
 
   @Override

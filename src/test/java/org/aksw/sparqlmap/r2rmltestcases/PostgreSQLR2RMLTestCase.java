@@ -16,6 +16,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jolbox.bonecp.BoneCPDataSource;
 import com.spotify.docker.client.DockerException;
@@ -29,6 +31,8 @@ public class PostgreSQLR2RMLTestCase extends R2RMLTest {
 				dbFileLocation, createDM);
 	}
 
+	
+	private static Logger log = LoggerFactory.getLogger(PostgreSQLR2RMLTestCase.class);
 	
 	@Parameters(name="{0}")
 	public static Collection<Object[]> data() {
@@ -45,12 +49,17 @@ public class PostgreSQLR2RMLTestCase extends R2RMLTest {
   @BeforeClass
   public static void startPostgresDocker() throws DockerException, InterruptedException {
    // this approach will work for most dev setups
-      dbconf =  DockerHelper.startPostGresDocker();
+    try{
+        dbconf =  DockerHelper.startDirectOrDockerizedPostgres();
+    } catch (Exception e) {
+      log.error("FAiled to start Docker contaier", e);
+      dbIsReachable = false;
+    }
   }
 
   @AfterClass
   public static void stopPostgresDocker() throws DockerException, InterruptedException {
-    DockerHelper.stopPostGresDocker();
+    DockerHelper.stopdirecOrDockerizedPostgres();
     
   }
 

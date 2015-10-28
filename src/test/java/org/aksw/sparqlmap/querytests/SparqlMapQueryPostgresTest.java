@@ -22,6 +22,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.Lists;
@@ -38,12 +40,17 @@ import com.spotify.docker.client.DockerException;
  */
 public class SparqlMapQueryPostgresTest  extends SparqlMapQueryBaseTest{
   
-
+  private static Logger log = LoggerFactory.getLogger(SparqlMapQueryPostgresTest.class);
 
 
   @BeforeClass
   public static void startPostGresDocker() throws DockerException, InterruptedException {
-    dbconf = DockerHelper.startPostGresDocker();
+    try{
+      dbconf = DockerHelper.startDirectOrDockerizedPostgres();
+    } catch (Exception e) {
+      log.error("FAiled to start Docker contaier", e);
+      canConnect = false;
+    }
   }
   
 
@@ -51,7 +58,7 @@ public class SparqlMapQueryPostgresTest  extends SparqlMapQueryBaseTest{
   @AfterClass
   public static void doTeardownHost() throws DockerException, InterruptedException {
     
-    DockerHelper.stopPostGresDocker();
+    DockerHelper.stopdirecOrDockerizedPostgres();
     
   }
   

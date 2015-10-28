@@ -1,8 +1,26 @@
 language: java
-
+sudo: required
 services:
   - docker
 
+addons:
+  postgresql: "9.3"
+
 jdk:
   - openjdk7
-  - oraclejdk7  
+
+before_script:
+  - psql -c 'create database sparqlmap;' -U postgres
+  - mysql -e 'create database sparqlmap;'
+
+script:
+  - ./gradlew check --info
+
+env:
+  global:
+    - SPARQLMAP_POSTGRES_URL=jdbc:postgresql://localhost/sparqlmap
+    - SPARQLMAP_POSTGRES_USER=postgres
+    - SPARQLMAP_POSTGRES_PASS=
+    - SPARQLMAP_MYSQL_URL=jdbc:mysql://localhost/sparqlmap?padCharsWithSpace=true&sessionVariables=sql_mode='ANSI_QUOTES'
+    - SPARQLMAP_MYSQL_USER=travis
+    - SPARQLMAP_MYSQL_PASS=

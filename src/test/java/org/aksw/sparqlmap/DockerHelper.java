@@ -39,10 +39,17 @@ public class DockerHelper {
   
   private static final String MYSQL_DOCKER_CONTAINER_NAME = "sparqlmap_mysql_test";
   private static final String MYSQL_DOCKER_IMAGE_NAME = "mysql";
+  private static final String MYSQL_ENV_DB_URL = "SPARQLMAP_MYSQL_URL";
+  private static final String MYSQL_ENV_DB_USER = "SPARQLMAP_MYSQL_USER";
+  private static final String MYSQL_ENV_DB_PASS = "SPARQLMAP_MYSQL_PASS";
+
+  
   
   private static final String POSTGRES_DOCKER_CONTAINER_NAME = "sparqlmap_postgres_test";
   private static final String POSTGRES_DOCKER_IMAGE_NAME = "postgres";
-  
+  private static final String POSTGRES_ENV_DB_URL = "SPARQLMAP_POSTGRES_URL";
+  private static final String POSTGRES_ENV_DB_USER = "SPARQLMAP_POSTGRES_USER";
+  private static final String POSTGRES_ENV_DB_PASS = "SPARQLMAP_POSTGRES_PASS";
   
   
   private static Logger log = LoggerFactory.getLogger(DockerHelper.class);
@@ -124,7 +131,6 @@ public class DockerHelper {
        log.error("Failed to get Docker Certificates ",e);
       }
     }
-    
     return docker;
   }
   
@@ -168,6 +174,28 @@ public class DockerHelper {
    return host;
   }
   
+  /**
+   * Either us connection information provided via env variables, or attempt to start a dockercontainer.
+   * @return
+   * @throws InterruptedException 
+   * @throws DockerException 
+   */
+  public static DBConnConfig startDirectOrDockerizedMySQL() throws DockerException, InterruptedException{
+    
+    DBConnConfig dbconn = null;
+    if(System.getenv(MYSQL_ENV_DB_URL)!=null){
+      dbconn = new DBConnConfig();
+      dbconn.jdbcString = System.getenv(MYSQL_ENV_DB_URL);
+      dbconn.password = System.getenv(MYSQL_ENV_DB_PASS);
+      dbconn.username = System.getenv(MYSQL_ENV_DB_USER);
+    }else{
+      dbconn = startMySQLDocker();
+    }
+    
+    return dbconn;
+    
+  }
+  
   public static DBConnConfig startMySQLDocker() throws DockerException, InterruptedException {
     // this approach will work for most dev setups
      
@@ -190,8 +218,39 @@ public class DockerHelper {
     public String jdbcString;
     
   }
+  
+  public static void stopDirectOrDockerizedMysql() throws DockerException, InterruptedException{
+    if(System.getenv(MYSQL_ENV_DB_URL)!=null){
+      // do nothing
+    }else{
+      stopMySQLDocker();
+    }
+  }
+  
   public static void stopMySQLDocker() throws DockerException, InterruptedException {
     stopDocker(MYSQL_DOCKER_CONTAINER_NAME);
+  }
+  
+  /**
+   * Either us connection information provided via env variables, or attempt to start a dockercontainer.
+   * @return
+   * @throws InterruptedException 
+   * @throws DockerException 
+   */
+  public static DBConnConfig startDirectOrDockerizedPostgres() throws DockerException, InterruptedException{
+    
+    DBConnConfig dbconn = null;
+    if(System.getenv(POSTGRES_ENV_DB_URL)!=null){
+      dbconn = new DBConnConfig();
+      dbconn.jdbcString = System.getenv(POSTGRES_ENV_DB_URL);
+      dbconn.password = System.getenv(POSTGRES_ENV_DB_PASS);
+      dbconn.username = System.getenv(POSTGRES_ENV_DB_USER);
+    }else{
+      dbconn = startPostGresDocker();
+    }
+    
+    return dbconn;
+    
   }
 
   public static DBConnConfig startPostGresDocker() throws DockerException, InterruptedException {
@@ -212,6 +271,14 @@ public class DockerHelper {
     
     return result;
     
+  }
+  
+  public static void stopdirecOrDockerizedPostgres() throws DockerException, InterruptedException{
+    if(System.getenv(POSTGRES_ENV_DB_URL)!=null){
+      // do nothing
+    }else{
+      stopPostGresDocker();
+    }
   }
 
   public static void stopPostGresDocker() throws DockerException, InterruptedException {
