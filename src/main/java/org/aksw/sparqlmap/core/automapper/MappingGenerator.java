@@ -3,7 +3,7 @@ package org.aksw.sparqlmap.core.automapper;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RML;
+import org.aksw.sparqlmap.core.r2rml.R2RML;
 import org.apache.jena.riot.system.IRILib;
 import org.apache.metamodel.schema.Column;
 import org.apache.metamodel.schema.MutableColumn;

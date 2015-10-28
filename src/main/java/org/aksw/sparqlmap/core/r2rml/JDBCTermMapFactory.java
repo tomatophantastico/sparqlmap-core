@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap.core.config.syntax.r2rml;
+package org.aksw.sparqlmap.core.r2rml;
 
 import java.sql.Timestamp;
 
@@ -21,9 +21,14 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-
+/**
+ * This factory creates JDBC TermMaps, i.e. TermMaps that are bound to a specific database. 
+ * 
+ * @author joerg
+ *
+ */
 @Component
-public class TermMapFactory {
+public class JDBCTermMapFactory {
 	
 	@Autowired
 	DataTypeHelper dth;
@@ -37,9 +42,9 @@ public class TermMapFactory {
 	 * @param node
 	 * @return
 	 */
-	public TermMap createTermMap(Node node){
+	public JDBCTermMap createTermMap(Node node){
 		
-		TermMap tm = new TermMap(dth);
+		JDBCTermMap tm = new JDBCTermMap(dth);
 	
 		if(node.isLiteral()){
 			tm.setTermTyp(R2RML.Literal);
@@ -108,8 +113,8 @@ public class TermMapFactory {
 	
 	
 	
-	public TermMap createBoolTermMap(Expression bool){
-		TermMap tm = new TermMap(dth);
+	public JDBCTermMap createBoolTermMap(Expression bool){
+		JDBCTermMap tm = new JDBCTermMap(dth);
 		tm.setTermTyp(R2RML.Literal);
 		tm.setLiteralDataType(XSDDatatype.XSDboolean.getURI());
 		tm.literalValBool = dth.cast(bool, dth.getBooleanCastType());
@@ -117,8 +122,8 @@ public class TermMapFactory {
 		return tm;
 	}
 	
-	public TermMap createStringTermMap(Expression string){
-		TermMap tm = new TermMap(dth);
+	public JDBCTermMap createStringTermMap(Expression string){
+		JDBCTermMap tm = new JDBCTermMap(dth);
 		tm.setTermTyp(R2RML.Literal);
 		tm.setLiteralDataType(RDFS.Literal.getURI());
 		tm.literalValString = dth.cast(string, dth.getStringCastType());
@@ -126,8 +131,8 @@ public class TermMapFactory {
 		return tm;
 	}
 	
-	public TermMap createNumericalTermMap(Expression numeric,Expression datatype){
-		TermMap tm = new TermMap(dth);
+	public JDBCTermMap createNumericalTermMap(Expression numeric,Expression datatype){
+		JDBCTermMap tm = new JDBCTermMap(dth);
 		tm.setTermTyp(R2RML.Literal);
 		tm.literalType = datatype;
 		tm.literalValNumeric = dth.cast(numeric, dth.getNumericCastType());
@@ -135,8 +140,8 @@ public class TermMapFactory {
 		return tm;
 	}
 	
-	 public TermMap createNumericalTermMap(Expression numeric,XSDDatatype datatype){
-	    TermMap tm = new TermMap(dth);
+	 public JDBCTermMap createNumericalTermMap(Expression numeric,XSDDatatype datatype){
+	    JDBCTermMap tm = new JDBCTermMap(dth);
 	    tm.setTermTyp(R2RML.Literal);
 	    tm.setLiteralDataType(datatype.getURI());
 	    tm.literalValNumeric = dth.cast(numeric, dth.getNumericCastType());

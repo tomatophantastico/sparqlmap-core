@@ -21,8 +21,8 @@ import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLValidationException;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.aksw.sparqlmap.core.r2rml.R2RMLValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

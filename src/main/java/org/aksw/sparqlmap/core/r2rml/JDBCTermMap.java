@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap.core.config.syntax.r2rml;
+package org.aksw.sparqlmap.core.r2rml;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,9 +39,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.hp.hpl.jena.rdf.model.Resource;
 
-public class TermMap{
+public class JDBCTermMap{
 	
-	org.slf4j.Logger log = LoggerFactory.getLogger(TermMap.class); 
+	org.slf4j.Logger log = LoggerFactory.getLogger(JDBCTermMap.class); 
 	
 	DataTypeHelper dth;
 
@@ -49,7 +49,7 @@ public class TermMap{
 	//  for each fromItem 
 	protected Set<EqualsTo> joinConditions = new HashSet<EqualsTo>();
 	
-	protected TripleMap trm;
+	protected JDBCTripleMap trm;
 		
 	private CompatibilityChecker cchecker;
 
@@ -101,15 +101,15 @@ public class TermMap{
 	}
 
 
-	public static  TermMap createTermMap(DataTypeHelper dataTypeHelper, Collection<Expression> expressions) {
-		TermMap tm = new TermMap(dataTypeHelper);
+	public static  JDBCTermMap createTermMap(DataTypeHelper dataTypeHelper, Collection<Expression> expressions) {
+		JDBCTermMap tm = new JDBCTermMap(dataTypeHelper);
 		tm.setExpressions(new ArrayList<Expression>(expressions));
 		
 		return tm;
 			
 	}
 	
-	public TermMap(DataTypeHelper dth){
+	public JDBCTermMap(DataTypeHelper dth){
 		this.dth = dth;
 		termType = dth.getIntegerDefaultExpression();
 		literalType = dth.getStringDefaultExpression();
@@ -133,7 +133,7 @@ public class TermMap{
 		Expression typeExpr =exprs.remove(0);
 		SelectExpressionItem typeSei = new SelectExpressionItem();
 		typeSei.setExpression(typeExpr);
-		typeSei.setAlias(colalias + ColumnHelper.COL_NAME_RDFTYPE);
+		typeSei.setAlias(colalias + JDBCColumnHelper.COL_NAME_RDFTYPE);
 		
 		seis.add(typeSei);
 		
@@ -142,47 +142,47 @@ public class TermMap{
 		//read the litypefield
 		Expression litTypeExpr = exprs.remove(0);
 		SelectExpressionItem litTypeSei  = new SelectExpressionItem();
-		litTypeSei.setAlias(colalias + ColumnHelper.COL_NAME_LITERAL_TYPE);
+		litTypeSei.setAlias(colalias + JDBCColumnHelper.COL_NAME_LITERAL_TYPE);
 		litTypeSei.setExpression(litTypeExpr);
 		seis.add(litTypeSei);
 
 		//read the lang
 		Expression litlangExpr = exprs.remove(0);
 		SelectExpressionItem litnangSei  = new SelectExpressionItem();
-		litnangSei.setAlias(colalias + ColumnHelper.COL_NAME_LITERAL_LANG);
+		litnangSei.setAlias(colalias + JDBCColumnHelper.COL_NAME_LITERAL_LANG);
 		litnangSei.setExpression(litlangExpr);
 		seis.add(litnangSei);
 		
 	
 		//add the string col
 		SelectExpressionItem stringsei = new SelectExpressionItem();
-		stringsei.setAlias(colalias + ColumnHelper.COL_NAME_LITERAL_STRING);
+		stringsei.setAlias(colalias + JDBCColumnHelper.COL_NAME_LITERAL_STRING);
 		stringsei.setExpression(exprs.remove(0));
 		seis.add(stringsei);
 		
 		//add the numeric col
 		SelectExpressionItem numSei = new SelectExpressionItem();
-		numSei.setAlias(colalias + ColumnHelper.COL_NAME_LITERAL_NUMERIC);
+		numSei.setAlias(colalias + JDBCColumnHelper.COL_NAME_LITERAL_NUMERIC);
 		numSei.setExpression(exprs.remove(0));
 		seis.add(numSei);
 		
 		//add the data col
 		SelectExpressionItem dateSei = new SelectExpressionItem();
-		dateSei.setAlias(colalias + ColumnHelper.COL_NAME_LITERAL_DATE);
+		dateSei.setAlias(colalias + JDBCColumnHelper.COL_NAME_LITERAL_DATE);
 		dateSei.setExpression(exprs.remove(0));
 		seis.add(dateSei);
 		
 		
 		//add the bool col
 		SelectExpressionItem boolsei = new SelectExpressionItem();
-		boolsei.setAlias(colalias + ColumnHelper.COL_NAME_LITERAL_BOOL);
+		boolsei.setAlias(colalias + JDBCColumnHelper.COL_NAME_LITERAL_BOOL);
 		boolsei.setExpression(exprs.remove(0));
 		seis.add(boolsei);
 		
 		
 		//add the binary col
 		SelectExpressionItem binsei = new SelectExpressionItem();
-		binsei.setAlias(colalias + ColumnHelper.COL_NAME_LITERAL_BINARY);
+		binsei.setAlias(colalias + JDBCColumnHelper.COL_NAME_LITERAL_BINARY);
 		binsei.setExpression(exprs.remove(0));
 		seis.add(binsei);
 			
@@ -192,7 +192,7 @@ public class TermMap{
 		int i = 0;
 		for (Expression expr: exprs) {
 			SelectExpressionItem resSei = new SelectExpressionItem();
-			resSei.setAlias(colalias + ColumnHelper.COL_NAME_RESOURCE_COL_SEGMENT + i++);
+			resSei.setAlias(colalias + JDBCColumnHelper.COL_NAME_RESOURCE_COL_SEGMENT + i++);
 			resSei.setExpression(expr);
 			seis.add(resSei);
 		}
@@ -283,9 +283,9 @@ public class TermMap{
 	
 	
 	
-	public TermMap clone(String suffix) {
+	public JDBCTermMap clone(String suffix) {
 		
-		TermMap clone = new TermMap(this.dth);
+		JDBCTermMap clone = new JDBCTermMap(this.dth);
 		clone.cchecker = cchecker;
 		clone.termType = cloneExpression(termType, suffix);
 		clone.literalLang = cloneExpression(literalLang, suffix);
@@ -379,7 +379,7 @@ public class TermMap{
 	
 	
 	
-	public TripleMap getTripleMap() {
+	public JDBCTripleMap getTripleMap() {
 		return trm;
 	}
 	
@@ -393,8 +393,8 @@ public class TermMap{
 		this.cchecker = cchecker;
 	}
 	
-	public static TermMap createNullTermMap(DataTypeHelper dth){
-		TermMap nullTm = new TermMap(dth);
+	public static JDBCTermMap createNullTermMap(DataTypeHelper dth){
+		JDBCTermMap nullTm = new JDBCTermMap(dth);
 		
 		return nullTm;
 		
@@ -450,11 +450,11 @@ public class TermMap{
 	
 	public void setTermTyp(Resource tt){
 		if(tt.equals(R2RML.IRI)){
-			termType =dth.asInteger(ColumnHelper.COL_VAL_TYPE_RESOURCE);
+			termType =dth.asInteger(JDBCColumnHelper.COL_VAL_TYPE_RESOURCE);
 		}else if (tt.equals(R2RML.BlankNode)) {
-			termType = dth.asInteger(ColumnHelper.COL_VAL_TYPE_BLANK);
+			termType = dth.asInteger(JDBCColumnHelper.COL_VAL_TYPE_BLANK);
 		} else if (tt.equals(R2RML.Literal)) {
-			termType = dth.asInteger(ColumnHelper.COL_VAL_TYPE_LITERAL);
+			termType = dth.asInteger(JDBCColumnHelper.COL_VAL_TYPE_LITERAL);
 		}
 	}
 	
@@ -464,9 +464,9 @@ public class TermMap{
 	public Resource getTermTypeAsResource(){
 		String tt = ((LongValue)DataTypeHelper.uncast(termType)).getStringValue();
 		
-		if(tt.equals(ColumnHelper.COL_VAL_TYPE_RESOURCE.toString())){
+		if(tt.equals(JDBCColumnHelper.COL_VAL_TYPE_RESOURCE.toString())){
 			return R2RML.IRI;
-		}else if (tt.equals(ColumnHelper.COL_VAL_TYPE_BLANK.toString())) {
+		}else if (tt.equals(JDBCColumnHelper.COL_VAL_TYPE_BLANK.toString())) {
 			return R2RML.BlankNode;
 		} else{
 			return R2RML.Literal;
@@ -511,7 +511,7 @@ public class TermMap{
 		   if (obj.getClass() != getClass()) {
 		     return false;
 		   }
-		   TermMap otherTm = (TermMap) obj;
+		   JDBCTermMap otherTm = (JDBCTermMap) obj;
 		   if(getExpressions().size()!=otherTm.getExpressions().size()){
 			   return false;
 		   }

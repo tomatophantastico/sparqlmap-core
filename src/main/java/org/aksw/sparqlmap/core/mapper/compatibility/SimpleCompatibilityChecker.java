@@ -13,10 +13,10 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.FromItem;
 
 import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.google.common.base.Splitter;
@@ -29,12 +29,12 @@ import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueNode;
 
 public class SimpleCompatibilityChecker implements CompatibilityChecker{
 	
-	private TermMap termMap;
+	private JDBCTermMap termMap;
 	private DataTypeHelper dth;
 	//contains the cast type of the column, that would naturally be used (e.g. an tinyint will get for postgres NUMERIC)
 	private Map<String,String> colname2castType = new HashMap<String, String>(); 
 	
-	public SimpleCompatibilityChecker(TermMap tm, DBAccess dba, DataTypeHelper dth) {
+	public SimpleCompatibilityChecker(JDBCTermMap tm, DBAccess dba, DataTypeHelper dth) {
 		this.termMap = tm;
 		this.dth = dth;
 		
@@ -61,23 +61,23 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 	
 
 	@Override
-	public boolean isCompatible(TermMap termMap2) {
+	public boolean isCompatible(JDBCTermMap termMap2) {
 		
 		
 		boolean compatibleType = false;
 		
-		ColumnHelper.getResourceExpressions(termMap.getExpressions());
+		JDBCColumnHelper.getResourceExpressions(termMap.getExpressions());
 		
-		Expression termMapType = ColumnHelper.getTermType(this.termMap.getExpressions());
-		Expression termMap2Type = ColumnHelper.getTermType(termMap2.getExpressions());
+		Expression termMapType = JDBCColumnHelper.getTermType(this.termMap.getExpressions());
+		Expression termMap2Type = JDBCColumnHelper.getTermType(termMap2.getExpressions());
 
 		if(isCompatible(termMapType, termMap2Type)){
 			
-			if(termMapType.equals(ColumnHelper.COL_VAL_TYPE_LITERAL)){
+			if(termMapType.equals(JDBCColumnHelper.COL_VAL_TYPE_LITERAL)){
 				//we check for datatype and language
 				
-				Expression datatype1  = ColumnHelper.getDataType(termMap.getExpressions());
-				Expression datatype2  = ColumnHelper.getDataType(termMap2.getExpressions());
+				Expression datatype1  = JDBCColumnHelper.getDataType(termMap.getExpressions());
+				Expression datatype2  = JDBCColumnHelper.getDataType(termMap2.getExpressions());
 				
 				if(datatype1!=null && datatype2!=null){
 					if(!isCompatible(datatype1, datatype2)){
@@ -92,8 +92,8 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 			}else {
 				//is either blank node or resource, so we evaluate the resource constructor
 				
-				List<Expression> resourceExpr1 = ColumnHelper.getResourceExpressions(termMap.getExpressions());
-				List<Expression> resourceExpr2 = ColumnHelper.getResourceExpressions(termMap2.getExpressions());
+				List<Expression> resourceExpr1 = JDBCColumnHelper.getResourceExpressions(termMap.getExpressions());
+				List<Expression> resourceExpr2 = JDBCColumnHelper.getResourceExpressions(termMap2.getExpressions());
 								
 
 				//the uri separator split list. Currently only split for  "/"
@@ -353,23 +353,23 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 
 	private boolean isCompatibleLiteral(Node n) {
 		//if the term map has no literal expressions, it cannot produce a literal
-		if(ColumnHelper.getLiteralExpression(termMap.getExpressions()).isEmpty()){
+		if(JDBCColumnHelper.getLiteralExpression(termMap.getExpressions()).isEmpty()){
 			return false;
 		}
 		
 		//we check for the datatype
 		//if exactly one of them is null, then it is false
-		if((n.getLiteralDatatypeURI() != null && ColumnHelper.getDataType(termMap.getExpressions()) ==null) 
-				||(n.getLiteralDatatypeURI() == null && ColumnHelper.getDataType(termMap.getExpressions()) !=null)){
+		if((n.getLiteralDatatypeURI() != null && JDBCColumnHelper.getDataType(termMap.getExpressions()) ==null) 
+				||(n.getLiteralDatatypeURI() == null && JDBCColumnHelper.getDataType(termMap.getExpressions()) !=null)){
 			return false;
 		}
 		//if they are not null and different
-		if((n.getLiteralDatatypeURI() != null && ColumnHelper.getDataType(termMap.getExpressions()) !=null) && !n.getLiteralDatatypeURI().equals(ColumnHelper.getDataType(termMap.getExpressions()))){
+		if((n.getLiteralDatatypeURI() != null && JDBCColumnHelper.getDataType(termMap.getExpressions()) !=null) && !n.getLiteralDatatypeURI().equals(JDBCColumnHelper.getDataType(termMap.getExpressions()))){
 			return false;
 		}
 		// if the language does not match
 		String lang = n.getLiteralLanguage();
-		Expression langExpr = ColumnHelper.getLanguage(termMap.getExpressions());
+		Expression langExpr = JDBCColumnHelper.getLanguage(termMap.getExpressions());
 		if(lang!=null){
 			throw new ImplementationException("Implement language compatibility check.");
 		}

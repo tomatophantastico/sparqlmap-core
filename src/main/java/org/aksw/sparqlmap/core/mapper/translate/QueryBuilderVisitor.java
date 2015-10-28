@@ -30,11 +30,11 @@ import net.sf.jsqlparser.util.BaseSelectVisitor;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMapFactory;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap.PO;
+import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMapFactory;
+import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap;
+import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap.PO;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,13 +101,13 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	private Map<PlainSelect, PlainSelectWrapper> selectBody2Wrapper = new HashMap<PlainSelect, PlainSelectWrapper>();
 	private Stack<PlainSelect> selects = new Stack<PlainSelect>();
 	
-	TermMap crc;
+	JDBCTermMap crc;
 
 	private FilterUtil filterUtil;
 	private final TranslationContext translationContext;
-  private TermMapFactory tmf;
+  private JDBCTermMapFactory tmf;
 
-	public QueryBuilderVisitor(TranslationContext translationContext,	DataTypeHelper dataTypeHelper, ExpressionConverter expressionConverter, FilterUtil filterUtil, TermMapFactory tmf) {
+	public QueryBuilderVisitor(TranslationContext translationContext,	DataTypeHelper dataTypeHelper, ExpressionConverter expressionConverter, FilterUtil filterUtil, JDBCTermMapFactory tmf) {
 		this.filterUtil = filterUtil;
 		this.dataTypeHelper = dataTypeHelper;
 		this.exprconv = expressionConverter;
@@ -350,12 +350,12 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 
 		
 		
-		Collection<TripleMap> trms = translationContext.getQueryBinding().getBindingMap().get(quad);
+		Collection<JDBCTripleMap> trms = translationContext.getQueryBinding().getBindingMap().get(quad);
 		
 
 		// do we need to create a union?
 		if(trms.size()==1&&trms.iterator().next().getPos().size()==1&&filterUtil.getOptConf().optimizeSelfJoin){
-			TripleMap trm = trms.iterator().next();
+			JDBCTripleMap trm = trms.iterator().next();
 			PO po = trm.getPos().iterator().next();
 			//no we do not need
 			psw.addTripleQuery(trm.getGraph(),quad.getGraph().getName(), trm.getSubject(), quad
@@ -370,9 +370,9 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 		}else if(trms.size()==0){
 			// no triple maps found.
 			//bind to null values instead.
-			psw.addTripleQuery(TermMap.createNullTermMap(dataTypeHelper),quad.getGraph().getName(),TermMap.createNullTermMap(dataTypeHelper), quad
-					.getSubject().getName(), TermMap.createNullTermMap(dataTypeHelper),quad
-					.getPredicate().getName(),TermMap.createNullTermMap(dataTypeHelper),quad.getObject().getName(), isOptional);
+			psw.addTripleQuery(JDBCTermMap.createNullTermMap(dataTypeHelper),quad.getGraph().getName(),JDBCTermMap.createNullTermMap(dataTypeHelper), quad
+					.getSubject().getName(), JDBCTermMap.createNullTermMap(dataTypeHelper),quad
+					.getPredicate().getName(),JDBCTermMap.createNullTermMap(dataTypeHelper),quad.getObject().getName(), isOptional);
 			
 			
 		}else{
@@ -381,7 +381,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 			//multiple triple maps, so we contruct a union
 			
 			
-			for (TripleMap trm : trms) {
+			for (JDBCTripleMap trm : trms) {
 				for (PO po : trm.getPos()) {
 
 					PlainSelectWrapper innerPlainSelect = new PlainSelectWrapper(this.selectBody2Wrapper,dataTypeHelper,exprconv,filterUtil, translationContext);
@@ -448,7 +448,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 		SelectBody sb = selects.pop();
 		PlainSelect toModify = null;
 
-		Map<String, TermMap> var2termMap = Maps.newHashMap();
+		Map<String, JDBCTermMap> var2termMap = Maps.newHashMap();
 		
 		if(sb instanceof SetOperationList){
 			
@@ -476,7 +476,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 
 			for(Object o_sei:  ((PlainSelect) sb).getSelectItems()){
 				SelectExpressionItem sei = (SelectExpressionItem) o_sei;
-				String varname = ColumnHelper.colnameBelongsToVar(sei.getAlias());
+				String varname = JDBCColumnHelper.colnameBelongsToVar(sei.getAlias());
 				//eventuall clean from deunion
 				if(varname.contains("-du")){
 					varname = varname.substring(0, varname.length()-5);
@@ -520,7 +520,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 					if(matchingExp==null){
 						//we need to add the order by column to the select item
 						SelectExpressionItem obySei = new SelectExpressionItem();
-						obySei.setAlias(ColumnHelper.COL_NAME_LITERAL_NUMERIC + i++);
+						obySei.setAlias(JDBCColumnHelper.COL_NAME_LITERAL_NUMERIC + i++);
 						obySei.setExpression(obExpr);
 						toModify.getSelectItems().add(obySei);
 					}
@@ -634,7 +634,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	  Expr expr = opExtend.getVarExprList().getExpr(var);
 	     
 	  
-	  TermMap termMap = this.exprconv.asTermMap(expr, psw.getVar2TermMap());
+	  JDBCTermMap termMap = this.exprconv.asTermMap(expr, psw.getVar2TermMap());
 	  
 	  selectBody2Wrapper.get(ps).putTermMap(termMap, var.getName(), false);
 	  
@@ -748,7 +748,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	  if(aggregate instanceof AggCountVar){
 	    AggCountVar aggCountVar = (AggCountVar) aggregate;
 	    ExprVar countVar = (ExprVar) aggCountVar.getExpr();
-	    TermMap countTermMap = psw.getVar2TermMap().get(countVar.getVarName());
+	    JDBCTermMap countTermMap = psw.getVar2TermMap().get(countVar.getVarName());
 	    
 	    if(countTermMap.getColumns().isEmpty()){
 	      throw new ImplementationException("count on non-col based var needs subquery");
@@ -772,7 +772,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	  
 	
 	  
-	  TermMap countTm = tmf.createNumericalTermMap(aggregateFunction, XSDDatatype.XSDinteger);
+	  JDBCTermMap countTm = tmf.createNumericalTermMap(aggregateFunction, XSDDatatype.XSDinteger);
 	  
 	  psw.putTermMap(countTm, aggVar.getVarName(), false);
 	  

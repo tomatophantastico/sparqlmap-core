@@ -13,11 +13,6 @@ import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLModel;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMapFactory;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap.PO;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.mapper.finder.Binder;
 import org.aksw.sparqlmap.core.mapper.finder.FilterFinder;
@@ -29,6 +24,11 @@ import org.aksw.sparqlmap.core.mapper.translate.FilterUtil;
 import org.aksw.sparqlmap.core.mapper.translate.OptimizationConfiguration;
 import org.aksw.sparqlmap.core.mapper.translate.QueryBuilderVisitor;
 import org.aksw.sparqlmap.core.normalizer.QueryNormalizer;
+import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMapFactory;
+import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap;
+import org.aksw.sparqlmap.core.r2rml.R2RMLModel;
+import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap.PO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +58,7 @@ public class AlgebraMapper implements Mapper {
 	private DataTypeHelper dth;
 	
 	@Autowired
-	private ColumnHelper colhelp;
+	private JDBCColumnHelper colhelp;
 	
 	@Autowired 
 	private ExpressionConverter exprconv;
@@ -70,7 +70,7 @@ public class AlgebraMapper implements Mapper {
 	private OptimizationConfiguration fopt;
 	
 	@Autowired
-	private TermMapFactory tmf;
+	private JDBCTermMapFactory tmf;
 	
 
 	
@@ -176,7 +176,7 @@ public class AlgebraMapper implements Mapper {
 				for (Quad quad : queryBinding.getBindingMap().keySet()) {
 					if (quad.getSubject().equals(pvar)) {
 						// now check all bindings
-						for (TripleMap tripleMap : queryBinding.getBindingMap()
+						for (JDBCTripleMap tripleMap : queryBinding.getBindingMap()
 								.get(quad)) {
 							if (!tripleMap.getSubject().isConstant()) {
 								return false;
@@ -185,7 +185,7 @@ public class AlgebraMapper implements Mapper {
 					}
 					if (quad.getGraph().equals(pvar)) {
 						// now check all bindings
-						for (TripleMap tripleMap : queryBinding.getBindingMap()
+						for (JDBCTripleMap tripleMap : queryBinding.getBindingMap()
 								.get(quad)) {
 							if (!tripleMap.getGraph().isConstant()) {
 								return false;
@@ -193,7 +193,7 @@ public class AlgebraMapper implements Mapper {
 						}
 					}
 					if (quad.getPredicate().equals(pvar)) {
-						for (TripleMap tripleMap : queryBinding.getBindingMap()
+						for (JDBCTripleMap tripleMap : queryBinding.getBindingMap()
 								.get(quad)) {
 							for (PO po : tripleMap.getPos()) {
 								if (!po.getPredicate().isConstant()) {
@@ -204,7 +204,7 @@ public class AlgebraMapper implements Mapper {
 						}
 					}
 					if (quad.getObject().equals(pvar)) {
-						for (TripleMap tripleMap : queryBinding.getBindingMap()
+						for (JDBCTripleMap tripleMap : queryBinding.getBindingMap()
 								.get(quad)) {
 							for (PO po : tripleMap.getPos()) {
 								if (!po.getObject().isConstant()) {
@@ -240,19 +240,19 @@ public class AlgebraMapper implements Mapper {
 		
 		
 		
-		for(TripleMap fullTrm: mappingConf.getTripleMaps()){
+		for(JDBCTripleMap fullTrm: mappingConf.getTripleMaps()){
 			for(PO po :fullTrm.getPos()){
 
         TranslationContext context = new TranslationContext();
-        TripleMap singleTrm = fullTrm.getShallowCopy();
+        JDBCTripleMap singleTrm = fullTrm.getShallowCopy();
         singleTrm.getPos().clear();
         singleTrm.addPO(po.getPredicate(), po.getObject());
 
         context.setQuery(spo);
         context.setQueryName("dump query");
 
-        Map<Quad, Collection<TripleMap>> bindingMap =
-          new HashMap<Quad, Collection<TripleMap>>();
+        Map<Quad, Collection<JDBCTripleMap>> bindingMap =
+          new HashMap<Quad, Collection<JDBCTripleMap>>();
         bindingMap.put(triple, Arrays.asList(singleTrm));
 
         MappingBinding qbind = new MappingBinding(bindingMap);

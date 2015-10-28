@@ -31,8 +31,8 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.util.BaseSelectVisitor;
 
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
+import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
 import org.hamcrest.core.IsNull;
 
 import com.google.common.collect.HashMultimap;
@@ -78,8 +78,8 @@ public class PlainSelectWrapper implements Wrapper{
 			.create();
 
 
-	private Map<String,TermMap> var2termMap = new LinkedHashMap<String,TermMap>();
-	private Map<TermMap,String> termMap2var = new LinkedHashMap<TermMap,String>();
+	private Map<String,JDBCTermMap> var2termMap = new LinkedHashMap<String,JDBCTermMap>();
+	private Map<JDBCTermMap,String> termMap2var = new LinkedHashMap<JDBCTermMap,String>();
 	
 
 	private DataTypeHelper dth;
@@ -130,10 +130,10 @@ public class PlainSelectWrapper implements Wrapper{
 	
 	
 	
-	Multimap<TermMap,TermMap> orig2dupClones = HashMultimap.create();
-	Multimap<TermMap,TermMap> joins =  HashMultimap.create();
+	Multimap<JDBCTermMap,JDBCTermMap> orig2dupClones = HashMultimap.create();
+	Multimap<JDBCTermMap,JDBCTermMap> joins =  HashMultimap.create();
 	//Multimap<TermMap,TermMap> optJoins =  HashMultimap.create();
-	Set<TermMap> optionalTermMaps = new HashSet<TermMap>();
+	Set<JDBCTermMap> optionalTermMaps = new HashSet<JDBCTermMap>();
 
 
 
@@ -162,7 +162,7 @@ public class PlainSelectWrapper implements Wrapper{
 				.create();
 
 		for(String var: var2termMap.keySet()){
-			TermMap tm = var2termMap.get(var);
+			JDBCTermMap tm = var2termMap.get(var);
 
 			
 			// calculate the join conditions we have to put into the join beside
@@ -171,7 +171,7 @@ public class PlainSelectWrapper implements Wrapper{
 			mapTermMapToJoin(fromItemAliases, tm, fromItemAliasesOfExpression);
 
 			// add the joins
-			Collection<TermMap> joinginTermMaps = new ArrayList<TermMap>();
+			Collection<JDBCTermMap> joinginTermMaps = new ArrayList<JDBCTermMap>();
 			
 			//joinginTermMaps.addAll(this.optJoins.get(tm));
 			
@@ -179,11 +179,11 @@ public class PlainSelectWrapper implements Wrapper{
 
 			
 			
-			for(TermMap joinginTermMap : joinginTermMaps){
+			for(JDBCTermMap joinginTermMap : joinginTermMaps){
 				
 				
 
-				TermMap equalTermMap = filterUtil.compareTermMaps( joinginTermMap,tm,
+				JDBCTermMap equalTermMap = filterUtil.compareTermMaps( joinginTermMap,tm,
 						EqualsTo.class);
 
 				// attempt to break up this expression
@@ -233,7 +233,7 @@ public class PlainSelectWrapper implements Wrapper{
 	}
 
 
-	public void mapTermMapToJoin(Set<String> fromItemAliases, TermMap tm,			
+	public void mapTermMapToJoin(Set<String> fromItemAliases, JDBCTermMap tm,			
 			Multimap<Expression, String> fromItemAliasesOfExpression) {
 		
 		
@@ -356,7 +356,7 @@ public class PlainSelectWrapper implements Wrapper{
 
 
 
-	public Map<String, TermMap> getVar2TermMap() {
+	public Map<String, JDBCTermMap> getVar2TermMap() {
 		return var2termMap;
 	}
 	
@@ -390,16 +390,16 @@ public class PlainSelectWrapper implements Wrapper{
 	
 	
 
-	public void addTripleQuery(TermMap origGraph, String graphAlias, TermMap origSubject, String subjectAlias,
-			TermMap origPredicate, String predicateAlias, TermMap origObject,
+	public void addTripleQuery(JDBCTermMap origGraph, String graphAlias, JDBCTermMap origSubject, String subjectAlias,
+			JDBCTermMap origPredicate, String predicateAlias, JDBCTermMap origObject,
 			String objectAlias, boolean isOptional) {
 
 		String suffix = "_" + subjectAlias;
 		
-		TermMap subject = origSubject.clone(suffix);	
-		TermMap object = origObject.clone(suffix);
-		TermMap predicate = origPredicate.clone(suffix);
-		TermMap graph = origGraph.clone(suffix);
+		JDBCTermMap subject = origSubject.clone(suffix);	
+		JDBCTermMap object = origObject.clone(suffix);
+		JDBCTermMap predicate = origPredicate.clone(suffix);
+		JDBCTermMap graph = origGraph.clone(suffix);
 		
 		if(needsDuplication(subject, subjectAlias) || needsDuplication(object, objectAlias)||needsDuplication(predicate, predicateAlias)||needsDuplication(graph, graphAlias)){
 			
@@ -421,7 +421,7 @@ public class PlainSelectWrapper implements Wrapper{
 	
 	
 	
-	public void putTermMap(TermMap termMap, String alias, boolean isOptional){
+	public void putTermMap(JDBCTermMap termMap, String alias, boolean isOptional){
 		
 		mapTermMap(termMap, alias, isOptional);
 		
@@ -434,7 +434,7 @@ public class PlainSelectWrapper implements Wrapper{
 
 	private void setNullForNonOptionals() {
 		List<Expression> notnulls = new ArrayList<Expression>();
-		for (TermMap tm : var2termMap.values()) {
+		for (JDBCTermMap tm : var2termMap.values()) {
 			if (!optionalTermMaps.contains(tm)) {
 			  for(Expression tocheck: tm.getExpressions()){
 			    tocheck = DataTypeHelper.uncast(tocheck);
@@ -465,7 +465,7 @@ public class PlainSelectWrapper implements Wrapper{
 	}
 	
 	
-	private boolean needsDuplication(TermMap termMap, String alias){
+	private boolean needsDuplication(JDBCTermMap termMap, String alias){
 		if(termMap2var.containsKey(termMap)){
 			// term map already in use
 			String varTermMapInUse = termMap2var.get(termMap);
@@ -481,12 +481,12 @@ public class PlainSelectWrapper implements Wrapper{
 	}
 
 
-	public void mapTermMap(TermMap termMap, String alias, boolean isOptional) {
+	public void mapTermMap(JDBCTermMap termMap, String alias, boolean isOptional) {
 		
 		
 		if(var2termMap.containsKey(alias)){
 			//we add but we'll have to mark that as joins
-			TermMap termMapInUse = var2termMap.get(alias);
+			JDBCTermMap termMapInUse = var2termMap.get(alias);
 //			if(isOptional){
 //				optJoins.put(termMapInUse,termMap);
 //			}else{
@@ -531,10 +531,10 @@ public class PlainSelectWrapper implements Wrapper{
       // generated from more than one column.
       for (String var : ps.getVarsMentioned()) {
 
-        TermMap rightVarTc = ps.getVar2TermMap().get(var);
+        JDBCTermMap rightVarTc = ps.getVar2TermMap().get(var);
         // variables already there and equal can be ignored
         // if not equal, we cannot use this optimization
-        TermMap thisVarTc = var2termMap.get(var);
+        JDBCTermMap thisVarTc = var2termMap.get(var);
         if (thisVarTc == null) {
 
           // add it if all from items are already in the plain select
@@ -561,7 +561,7 @@ public class PlainSelectWrapper implements Wrapper{
       subsell.setAlias(SUBSEL_SUFFIX
           + translationContext.getAndIncrementSubqueryCounter());
 
-      Map<String, TermMap> rightVar2TermMap = null;
+      Map<String, JDBCTermMap> rightVar2TermMap = null;
 
       if (right instanceof UnionWrapper) {
         UnionWrapper rightWrapper = (UnionWrapper) right;
@@ -574,7 +574,7 @@ public class PlainSelectWrapper implements Wrapper{
       for (String var : rightVar2TermMap.keySet()) {
 
         // create a new subselect term for each term map in there.
-        TermMap subselTermMap = createSubseletTermMap(
+        JDBCTermMap subselTermMap = createSubseletTermMap(
             rightVar2TermMap.get(var), var, subsell);
         putTermMap(subselTermMap, var, optional);
       }
@@ -597,17 +597,17 @@ public class PlainSelectWrapper implements Wrapper{
 	}
 	
 	
-	private TermMap createSubseletTermMap(TermMap orig,String var, FromItem subselect){
+	private JDBCTermMap createSubseletTermMap(JDBCTermMap orig,String var, FromItem subselect){
 		
 		
 		
 		List<Expression> expressions = new ArrayList<Expression>();
 		
 		for(SelectExpressionItem sei: orig.getSelectExpressionItems(var)){
-			expressions.add( ColumnHelper.createColumn(subselect.getAlias(), sei.getAlias()));
+			expressions.add( JDBCColumnHelper.createColumn(subselect.getAlias(), sei.getAlias()));
 		}
 		
-		TermMap tm =  TermMap.createTermMap(dth, expressions);
+		JDBCTermMap tm =  JDBCTermMap.createTermMap(dth, expressions);
 		tm.addFromItem(subselect);
 		return tm;
 		

@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap.core.config.syntax.r2rml;
+package org.aksw.sparqlmap.core.r2rml;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,7 +39,7 @@ public class R2RMLModelConfigurator {
 	@Autowired
 	DBAccess dbaccess;
 	@Autowired
-	private ColumnHelper columnhelper;
+	private JDBCColumnHelper columnhelper;
 	@Autowired
 	private DataTypeHelper dth;
 	

@@ -13,8 +13,8 @@ import java.util.Locale;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.jena.iri.IRIException;
 import org.apache.jena.riot.system.IRILib;
@@ -107,9 +107,9 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
       // - ColumnHelper.COL_NAME_RDFTYPE.length()));
       // }
 
-      if (colname.contains(ColumnHelper.COL_NAME_RESOURCE_COL_SEGMENT)) {
+      if (colname.contains(JDBCColumnHelper.COL_NAME_RESOURCE_COL_SEGMENT)) {
         // we extract the var name
-        String var = ColumnHelper.colnameBelongsToVar(colname);
+        String var = JDBCColumnHelper.colnameBelongsToVar(colname);
         var2ResourceCols.put(var, colname);
       }
 
@@ -172,13 +172,13 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
         Node node = null;
         // create the binding here
         // first check for type
-        if (rs.getInt(var + ColumnHelper.COL_NAME_RDFTYPE) != 0) {
+        if (rs.getInt(var + JDBCColumnHelper.COL_NAME_RDFTYPE) != 0) {
 
-          Integer type = rs.getInt(var + ColumnHelper.COL_NAME_RDFTYPE);
-          if (type.equals(ColumnHelper.COL_VAL_TYPE_RESOURCE)
-            || type.equals(ColumnHelper.COL_VAL_TYPE_BLANK)) {
+          Integer type = rs.getInt(var + JDBCColumnHelper.COL_NAME_RDFTYPE);
+          if (type.equals(JDBCColumnHelper.COL_VAL_TYPE_RESOURCE)
+            || type.equals(JDBCColumnHelper.COL_VAL_TYPE_BLANK)) {
             node = createResource(var, type);
-          } else if (type == ColumnHelper.COL_VAL_TYPE_LITERAL) {
+          } else if (type == JDBCColumnHelper.COL_VAL_TYPE_LITERAL) {
             node = createLiteral(var);
           }
           if (node != null) {
@@ -218,14 +218,14 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
 
   private Node createLiteral(String var) throws SQLException {
     Node node = null;
-    String litType = rs.getString(var + ColumnHelper.COL_NAME_LITERAL_TYPE);
+    String litType = rs.getString(var + JDBCColumnHelper.COL_NAME_LITERAL_TYPE);
     RDFDatatype dt = null;
     if (litType != null && !litType.isEmpty()
       && !litType.equals(RDFS.Literal.getURI())) {
       dt = TypeMapper.getInstance().getSafeTypeByName(litType);
     }
 
-    String lang = rs.getString(var + ColumnHelper.COL_NAME_LITERAL_LANG);
+    String lang = rs.getString(var + JDBCColumnHelper.COL_NAME_LITERAL_LANG);
 
     if (lang != null && lang.equals(RDFS.Literal.getURI())) {
       lang = null;
@@ -235,55 +235,55 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
 
     if (XSDDatatype.XSDdecimal.getURI().equals(litType)) {
       literalValue =
-        rs.getBigDecimal(var + ColumnHelper.COL_NAME_LITERAL_NUMERIC)
+        rs.getBigDecimal(var + JDBCColumnHelper.COL_NAME_LITERAL_NUMERIC)
           .toString();
 
     } else if (XSDDatatype.XSDdouble.getURI().equals(litType)) {
       literalValue =
         doubleFormatter.format(rs.getDouble(var
-          + ColumnHelper.COL_NAME_LITERAL_NUMERIC));
+          + JDBCColumnHelper.COL_NAME_LITERAL_NUMERIC));
 
     } else if (XSDDatatype.XSDint.getURI().equals(litType)
       || XSDDatatype.XSDinteger.getURI().equals(litType)) {
       literalValue =
         Integer.toString(rs
-          .getInt((var + ColumnHelper.COL_NAME_LITERAL_NUMERIC)));
+          .getInt((var + JDBCColumnHelper.COL_NAME_LITERAL_NUMERIC)));
       if (rs.wasNull()) {
         literalValue = null;
       }
 
     } else if (XSDDatatype.XSDstring.getURI().equals(litType)
       || litType == null) {
-      literalValue = rs.getString(var + ColumnHelper.COL_NAME_LITERAL_STRING);
+      literalValue = rs.getString(var + JDBCColumnHelper.COL_NAME_LITERAL_STRING);
 
     } else if (XSDDatatype.XSDdateTime.getURI().equals(litType)) {
       literalValue =
         datetimeFormatter.print((rs.getTimestamp(var
-          + ColumnHelper.COL_NAME_LITERAL_DATE)).getTime());
+          + JDBCColumnHelper.COL_NAME_LITERAL_DATE)).getTime());
 
     } else if (XSDDatatype.XSDdate.getURI().equals(litType)) {
       literalValue =
         dateFormatter.print(rs.getTimestamp(
-          var + ColumnHelper.COL_NAME_LITERAL_DATE).getTime());
+          var + JDBCColumnHelper.COL_NAME_LITERAL_DATE).getTime());
 
     } else if (XSDDatatype.XSDtime.getURI().equals(litType)) {
       literalValue =
         timeFormatter.print(rs.getTimestamp(
-          var + ColumnHelper.COL_NAME_LITERAL_DATE).getTime());
+          var + JDBCColumnHelper.COL_NAME_LITERAL_DATE).getTime());
 
     } else if (XSDDatatype.XSDboolean.getURI().equals(litType)) {
       literalValue =
         Boolean.toString(rs
-          .getBoolean(var + ColumnHelper.COL_NAME_LITERAL_BOOL));
+          .getBoolean(var + JDBCColumnHelper.COL_NAME_LITERAL_BOOL));
 
     } else if (XSDDatatype.XSDhexBinary.getURI().equals(litType)) {
       String hex =
         Hex.encodeHexString(rs.getBytes(var
-          + ColumnHelper.COL_NAME_LITERAL_BINARY));
+          + JDBCColumnHelper.COL_NAME_LITERAL_BINARY));
       literalValue = new String(hex);
 
     } else {
-      literalValue = rs.getString(var + ColumnHelper.COL_NAME_LITERAL_STRING);
+      literalValue = rs.getString(var + JDBCColumnHelper.COL_NAME_LITERAL_STRING);
     }
 
     if (literalValue != null) {
@@ -319,7 +319,7 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
     if (uri.length() == 0) {
       node = null;
     } else {
-      if (type.equals(ColumnHelper.COL_VAL_TYPE_RESOURCE)) {
+      if (type.equals(JDBCColumnHelper.COL_VAL_TYPE_RESOURCE)) {
         if (baseUri != null) {
           try {
             node = NodeFactory.createURI(uri.toString());

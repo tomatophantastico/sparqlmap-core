@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
+import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,7 +117,7 @@ public class QueryNormalizer extends TransformCopy {
 	  
 	  if(graph.equals(Quad.defaultGraphNodeGenerated)
 	       && ! context.getQuery().getGraphURIs().isEmpty() ){
-	    Node nNew  = Var.alloc(i++ + ColumnHelper.COL_NAME_INTERNAL);
+	    Node nNew  = Var.alloc(i++ + JDBCColumnHelper.COL_NAME_INTERNAL);
         termToVariable.put(graph.toString(), nNew);
    
 	      List<String> graphuris = context.getQuery().getGraphURIs();
@@ -178,7 +178,7 @@ public class QueryNormalizer extends TransformCopy {
 		
 		for(Node quadNode: quadNodes){
 			if(quadNode.isVariable()&&uniqeNodes.contains(quadNode)){
-				Var var_new = Var.alloc(i++ + ColumnHelper.COL_NAME_INTERNAL);
+				Var var_new = Var.alloc(i++ + JDBCColumnHelper.COL_NAME_INTERNAL);
 				uniqeNodes.add(var_new);
 				exprList.add(new E_Equals(new ExprVar(quadNode),new ExprVar(var_new)));
 
@@ -198,7 +198,7 @@ public class QueryNormalizer extends TransformCopy {
 
 			Node nNew = termToVariable.get(n.toString()); 
 			if(nNew==null){
-				nNew = Var.alloc(i++ + ColumnHelper.COL_NAME_INTERNAL);
+				nNew = Var.alloc(i++ + JDBCColumnHelper.COL_NAME_INTERNAL);
 				termToVariable.put(n.toString(), nNew);
 			}
 

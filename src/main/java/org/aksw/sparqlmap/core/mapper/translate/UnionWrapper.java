@@ -21,8 +21,8 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.select.UnionOp;
 
 import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
+import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -39,7 +39,7 @@ public class UnionWrapper implements Wrapper {
 	private TreeMap<String, SelectExpressionItem> seiTreeMap = new TreeMap<String, SelectExpressionItem>();
 	private SetOperationList union;
 	private Set<String> variablesMentioned = new HashSet<String>();
-	private BiMap<String, TermMap> var2termMap;
+	private BiMap<String, JDBCTermMap> var2termMap;
 
 
 	private SubSelect subselect;
@@ -123,7 +123,7 @@ public class UnionWrapper implements Wrapper {
 						emptysei.setAlias(alias);
 						
 						//if part of a resource, than use an empty string, otherwise use 
-						if(ColumnHelper.isColnameResourceSegment(alias)){
+						if(JDBCColumnHelper.isColnameResourceSegment(alias)){
 							emptysei.setExpression(dth.cast(new StringValue("\"\""),dth.getCastType(alias)));
 						}else{
 							emptysei.setExpression(dth.getDefaultValue(dth.getCastType(alias)));
@@ -140,7 +140,7 @@ public class UnionWrapper implements Wrapper {
 	
 
 	
-	public BiMap<String,TermMap> getVar2TermMap(String subselectName){
+	public BiMap<String,JDBCTermMap> getVar2TermMap(String subselectName){
 		
 		
 		if(var2termMap==null){
@@ -162,9 +162,9 @@ public class UnionWrapper implements Wrapper {
 		Multimap<String,Expression> var2siExpression = LinkedHashMultimap.create();
 		
 		for(String colname: seiTreeMap.keySet()){
-			String var = ColumnHelper.colnameBelongsToVar(colname);
+			String var = JDBCColumnHelper.colnameBelongsToVar(colname);
 			SelectExpressionItem sei  = seiTreeMap.get(colname);
-			var2siExpression.put(var, ColumnHelper.createColumn(subselectName, sei.getAlias()));
+			var2siExpression.put(var, JDBCColumnHelper.createColumn(subselectName, sei.getAlias()));
 
 		}
 		this.var2termMap =  HashBiMap.create();
@@ -174,7 +174,7 @@ public class UnionWrapper implements Wrapper {
 		subselect.setSelectBody(union);
 		
 		for(String var : var2siExpression.keySet()){
-			TermMap tm = TermMap.createTermMap(dth, var2siExpression.get(var));
+			JDBCTermMap tm = JDBCTermMap.createTermMap(dth, var2siExpression.get(var));
 			tm.addFromItem(subselect);
 			this.var2termMap.put(var, tm);
 		}

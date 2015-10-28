@@ -22,8 +22,8 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.Limit;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
 import org.aksw.sparqlmap.core.db.DBAccess;
+import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hp.hpl.jena.datatypes.RDFDatatype;
@@ -60,15 +60,15 @@ public abstract  class DataTypeHelper {
 	Map<String,String> suffix2datatype = new HashMap<String, String>();
 	
 	public DataTypeHelper() {
-		suffix2datatype.put(ColumnHelper.COL_NAME_LITERAL_BINARY,this.getBinaryDataType());
-		suffix2datatype.put(ColumnHelper.COL_NAME_LITERAL_BOOL,this.getBooleanCastType());
-		suffix2datatype.put(ColumnHelper.COL_NAME_LITERAL_DATE, this.getDateCastType());
-		suffix2datatype.put(ColumnHelper.COL_NAME_LITERAL_LANG, this.getStringCastType());
-		suffix2datatype.put(ColumnHelper.COL_NAME_LITERAL_NUMERIC,this.getNumericCastType());
-		suffix2datatype.put(ColumnHelper.COL_NAME_LITERAL_STRING, this.getStringCastType());
-		suffix2datatype.put(ColumnHelper.COL_NAME_LITERAL_TYPE, this.getStringCastType());
-		suffix2datatype.put(ColumnHelper.COL_NAME_RDFTYPE, this.getNumericCastType());
-		suffix2datatype.put(ColumnHelper.COL_NAME_RESOURCE_COL_SEGMENT, this.getStringCastType());
+		suffix2datatype.put(JDBCColumnHelper.COL_NAME_LITERAL_BINARY,this.getBinaryDataType());
+		suffix2datatype.put(JDBCColumnHelper.COL_NAME_LITERAL_BOOL,this.getBooleanCastType());
+		suffix2datatype.put(JDBCColumnHelper.COL_NAME_LITERAL_DATE, this.getDateCastType());
+		suffix2datatype.put(JDBCColumnHelper.COL_NAME_LITERAL_LANG, this.getStringCastType());
+		suffix2datatype.put(JDBCColumnHelper.COL_NAME_LITERAL_NUMERIC,this.getNumericCastType());
+		suffix2datatype.put(JDBCColumnHelper.COL_NAME_LITERAL_STRING, this.getStringCastType());
+		suffix2datatype.put(JDBCColumnHelper.COL_NAME_LITERAL_TYPE, this.getStringCastType());
+		suffix2datatype.put(JDBCColumnHelper.COL_NAME_RDFTYPE, this.getNumericCastType());
+		suffix2datatype.put(JDBCColumnHelper.COL_NAME_RESOURCE_COL_SEGMENT, this.getStringCastType());
 	}
 	
 	
@@ -345,8 +345,9 @@ public abstract  class DataTypeHelper {
 	}
 
 	public String getColnameQuery(String colname, String from) {
-		return 			"SELECT " + colname + " FROM " +from+  " LIMIT 1";
+		return "SELECT " + colname + " FROM " +from+  " LIMIT 1";
 	}
+	
 	public String getDataTypeQuery(String colname, String from) {
 		return 		getColnameQuery("\""+colname+"\"", from);
 	}

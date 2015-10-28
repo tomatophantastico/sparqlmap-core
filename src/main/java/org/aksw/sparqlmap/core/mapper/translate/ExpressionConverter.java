@@ -34,9 +34,9 @@ import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.OrderByExpressionElement;
 
 import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.ColumnHelper;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMapFactory;
+import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMapFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -104,7 +104,7 @@ public class ExpressionConverter {
 	OptimizationConfiguration optConf;
 	
 	@Autowired
-	TermMapFactory tmf;
+	JDBCTermMapFactory tmf;
 	
 	
 	/**
@@ -116,7 +116,7 @@ public class ExpressionConverter {
 	 */
 
 	public List<OrderByElement> convert(OpOrder opo,
-			Map<String, TermMap> var2termMap) {
+			Map<String, JDBCTermMap> var2termMap) {
 
 		List<OrderByElement> obys = new ArrayList<OrderByElement>();
 		for (SortCondition soCond : opo.getConditions()) {
@@ -126,7 +126,7 @@ public class ExpressionConverter {
 			if (expr instanceof ExprVar) {
 				
 				String var = expr.getVarName();
-				TermMap tc  = var2termMap.get(var);
+				JDBCTermMap tc  = var2termMap.get(var);
 
 				for(Expression exp :tc.getExpressions()){
 					//remove cast here, as e.g. hsql cannot handle them
@@ -182,9 +182,9 @@ public class ExpressionConverter {
 //	}
 	
 	
-	public Expression asFilter(Expr expr, Map<String, TermMap> var2termMap){
+	public Expression asFilter(Expr expr, Map<String, JDBCTermMap> var2termMap){
 		
-		TermMap tm = asTermMap(expr, var2termMap);
+		JDBCTermMap tm = asTermMap(expr, var2termMap);
 		return DataTypeHelper.uncast(tm.literalValBool);
 		
 		
@@ -192,7 +192,7 @@ public class ExpressionConverter {
 	}
 	
 	
-	public TermMap asTermMap(Expr expr,Map<String, TermMap> var2termMap){
+	public JDBCTermMap asTermMap(Expr expr,Map<String, JDBCTermMap> var2termMap){
 		ExprToTermapVisitor ettm = new ExprToTermapVisitor(var2termMap);
 		
 		ExprWalker.walk(ettm, expr);
@@ -205,12 +205,12 @@ public class ExpressionConverter {
 	
 	
 	public class ExprToTermapVisitor extends ExprVisitorBase{
-		Stack<TermMap> tms=  new Stack<TermMap>();
-		Map<String, TermMap> var2termMap;
+		Stack<JDBCTermMap> tms=  new Stack<JDBCTermMap>();
+		Map<String, JDBCTermMap> var2termMap;
 	
 		
 		
-		public ExprToTermapVisitor(Map<String, TermMap> var2termMap) {
+		public ExprToTermapVisitor(Map<String, JDBCTermMap> var2termMap) {
 			super();
 			this.var2termMap = var2termMap;
 		}
@@ -227,11 +227,11 @@ public class ExpressionConverter {
 		public void visit(ExprFunction1 func) {
 		  		  
 			if(func instanceof E_Bound){
-				TermMap boundCheck = tms.pop();
+				JDBCTermMap boundCheck = tms.pop();
 				tms.push(translateIsBound(boundCheck));
 				
 			} else if(func instanceof E_LogicalNot){
-				TermMap notCheck = tms.pop();
+				JDBCTermMap notCheck = tms.pop();
 				Expression bool = DataTypeHelper.uncast( notCheck.getLiteralValBool());
 				if(bool instanceof IsNullExpression){
 					((IsNullExpression) bool).setNot(!((IsNullExpression) bool).isNot());
@@ -247,13 +247,13 @@ public class ExpressionConverter {
 				tms.push(notCheck);
 				
 			}else if(func instanceof E_Lang){
-				TermMap langFunc = tms.pop();
+				JDBCTermMap langFunc = tms.pop();
 				Expression lang = DataTypeHelper.uncast( langFunc.getLiteralLang());
-				TermMap langTermMap = tmf.createStringTermMap(lang);
+				JDBCTermMap langTermMap = tmf.createStringTermMap(lang);
 				tms.push(langTermMap);
 				
 			} else if (func instanceof E_Str){
-				TermMap strParam = tms.pop();
+				JDBCTermMap strParam = tms.pop();
 				
 				
 				//create the coalesce function here
@@ -274,22 +274,22 @@ public class ExpressionConverter {
 				
 				tms.push(tmf.createStringTermMap(toString));
 			}else if(func instanceof E_IsBlank){
-				TermMap isBlank =  tms.pop();
+				JDBCTermMap isBlank =  tms.pop();
 				EqualsTo eq = new EqualsTo();
 				eq.setLeftExpression(isBlank.getTermType());
-				eq.setRightExpression(new StringValue("'" +ColumnHelper.COL_VAL_TYPE_BLANK+ "'"));
+				eq.setRightExpression(new StringValue("'" +JDBCColumnHelper.COL_VAL_TYPE_BLANK+ "'"));
 				tms.push(tmf.createBoolTermMap(eq));
 			}else if(func instanceof E_IsIRI){
-				TermMap isIri =  tms.pop();
+				JDBCTermMap isIri =  tms.pop();
 				EqualsTo eq = new EqualsTo();
 				eq.setLeftExpression(isIri.getTermType());
-				eq.setRightExpression(new StringValue("'" +ColumnHelper.COL_VAL_TYPE_RESOURCE+ "'"));
+				eq.setRightExpression(new StringValue("'" +JDBCColumnHelper.COL_VAL_TYPE_RESOURCE+ "'"));
 				tms.push(tmf.createBoolTermMap(eq));
 			}else if(func instanceof E_IsLiteral){
-				TermMap isLiteral =  tms.pop();
+				JDBCTermMap isLiteral =  tms.pop();
 				EqualsTo eq = new EqualsTo();
 				eq.setLeftExpression(isLiteral.getTermType());
-				eq.setRightExpression(new StringValue("'" +ColumnHelper.COL_VAL_TYPE_LITERAL+ "'"));
+				eq.setRightExpression(new StringValue("'" +JDBCColumnHelper.COL_VAL_TYPE_LITERAL+ "'"));
 				tms.push(tmf.createBoolTermMap(eq));
 			}else{
 				throw new ImplementationException("Implement Conversion for " + func.toString());
@@ -299,7 +299,7 @@ public class ExpressionConverter {
 				
 		}
 		
-		private TermMap translateIsBound(TermMap tm){
+		private JDBCTermMap translateIsBound(JDBCTermMap tm){
 			List<Expression> isNotNullExprs = new ArrayList<Expression>();
 		isNotNullExprs.add(isExpressionBound(tm.getLiteralValBinary()));
 		isNotNullExprs.add(isExpressionBound(tm.getLiteralValBool()));
@@ -359,8 +359,8 @@ public class ExpressionConverter {
 		
 		@Override 
 		public void visit(ExprFunction2 func) {
-			TermMap left = tms.pop();
-			TermMap right = tms.pop();
+			JDBCTermMap left = tms.pop();
+			JDBCTermMap right = tms.pop();
 			
 			if(func instanceof E_Equals){
 				putXpathTestOnStack(left, right, EqualsTo.class );
@@ -402,7 +402,7 @@ public class ExpressionConverter {
 		
 
 
-		private void putLogicalOnStack(TermMap left, TermMap right,
+		private void putLogicalOnStack(JDBCTermMap left, JDBCTermMap right,
 				Class<? extends BinaryExpression> logicalClass) {
 			try {
 				BinaryExpression logical =  logicalClass.newInstance();
@@ -418,7 +418,7 @@ public class ExpressionConverter {
 		}
 
 
-		private void putArithmeticOnStack(TermMap left, TermMap right,
+		private void putArithmeticOnStack(JDBCTermMap left, JDBCTermMap right,
 				Class<? extends BinaryExpression> arithmeticOp) {
 			try {
 				BinaryExpression arithmetical  = arithmeticOp.newInstance();
@@ -494,7 +494,7 @@ public class ExpressionConverter {
 		
 
 
-		public void putLanMatchesOnStack(TermMap left, TermMap right) {
+		public void putLanMatchesOnStack(JDBCTermMap left, JDBCTermMap right) {
 			EqualsTo eqExpr = new EqualsTo();
 			//wrap into to_lowercase functions
 			Function funcLeftLower = new Function();
@@ -512,13 +512,13 @@ public class ExpressionConverter {
 		}
 
 
-		public void putXpathTestOnStack(TermMap left, TermMap right, Class<? extends BinaryExpression> test) {
+		public void putXpathTestOnStack(JDBCTermMap left, JDBCTermMap right, Class<? extends BinaryExpression> test) {
 	
 	
 					
 					Expression binaryTestExpression  = filterUtil.compareTermMaps(left, right, test).getLiteralValBool();
 					
-					TermMap eqTermMap = tmf.createBoolTermMap(new Parenthesis(binaryTestExpression));
+					JDBCTermMap eqTermMap = tmf.createBoolTermMap(new Parenthesis(binaryTestExpression));
 					tms.push(eqTermMap);
 					
 				
@@ -534,7 +534,7 @@ public class ExpressionConverter {
 		
 		@Override
 		public void visit(ExprVar nv) {
-		  TermMap value = var2termMap.get( nv.asVar().getName());
+		  JDBCTermMap value = var2termMap.get( nv.asVar().getName());
 		  if(value ==null){
 		    value = tmf.createBoolTermMap(new StringExpression("false"));
 		  }
@@ -555,7 +555,7 @@ public class ExpressionConverter {
     public void visit(ExprFunctionN func) {
       //correct the stack here
       
-      List<TermMap> termMaps = Lists.newArrayList();
+      List<JDBCTermMap> termMaps = Lists.newArrayList();
       
       for(int i = 0;i<func.getArgs().size();i++){
         termMaps.add(tms.pop());
@@ -568,12 +568,12 @@ public class ExpressionConverter {
       if (func instanceof E_OneOf) {
 
         List<Expression> exprs = Lists.newArrayList();  
-        TermMap leftHand = termMaps.remove(0);
+        JDBCTermMap leftHand = termMaps.remove(0);
 
         // just iterating here over the expressions to know how many items need
         // to be popped from the stack
-        for (TermMap rightHand : termMaps) {
-          TermMap comparison = filterUtil.compareTermMaps(leftHand, rightHand,
+        for (JDBCTermMap rightHand : termMaps) {
+          JDBCTermMap comparison = filterUtil.compareTermMaps(leftHand, rightHand,
               EqualsTo.class);
           Parenthesis parenthesis = new Parenthesis(
               comparison.getLiteralValBool());

@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap.core.config.syntax.r2rml;
+package org.aksw.sparqlmap.core.r2rml;
 
 import java.io.StringReader;
 import java.sql.SQLException;
@@ -33,13 +33,13 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.util.BaseSelectVisitor;
 
 import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap.PO;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.mapper.compatibility.CompatibilityChecker;
 import org.aksw.sparqlmap.core.mapper.compatibility.SimpleCompatibilityChecker;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.aksw.sparqlmap.core.mapper.translate.FilterUtil;
 import org.aksw.sparqlmap.core.mapper.translate.OptimizationConfiguration;
+import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap.PO;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.HashMultimap;
@@ -69,7 +69,7 @@ public class R2RMLModel {
 	
 	
 	@Autowired
-	private TermMapFactory tfac;
+	private JDBCTermMapFactory tfac;
 	
 	@Autowired
 	private OptimizationConfiguration optConf;
@@ -79,7 +79,7 @@ public class R2RMLModel {
 	Model mapping = null;
 	Model r2rmlSchema = null;
 	Model reasoningModel = null;
-	Multimap<String,TripleMap> tripleMaps = HashMultimap.create();
+	Multimap<String,JDBCTripleMap> tripleMaps = HashMultimap.create();
 	
 	private int queryCount = 1;
 	private int tableCount = 1;
@@ -123,7 +123,7 @@ public class R2RMLModel {
 	 * if a triple map s based on a query, we attempt to decompose it.
 	 */
 	private void decomposeVirtualTableQueries() {
-		TERMMAPLOOP: for(TripleMap trm: tripleMaps.values()){
+		TERMMAPLOOP: for(JDBCTripleMap trm: tripleMaps.values()){
 			FromItem fi = trm.getFrom();
 			if(fi instanceof SubSelect){
 				SelectBody sb  = ((SubSelect) fi).getSelectBody();
@@ -211,7 +211,7 @@ public class R2RMLModel {
 					
 					// modify the columns in the term maps
 					
-					TermMap s = trm.getSubject();
+					JDBCTermMap s = trm.getSubject();
 					trm.setSubject(replaceColumn(s, trm, projections, tables, joinConds));
 					for(PO po : trm.getPos()){
 						po.setObject(replaceColumn(po.getObject(),trm, projections, tables, joinConds));
@@ -260,7 +260,7 @@ public class R2RMLModel {
 		
 	}
 
-	private TermMap replaceColumn(TermMap tm,TripleMap trm, Map<String,Column> name2Col, List<Table> tables, List<EqualsTo> joinConditions){
+	private JDBCTermMap replaceColumn(JDBCTermMap tm,JDBCTripleMap trm, Map<String,Column> name2Col, List<Table> tables, List<EqualsTo> joinConditions){
 		List<Expression> expressions =  new ArrayList<Expression>();
 		//we use this to make sure constant value triple maps do not get the column set.
 		boolean hasReplaced = false;
@@ -279,7 +279,7 @@ public class R2RMLModel {
 				throw new ImplementationException("unknown expression in TermMap");
 			}	
 		}
-		TermMap newTm =TermMap.createTermMap(dth, expressions);
+		JDBCTermMap newTm =JDBCTermMap.createTermMap(dth, expressions);
 		if(hasReplaced){
 			for(Table table: tables){
 				newTm.alias2fromItem.put(table.getAlias(), table);
@@ -343,15 +343,15 @@ public class R2RMLModel {
 
 			// get the referenced map
 			Resource parentTripleMap = statement.getObject().asResource();
-			for (TripleMap parentTrM : this.tripleMaps.get(parentTripleMap.getURI())) {
+			for (JDBCTripleMap parentTrM : this.tripleMaps.get(parentTripleMap.getURI())) {
 
 				// get the child map
 				Resource poMap = reasoningModel.listStatements(null, R2RML.objectMap, objectMap).toList().get(0).getSubject();
 				Resource mapping = reasoningModel.listStatements(null, R2RML.predicateObjectMap, poMap).toList().get(0).getSubject();
-				for (TripleMap tripleMap : this.tripleMaps.get(mapping.getURI())) {
+				for (JDBCTripleMap tripleMap : this.tripleMaps.get(mapping.getURI())) {
 
 					// we insert this
-					TermMap newoTermMap = parentTrM.getSubject().clone("");
+					JDBCTermMap newoTermMap = parentTrM.getSubject().clone("");
 
 					newoTermMap.trm = parentTrM;
 
@@ -367,9 +367,9 @@ public class R2RMLModel {
 
 						this.dbconf.getDataType(parentTrM.from, getRealColumnName(parentjc, parentTrM.from));
 
-						Column leftCol = ColumnHelper.createColumn(parentTrM.from.getAlias(), parentjc);
+						Column leftCol = JDBCColumnHelper.createColumn(parentTrM.from.getAlias(), parentjc);
 
-						Column rightCol = ColumnHelper.createColumn(tripleMap.from.getAlias(), childjc);
+						Column rightCol = JDBCColumnHelper.createColumn(tripleMap.from.getAlias(), childjc);
 						EqualsTo eq = new EqualsTo();
 						eq.setLeftExpression(dth.cast(leftCol, dth.getStringCastType()));
 						eq.setRightExpression(dth.cast(rightCol, dth.getStringCastType()));
@@ -385,7 +385,7 @@ public class R2RMLModel {
 						// get the predicate Map
 						TermMapQueryResult ptmqr = new TermMapQueryResult(pnode.asResource(), reasoningModel, tripleMap.from);
 
-						TermMap ptm = mapQueryResultOnTermMap(ptmqr, tripleMap.from, tripleMap, R2RML.IRI);
+						JDBCTermMap ptm = mapQueryResultOnTermMap(ptmqr, tripleMap.from, tripleMap, R2RML.IRI);
 
 						tripleMap.addPO(ptm, newoTermMap);
 
@@ -421,7 +421,7 @@ public class R2RMLModel {
 //		CompatibilityCheckerFactory ccfac = new CompatibilityCheckerFactory(
 //				reasoningModel, dbconf);
 
-		for (TripleMap tripleMap : tripleMaps.values()) {
+		for (JDBCTripleMap tripleMap : tripleMaps.values()) {
 			CompatibilityChecker ccs = new SimpleCompatibilityChecker(
 					tripleMap.getSubject(),this.dbconf,this.dth);
 			tripleMap.getSubject().setCompChecker(ccs);
@@ -464,7 +464,7 @@ public class R2RMLModel {
 	
 
 	
-	public Set<TripleMap> getTripleMaps() {
+	public Set<JDBCTripleMap> getTripleMaps() {
 
 		return new HashSet(tripleMaps.values());
 	}
@@ -529,8 +529,8 @@ public class R2RMLModel {
 								+ tmUri.getURI(), e);
 			}
 
-			TripleMap triplemap = new TripleMap(tmUri.getURI(), fromItem);
-			Map<Resource,TripleMap> g2trimap  = new HashMap<Resource,TripleMap>();
+			JDBCTripleMap triplemap = new JDBCTripleMap(tmUri.getURI(), fromItem);
+			Map<Resource,JDBCTripleMap> g2trimap  = new HashMap<Resource,JDBCTripleMap>();
 
 			// fetch the subject and validate it
 			List<Statement> subjectResStmtnt = reasoningModel.listStatements(tmUri, R2RML.subjectMap,(RDFNode) null).toList();
@@ -549,19 +549,19 @@ public class R2RMLModel {
 			
 			//create the subject term map
 			
-			TermMap stm = null;
+			JDBCTermMap stm = null;
 
-			if (sres.termType != null) {
-				stm = mapQueryResultOnTermMap(sres, fromItem,triplemap, sres.termType);
+			if (sres.data.getTermType() != null) {
+				stm = mapQueryResultOnTermMap(sres, fromItem,triplemap, sres.data.getTermType());
 			} else {
 				stm = mapQueryResultOnTermMap(sres, fromItem,triplemap, R2RML.IRI);
 			}
 			// some validation
-			if (sres.termType != null && sres.termType.equals(R2RML.Literal)) {
+			if (sres.data.getTermType() != null && sres.data.getTermType().equals(R2RML.Literal)) {
 				throw new R2RMLValidationException(
 						"no literal in subject position");
 			}
-			if (sres.constant != null && !sres.constant.isURIResource()) {
+			if (sres.data.getConstant() != null && !sres.data.getConstant().isURIResource()) {
 				throw new R2RMLValidationException(
 						"Must IRI in predicate position");
 
@@ -576,7 +576,7 @@ public class R2RMLModel {
 	
 			List<Statement> postmts = reasoningModel.listStatements(tmUri, R2RML.predicateObjectMap, (RDFNode) null).toList();
 			
-			Map<TermMap,TripleMap> graph2TripleMap = new HashMap<TermMap,TripleMap>(); 
+			Map<JDBCTermMap,JDBCTripleMap> graph2TripleMap = new HashMap<JDBCTermMap,JDBCTripleMap>(); 
 			
 
 			for  (Statement postmt: postmts) {
@@ -593,7 +593,7 @@ public class R2RMLModel {
 				
 				// get the graph statements for the po here.
 				List<Statement> graphMapStmts =  reasoningModel.listStatements(poResource, R2RML.graphMap,(RDFNode) null).toList();
-				List<TermMap> graphMaps = getGraphmapsForPO(tmUri, triplemap, graphMapStmts);
+				List<JDBCTermMap> graphMaps = getGraphmapsForPO(tmUri, triplemap, graphMapStmts);
 				
 
 
@@ -601,13 +601,13 @@ public class R2RMLModel {
 						fromItem);
 				
 				
-				if (p.termType != null
-						&& !p.termType.getURI().equals(R2RML.IRI)) {
+				if (p.data.getTermType() != null
+						&& !p.data.getTermType().getURI().equals(R2RML.IRI)) {
 					throw new R2RMLValidationException(
 							"Only use iris in predicate position");
 				}
 		
-				TermMap ptm = mapQueryResultOnTermMap(p, fromItem,triplemap,R2RML.IRI);
+				JDBCTermMap ptm = mapQueryResultOnTermMap(p, fromItem,triplemap,R2RML.IRI);
 			
 
 
@@ -615,17 +615,17 @@ public class R2RMLModel {
 						fromItem);
 				//the term type definition according to the R2RML spec  http://www.w3.org/TR/r2rml/#termtype
 				
-				TermMap otm = null;
+				JDBCTermMap otm = null;
 			
 				//Identify the term type here
-				if(qr_o.termType != null){
-					otm = mapQueryResultOnTermMap(qr_o, fromItem,triplemap,qr_o.termType);
-				}else if(qr_o.constant!=null){
+				if(qr_o.data.getTermType() != null){
+					otm = mapQueryResultOnTermMap(qr_o, fromItem,triplemap,qr_o.data.getTermType());
+				}else if(qr_o.data.getConstant()!=null){
 					otm = mapQueryResultOnTermMap(qr_o, fromItem, triplemap, null);
-				}else if(qr_o.column != null //when column, etc. then it is a literal
-							|| qr_o.lang != null
-							|| qr_o.datatypeuri != null
-							|| (qr_o.termType != null && qr_o.termType.equals(
+				}else if(qr_o.data.getColumn() != null //when column, etc. then it is a literal
+							|| qr_o.data.getLang() != null
+							|| qr_o.data.getDatatypeuri() != null
+							|| (qr_o.data.getTermType() != null && qr_o.data.getTermType().equals(
 									R2RML.Literal))){
 					otm = mapQueryResultOnTermMap(qr_o, fromItem, triplemap,R2RML.Literal);
 					}else{
@@ -635,8 +635,8 @@ public class R2RMLModel {
 					}
 				
 				
-				for(TermMap graphTermMap: graphMaps){
-					TripleMap graphTripleMap = graph2TripleMap.get(graphTermMap);
+				for(JDBCTermMap graphTermMap: graphMaps){
+					JDBCTripleMap graphTripleMap = graph2TripleMap.get(graphTermMap);
 					if(graphTripleMap==null){
 						graphTripleMap = triplemap.getDeepCopy();
 						graphTripleMap.setGraph(graphTermMap);
@@ -650,10 +650,10 @@ public class R2RMLModel {
 		}
 	}
 
-	public List<TermMap> getGraphmapsForPO(Resource tmUri, TripleMap triplemap,
+	public List<JDBCTermMap> getGraphmapsForPO(Resource tmUri, JDBCTripleMap triplemap,
 			List<Statement> graphMapStmts) throws R2RMLValidationException {
 
-		List<TermMap> graphMaps = new ArrayList<TermMap>();
+		List<JDBCTermMap> graphMaps = new ArrayList<JDBCTermMap>();
 		if (graphMapStmts == null || graphMapStmts.isEmpty()) {
 			graphMaps = Arrays.asList(this.tfac
 					.createTermMap(Quad.defaultGraphNodeGenerated));
@@ -685,7 +685,7 @@ public class R2RMLModel {
 				}
 
 				// set the graph
-				TermMap gtm = new TermMap(dth);
+				JDBCTermMap gtm = new JDBCTermMap(dth);
 				gtm.setTermTyp(R2RML.IRI);
 				gtm.getResourceColSeg().addAll(graph);
 				gtm.trm = triplemap;
@@ -709,64 +709,58 @@ public class R2RMLModel {
 		
 		
 		public TermMapQueryResult(Resource tm, Model model, FromItem fi){
-			template = model.listObjectsOfProperty(tm, R2RML.template).hasNext()?cleanTemplate(model.listObjectsOfProperty(tm, R2RML.template).next().asLiteral().getString(),fi):null;
+			data.setTemplate(model.listObjectsOfProperty(tm, R2RML.template).hasNext()?cleanTemplate(model.listObjectsOfProperty(tm, R2RML.template).next().asLiteral().getString(),fi):null);
 			
-			column = model.listObjectsOfProperty(tm, R2RML.column).hasNext()?getRealColumnName(model.listObjectsOfProperty(tm, R2RML.column).next().asLiteral().getString(), fi):null;
+			data.setColumn(model.listObjectsOfProperty(tm, R2RML.column).hasNext()?getRealColumnName(model.listObjectsOfProperty(tm, R2RML.column).next().asLiteral().getString(), fi):null);
 			
-			lang = model.listObjectsOfProperty(tm, R2RML.language).hasNext()?model.listObjectsOfProperty(tm, R2RML.language).next().asLiteral().getString():null;
+			data.setLang(model.listObjectsOfProperty(tm, R2RML.language).hasNext()?model.listObjectsOfProperty(tm, R2RML.language).next().asLiteral().getString():null);
 			
-			inverseExpression = model.listObjectsOfProperty(tm, R2RML.inverseExpression).hasNext()?model.listObjectsOfProperty(tm, R2RML.inverseExpression).next().asLiteral().getString():null;
-			constant = model.listObjectsOfProperty(tm, R2RML.constant).hasNext()?model.listObjectsOfProperty(tm, R2RML.constant).next():null;
-			datatypeuri =model.listObjectsOfProperty(tm, R2RML.datatype).hasNext()?model.listObjectsOfProperty(tm, R2RML.datatype).next().asResource():null;		
-			termType =  model.listObjectsOfProperty(tm, R2RML.termType).hasNext()?model.listObjectsOfProperty(tm, R2RML.termType).next().asResource():null;
+			data.setInverseExpression(model.listObjectsOfProperty(tm, R2RML.inverseExpression).hasNext()?model.listObjectsOfProperty(tm, R2RML.inverseExpression).next().asLiteral().getString():null);
+			data.setConstant(model.listObjectsOfProperty(tm, R2RML.constant).hasNext()?model.listObjectsOfProperty(tm, R2RML.constant).next():null);
+			data.setDatatypeuri(model.listObjectsOfProperty(tm, R2RML.datatype).hasNext()?model.listObjectsOfProperty(tm, R2RML.datatype).next().asResource():null);		
+			data.setTermType(model.listObjectsOfProperty(tm, R2RML.termType).hasNext()?model.listObjectsOfProperty(tm, R2RML.termType).next().asResource():null);
 			
 			
 		}
 
 		
-		String[] template;
-		String column;
-		RDFNode constant;
-		String lang;
-		Resource datatypeuri;
-		String inverseExpression;
-		Resource termType;
+		TermMap data = new TermMap();
 		
 		
 	}
 	
-	public TermMap mapQueryResultOnTermMap(TermMapQueryResult qr, FromItem fi, TripleMap tripleMap, Resource termType){
+	public JDBCTermMap mapQueryResultOnTermMap(TermMapQueryResult qr, FromItem fi, JDBCTripleMap tripleMap, Resource termType){
 		
-		TermMap tm =  TermMap.createNullTermMap(dth);
+		JDBCTermMap tm =  JDBCTermMap.createNullTermMap(dth);
 		
 		if(termType!=null){
 			tm.setTermTyp(termType);
 		}
-		if(qr.constant!=null){
-			tm = tfac.createTermMap(qr.constant.asNode());			
-		}else if(qr.template!=null){
+		if(qr.data.getConstant()!=null){
+			tm = tfac.createTermMap(qr.data.getConstant().asNode());			
+		}else if(qr.data.getTemplate()!=null){
 			if(termType.equals(R2RML.Literal)){
 			
-				List<Expression> resourceExpression = templateToResourceExpression(qr.template, fi, dth);
+				List<Expression> resourceExpression = templateToResourceExpression(qr.data.getTemplate(), fi, dth);
 				tm.literalValString = FilterUtil.concat(resourceExpression.toArray(new Expression[0]));
 
 			}else{
-				List<Expression> resourceExpression = templateToResourceExpression(qr.template, fi, dth);
+				List<Expression> resourceExpression = templateToResourceExpression(qr.data.getTemplate(), fi, dth);
 				tm.getResourceColSeg().addAll(resourceExpression);
 			}
 			
-		}else if(qr.column!=null){
+		}else if(qr.data.getColumn()!=null){
 			
-			Column col = ColumnHelper.createColumn(fi.getAlias(), qr.column);
+			Column col = JDBCColumnHelper.createColumn(fi.getAlias(), qr.data.getColumn());
 			
 			if(termType.equals(R2RML.Literal)){
 				
 			  
-			  Resource datatype = qr.datatypeuri;
+			  Resource datatype = qr.data.getDatatypeuri();
 			  
 			  if(datatype==null){
 			    // get the default datatype for this sql type
-		       int sqlType = dbconf.getDataType(fi, qr.column);
+		       int sqlType = dbconf.getDataType(fi, qr.data.getColumn());
 		       RDFDatatype dt = DataTypeHelper.getRDFDataType(sqlType);
 		       
 		       // set default or rdfs:Literal
@@ -1007,7 +1001,7 @@ public class R2RMLModel {
 	
 	public void validatepost(){
 		// in the end every triple map should have predicate objects.
-		for(TripleMap triplemap : this.tripleMaps.values()){
+		for(JDBCTripleMap triplemap : this.tripleMaps.values()){
 			if(triplemap.getPos().size()==0){
 				throw new R2RMLValidationException("Make sure there are predicate-object maps in triple map: " + triplemap.getUri() );
 			}
@@ -1032,7 +1026,7 @@ public class R2RMLModel {
 				// validate and register the colname first
 				// dbaccess.getDataType(fi,colName);
 				newExprs.add(dth.cast(
-						ColumnHelper.createColumn(fi.getAlias(), colName),
+						JDBCColumnHelper.createColumn(fi.getAlias(), colName),
 						dth.getStringCastType()));
 			} else {
 				newExprs.add(dth.cast(new StringValue("\"" + altSeq.get(i)

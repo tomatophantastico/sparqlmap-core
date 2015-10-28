@@ -16,10 +16,10 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RML;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLModel;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.mapper.Mapper;
+import org.aksw.sparqlmap.core.r2rml.R2RML;
+import org.aksw.sparqlmap.core.r2rml.R2RMLModel;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.LangBuilder;
 import org.apache.jena.riot.RDFDataMgr;

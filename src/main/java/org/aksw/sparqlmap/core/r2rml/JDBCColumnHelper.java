@@ -1,4 +1,4 @@
-package org.aksw.sparqlmap.core.config.syntax.r2rml;
+package org.aksw.sparqlmap.core.r2rml;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
 @Component
-public class ColumnHelper {
+public class JDBCColumnHelper {
 
   public static String R2R_COL_SUFFIX = "_R2R";
 

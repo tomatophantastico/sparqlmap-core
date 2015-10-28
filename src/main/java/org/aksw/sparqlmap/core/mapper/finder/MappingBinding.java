@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap.PO;
+import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap;
+import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap.PO;
 
 import com.hp.hpl.jena.sparql.core.Quad;
 
@@ -18,10 +18,10 @@ import com.hp.hpl.jena.sparql.core.Quad;
  */
 public class MappingBinding {
 
-	private Map<Quad, Collection<TripleMap>> bindingMap = new HashMap<Quad, Collection<TripleMap>>();
+	private Map<Quad, Collection<JDBCTripleMap>> bindingMap = new HashMap<Quad, Collection<JDBCTripleMap>>();
 
 
-	public MappingBinding(Map<Quad, Collection<TripleMap>> bindingMap) {
+	public MappingBinding(Map<Quad, Collection<JDBCTripleMap>> bindingMap) {
 		this.bindingMap = bindingMap;
 	}
 
@@ -33,7 +33,7 @@ public class MappingBinding {
 		Set<Quad> quads = this.bindingMap.keySet();
 		for (Quad quad: quads) {
 			sb.append("* " + quad.toString() + "\n");
-			for (TripleMap tm : this.bindingMap.get(quad)) {
+			for (JDBCTripleMap tm : this.bindingMap.get(quad)) {
 				sb.append("    Triplemap: " + tm + "\n");
 				for (PO po : tm.getPos()) {
 					sb.append("     PO:" + po.getPredicate().toString() + " "
@@ -45,7 +45,7 @@ public class MappingBinding {
 	}
 	
 	
-	public Map<Quad, Collection<TripleMap>> getBindingMap() {
+	public Map<Quad, Collection<JDBCTripleMap>> getBindingMap() {
 		return bindingMap;
 	}
 	

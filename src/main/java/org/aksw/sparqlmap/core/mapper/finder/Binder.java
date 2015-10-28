@@ -9,11 +9,11 @@ import java.util.Stack;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.R2RMLModel;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TripleMap.PO;
 import org.aksw.sparqlmap.core.mapper.translate.QuadVisitorBase;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
+import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap;
+import org.aksw.sparqlmap.core.r2rml.R2RMLModel;
+import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap.PO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class Binder {
 
 	public MappingBinding bind(Op op){
 		
-		Map<Quad, Collection<TripleMap>> bindingMap = new HashMap<Quad, Collection<TripleMap>>();
+		Map<Quad, Collection<JDBCTripleMap>> bindingMap = new HashMap<Quad, Collection<JDBCTripleMap>>();
 		
 		OpWalker.walk(op, new BinderVisitor(tc.getQueryInformation().getFiltersforvariables(), bindingMap));
 		
@@ -65,14 +65,14 @@ public class Binder {
 		
 		
 		Map<Quad, Map<String,Collection<Expr>>> quads2variables2expressions;
-		Map<Quad, Collection<TripleMap>> binding;
+		Map<Quad, Collection<JDBCTripleMap>> binding;
 		
 		
 		
 		
 		public BinderVisitor(
 				Map<Quad, Map<String, Collection<Expr>>> quads2variables2expressions,
-				Map<Quad, Collection<TripleMap>> binding) {
+				Map<Quad, Collection<JDBCTripleMap>> binding) {
 			super();
 			this.quads2variables2expressions = quads2variables2expressions;
 			this.binding = binding;
@@ -177,8 +177,8 @@ public class Binder {
 		 * 
 		 * @return
 		 */
-		private Map<Quad,Collection<TripleMap>> partitionBindings(Collection<Quad> quads){
-			Map<Quad,Collection<TripleMap>> subset = new HashMap<Quad, Collection<TripleMap>>();
+		private Map<Quad,Collection<JDBCTripleMap>> partitionBindings(Collection<Quad> quads){
+			Map<Quad,Collection<JDBCTripleMap>> subset = new HashMap<Quad, Collection<JDBCTripleMap>>();
 			for(Quad quad : quads){
 				subset.put(quad, binding.get(quad));
 			}
@@ -190,9 +190,9 @@ public class Binder {
 		private void initialBinding(Quad quad) {
 			
 			// first bind all triple maps to the triple
-			Collection<TripleMap> trms = new HashSet<TripleMap>();
+			Collection<JDBCTripleMap> trms = new HashSet<JDBCTripleMap>();
 
-			for (TripleMap tripleMap : mapconf.getTripleMaps()) {
+			for (JDBCTripleMap tripleMap : mapconf.getTripleMaps()) {
 				trms.add(tripleMap.getShallowCopy());
 			}
 			binding.put(quad, trms);
@@ -211,7 +211,7 @@ public class Binder {
 		
 			// iterate over the subjects and remove them if they are not
 			// compatible
-			for (TripleMap tripleMap : new HashSet<TripleMap>(trms)) {
+			for (JDBCTripleMap tripleMap : new HashSet<JDBCTripleMap>(trms)) {
 				
 				if(!tripleMap.getGraph().getCompChecker().isCompatible(gname,gxprs)){
 					trms.remove(tripleMap);
@@ -299,8 +299,8 @@ public class Binder {
 	/**
 	 * merges the bindings. performs the join 
 	 */
-	private boolean mergeBinding(Map<Quad, Collection<TripleMap>> binding1,
-			Map<Quad, Collection<TripleMap>> binding2) {
+	private boolean mergeBinding(Map<Quad, Collection<JDBCTripleMap>> binding1,
+			Map<Quad, Collection<JDBCTripleMap>> binding2) {
 		
 
 		boolean wasmerged = false;
@@ -317,16 +317,16 @@ public class Binder {
 					
 								Node n1 = getField(quad1, f1);
 								Node n2 = getField(quad2, f2);
-								Collection<TripleMap> triplemaps1 = binding1
+								Collection<JDBCTripleMap> triplemaps1 = binding1
 										.get(quad1);
-								Collection<TripleMap> triplemaps1_copy= null;
+								Collection<JDBCTripleMap> triplemaps1_copy= null;
 								if(log.isDebugEnabled()){
-									triplemaps1_copy = new HashSet<TripleMap>(binding1
+									triplemaps1_copy = new HashSet<JDBCTripleMap>(binding1
 											.get(quad1));
 								}
 										
 								
-								Collection<TripleMap> triplemaps2 = binding2
+								Collection<JDBCTripleMap> triplemaps2 = binding2
 										.get(quad2);
 								if (matches(n1, n2)) {
 									wasmergedthisrun = mergeTripleMaps(f1, f2,
@@ -340,7 +340,7 @@ public class Binder {
 											log.debug("Removed the following triple maps:");
 											
 											triplemaps1_copy.removeAll(triplemaps1);
-											for (TripleMap tripleMap : triplemaps1_copy) {
+											for (JDBCTripleMap tripleMap : triplemaps1_copy) {
 												log.debug("" +  tripleMap);
 											}
 										}else{
@@ -378,21 +378,21 @@ public class Binder {
 	 * @param triplemaps2
 	 */
 	private boolean mergeTripleMaps(Field f1, Field f2,
-			Collection<TripleMap> triplemaps1, Collection<TripleMap> triplemaps2) {
+			Collection<JDBCTripleMap> triplemaps1, Collection<JDBCTripleMap> triplemaps2) {
 		// we keep track if a modification was performed. Needed later to notify
 		// the siblings.
 		boolean mergedSomething = false;
 
 		// we iterate over all triplemaps of both (join-style)
-		for (TripleMap triplemap1 : new HashSet<TripleMap>(triplemaps1)) {
-			Set<PO> toRetain = new HashSet<TripleMap.PO>();
+		for (JDBCTripleMap triplemap1 : new HashSet<JDBCTripleMap>(triplemaps1)) {
+			Set<PO> toRetain = new HashSet<JDBCTripleMap.PO>();
 			for (PO po1 : new HashSet<PO>(triplemap1.getPos())) {
-				for (TripleMap triplemap2 : triplemaps2) {
+				for (JDBCTripleMap triplemap2 : triplemaps2) {
 					// we iterate over the PO, as each generates a triple per
 					// row.
 					for (PO po2 : triplemap2.getPos()) {
-						TermMap tm1 = getTermMap(po1, f1);
-						TermMap tm2 = getTermMap(po2, f2);
+						JDBCTermMap tm1 = getTermMap(po1, f1);
+						JDBCTermMap tm2 = getTermMap(po2, f2);
 						if (tm1.getCompChecker().isCompatible(tm2)) {
 							// they are compatible! we keep!
 							toRetain.add(po1);
@@ -411,8 +411,8 @@ public class Binder {
 
 	}
 	
-	private TermMap getTermMap(PO po, Field field) {
-		TermMap result = null;
+	private JDBCTermMap getTermMap(PO po, Field field) {
+		JDBCTermMap result = null;
 		if (field == Field.subject) {
 			result = po.getTripleMap().getSubject();
 		} else	if (field == Field.predicate) {

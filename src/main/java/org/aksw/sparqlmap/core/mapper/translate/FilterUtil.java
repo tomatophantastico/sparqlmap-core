@@ -24,9 +24,9 @@ import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 
 import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMap;
-import org.aksw.sparqlmap.core.config.syntax.r2rml.TermMapFactory;
 import org.aksw.sparqlmap.core.db.DBAccess;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMapFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +49,7 @@ public class FilterUtil {
 	private DataTypeHelper dth;
 	
 	@Autowired
-	private TermMapFactory tmf;
+	private JDBCTermMapFactory tmf;
 	
 
 	
@@ -156,7 +156,7 @@ private static BitSet RESERVED = new BitSet();
 	 * @return
 	 */
 	
-	public TermMap compareTermMaps(TermMap left, TermMap right, Class<? extends BinaryExpression> test){
+	public JDBCTermMap compareTermMaps(JDBCTermMap left, JDBCTermMap right, Class<? extends BinaryExpression> test){
 	  
 		List<Expression> eqs = new ArrayList<Expression>();
 		
@@ -252,7 +252,7 @@ private static BitSet RESERVED = new BitSet();
 	 * adds the term type and literal type check to the expression.
 	 * @return
 	 */
-	private Expression andTypesAreEqual(Expression toWrap, TermMap left, TermMap right){
+	private Expression andTypesAreEqual(Expression toWrap, JDBCTermMap left, JDBCTermMap right){
 	    List<Expression> results = Lists.newArrayList();
 	    results.add(toWrap);
 	  if(!left.getTermType().equals(right.getTermType())){  
@@ -311,7 +311,7 @@ private static BitSet RESERVED = new BitSet();
 	}
 	
 	
-	private Expression compareResource(TermMap left, TermMap right,
+	private Expression compareResource(JDBCTermMap left, JDBCTermMap right,
 			Class<? extends BinaryExpression> test)
 			throws InstantiationException, IllegalAccessException {
 		
@@ -451,7 +451,7 @@ private static BitSet RESERVED = new BitSet();
 			return FilterUtil.conjunct(tests);
 		}
 	}
-	public boolean hasSubsel(TermMap left) {
+	public boolean hasSubsel(JDBCTermMap left) {
 		for (Expression expr : left.getResourceColSeg()){
 			 if(expr instanceof Column){
 				 //maybe not the best way to determine that.
