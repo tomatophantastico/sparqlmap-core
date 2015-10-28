@@ -10,8 +10,6 @@ before_script:
   - psql -c 'create database sparqlmap;' -U postgres
   - mysql -e 'create database sparqlmap;' -uroot
 
-script:
-  - ./gradlew check --info
 
 env:
   global:
