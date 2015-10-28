@@ -1,5 +1,5 @@
 # SparqlMap - core library
-
+[![Build Status](https://travis-ci.org/tomatophantastico/sparqlmap-core.svg?branch=develop)](https://travis-ci.org/tomatophantastico/sparqlmap-core) 
 
 SparqlMap - A SPARQL to SQL rewriter based on [R2RML](http://www.w3.org/TR/r2rml/) specification.
 
