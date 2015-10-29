@@ -80,25 +80,4 @@ public class SparqlMapQueryMySQLTest  extends SparqlMapQueryBaseTest{
     return data(MySQLConnector.MYSQL_DBNAME);
   }
   
- 
-
-  
-
-
-  
-
-
-
-
-
-
-  
-  
-  
-  
-  
-  
-  
-  
-
 }

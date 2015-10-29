@@ -3,6 +3,10 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 
+//basics
+group 'org.aksw.sparqlmap'
+version '0.6.4-SNAPSHOT'
+
 
 // We use Java 7
 sourceCompatibility = 1.7
@@ -13,18 +17,28 @@ targetCompatibility = 1.7
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId 'org.aksw.sparqlmap'
-            artifactId 'sparqlmap-core'
-            version '0.6.4-SNAPSHOT'
-
             from components.java 
             artifact testJar{
                 classifier "test"
             }
-         
         }
        
     }
+    repositories {
+        maven {
+            credentials {
+                username aksw_archiva_user
+                password aksw_archiva_pass
+            }
+
+            if(project.version.endsWith('-SNAPSHOT')) {
+                url "http://maven.aksw.org/archiva/repository/snapshots/"
+            } else {
+                url "http://maven.aksw.org/archiva/repository/internal/"
+            }
+        }
+    }
+
 }
 
 // In this section you declare where to find the dependencies of your project
@@ -41,6 +55,13 @@ repositories {
 task testJar(type: Jar) {
     classifier = 'tests'
     from sourceSets.test.output
+}
+
+task echo(){
+    doLast{
+    println project.version
+    println aksw_archiva_user
+}
 }
 
 dependencies {
@@ -62,7 +83,5 @@ dependencies {
     testCompile 'org.hsqldb:sqltool:2.3.3'
     testCompile "org.apache.jena:jena-tdb:1.1.1"
     testCompile 'mysql:mysql-connector-java:5.1.36'
-
-
 }
 
