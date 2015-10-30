@@ -1,21 +1,27 @@
 language: java
 
 addons:
-  postgresql: "9.3"
+  postgresql: '9.3'
 
 jdk:
-  - openjdk7
+- openjdk7
 
 before_script:
-  - psql -c 'create database sparqlmap;' -U postgres
-  - mysql -e 'create database sparqlmap;' -uroot
+- psql -c 'create database sparqlmap;' -U postgres
+- mysql -e 'create database sparqlmap;' -uroot
+
+after_success:
+- ./gradlew publish -Paksw_archiva_user=${ENC_AKSW_ARCHIVA_USER} -Paksw_archiva_pass=${AKSW_ARCHIVA_PASS}
+
 
 
 env:
   global:
-    - SPARQLMAP_POSTGRES_URL=jdbc:postgresql://localhost/sparqlmap
-    - SPARQLMAP_POSTGRES_USER=postgres
-    - SPARQLMAP_POSTGRES_PASS=
-    - SPARQLMAP_MYSQL_URL=jdbc:mysql://localhost/sparqlmap?padCharsWithSpace=true&sessionVariables=sql_mode='ANSI_QUOTES'
-    - SPARQLMAP_MYSQL_USER=travis
-    - SPARQLMAP_MYSQL_PASS=
+  - SPARQLMAP_POSTGRES_URL=jdbc:postgresql://localhost/sparqlmap
+  - SPARQLMAP_POSTGRES_USER=postgres
+  - SPARQLMAP_POSTGRES_PASS=
+  - SPARQLMAP_MYSQL_URL=jdbc:mysql://localhost/sparqlmap?padCharsWithSpace=true&sessionVariables=sql_mode='ANSI_QUOTES'
+  - SPARQLMAP_MYSQL_USER=travis
+  - SPARQLMAP_MYSQL_PASS=
+  - secure: D/Zgs1Nokv7AmtddqLyn/2PLQuik1hPnwur12BjDA6qD4hm1c+582JAfg5nGBEua4CMWeSSyrewsi8O4DUq0PSLyF5636wJEnbr/uK1fmg/uVywqVcEKs0enoZ83H1D06FMzLcqp0LRsdHG8J2yiDYEQZ39iPfXfL1r5KDVhlGUmWfqjSkhE2spxFuSlfFWO+qTMqCn0JjmM9jrUQRYgjIjJcmAVHbRreSdXiD0wSMQGCrES+rpod69w1O7eLJBDv2Ju0PKSjFgG5eJPIK6Wt4vuiA0Mvgmoj2ZOtatApgiypE42f2Lz8mjmMikjPXM+raVZQoknUOQQDtwZgZUs2GNpLcdgyeaXsZ0e9z76ZgkmNrI1LpQNscZ40X4sNV4mIFbL+h5AA3rhFdHQd3rGHbW93sEdews5rXmfY5YOI2y+Bd+G09X9p+TOS3snz7wyVGajDM76X41uJp0WIdT+AusAv7UbZDePVuhb6ihi+kK+Xf6e2sPJXxZY7cIyfSO3e8hRcfIlAqJkwnH7E5GalXN84B+Mwj26tkncejRxOfRdvYDtm3r71poX6qLPQMWM13UqtagbO+cBe9gIFS0q/YhuUmfcgQMlwIw20c5KsqR7+8hpXrWcdw1Zo0iKj/MwLMIp9Toq4WSGZxFnGwLZTa6qg1oq0IcXYJJcjP+ZlXQ=
+  - secure: Cd/UKc1Ow72X25zgi53utPbPXyfe3hGExd4eJNiOTIPI8yxB3Mz2siz/kFI15SNRag1wt3qZGjXzquuPCBk21LhNh2f2Xz7G659zN6zDZf6H+7sq3kUBhdy6xBa1kM8UIeJ0qWQCMQHfPSFW6AE1eqNf8LCSdnuNwW7Lb5WGyD/G8r/22lyRF+v/zE0JCM1tgbWu/ZzIR443sPpRn6V/k+TZlKLN5Cpb0h9iBn0eY6ooKh/u/8CsSTxxgiePMliTROUg8AgiUJymlmUbermQRHA2/jq+FkOanMUtIxKq6L35vdn01qJtlMEOJsjP2fFxvy5C0rfc3VXiFI9hmRPj9eet+fTnulH3ljc8jbmNsgoMNeGnkStAR0K7p+zzVl3rbwtkUEuZm+Wj931uwH8hp8UNEjMatm+AelS3JrDDPHfVWqnaVCspa3OHuoMVvzn7XkqSejodLhqssFGjxxtxIeqR98OQbj9+poKnJDf/jf/pvk5nH9E95jwTHZNeC5elIf/W/ja2MjF3nQfwZ3kAdBkY2lTI7C3+Whs7w68o2tKu1ClzFxQgwVIBm46NFV8/JLDosGAmf8+ZJrE6vNm4Dorje6czfJgFsbjOD2joFLRx4CpggpYHAUj7es3jCAWn9UtxeIis6veGs8IiGRTi/pV8NtheT6NktGUFpfjkOIw=
