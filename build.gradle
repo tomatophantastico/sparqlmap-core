@@ -27,8 +27,8 @@ publishing {
     repositories {
         maven {
             credentials {
-                username aksw_archiva_user
-                password aksw_archiva_pass
+                username (hasProperty('aksw_archiva_user') != null ? aksw_archiva_user : "")
+                password (hasProperty('aksw_archiva_pass') != null ? aksw_archiva_pass : "")
             }
 
             if(project.version.endsWith('-SNAPSHOT')) {
