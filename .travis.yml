@@ -11,7 +11,7 @@ before_script:
 - mysql -e 'create database sparqlmap;' -uroot
 
 after_success:
-- ./gradlew publish -Paksw_archiva_user=${ENC_AKSW_ARCHIVA_USER} -Paksw_archiva_pass=${AKSW_ARCHIVA_PASS}
+- ./gradlew publish -Paksw_archiva_user=${ENC_AKSW_ARCHIVA_USER} -Paksw_archiva_pass=${ENC_AKSW_ARCHIVA_PASS}
 
 
 
