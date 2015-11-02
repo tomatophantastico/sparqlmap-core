@@ -16,7 +16,7 @@ targetCompatibility = 1.7
 
 publishing {
     publications {
-        maven(MavenPublication) {
+        mavenJava(MavenPublication) {
             from components.java 
             artifact testJar{
                 classifier "test"
@@ -24,22 +24,41 @@ publishing {
         }
        
     }
-    repositories {
-        maven {
-            credentials {
-                username (hasProperty('aksw_archiva_user') != null ? aksw_archiva_user : "")
-                password (hasProperty('aksw_archiva_pass') != null ? aksw_archiva_pass : "")
-            }
+   
+    if(shouldPublish()){
+        repositories {
+            maven {
+                credentials {
+                    username (project.hasProperty('aksw_archiva_user') != null ? aksw_archiva_user : "")
+                    password (project.hasProperty('aksw_archiva_pass') != null ? aksw_archiva_pass : "")
+                }
 
-            if(project.version.endsWith('-SNAPSHOT')) {
-                url "http://maven.aksw.org/archiva/repository/snapshots/"
-            } else {
-                url "http://maven.aksw.org/archiva/repository/internal/"
+                if(project.version.endsWith('-SNAPSHOT')) {
+                    url "http://maven.aksw.org/archiva/repository/snapshots/"
+                } else {
+                    url "http://maven.aksw.org/archiva/repository/internal/"
+                }
             }
         }
     }
-
 }
+
+boolean shouldPublish(){
+    def grgit = Grgit.open(dir: '.')
+    def name = grgit.branch.current.name
+    name.equals('develop') || name.equals('master')
+}
+
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.ajoberstar:grgit:1.4.1'
+    }
+}
+import org.ajoberstar.grgit.*
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -57,12 +76,7 @@ task testJar(type: Jar) {
     from sourceSets.test.output
 }
 
-task echo(){
-    doLast{
-    println project.version
-    println aksw_archiva_user
-}
-}
+
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.5'
