@@ -17,9 +17,15 @@ import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
 import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
+import org.aksw.sparqlmap.core.r2rml.R2RML;
+import org.aksw.sparqlmap.core.r2rml.TermMap;
+import org.aksw.sparqlmap.core.r2rml.TermMapTemplateStringColumn;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import util.QuadPosition;
+
 import com.google.common.base.Splitter;
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.sparql.expr.E_Equals;
 import com.hp.hpl.jena.sparql.expr.Expr;
@@ -29,88 +35,53 @@ import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueNode;
 
 public class SimpleCompatibilityChecker implements CompatibilityChecker{
 	
-	private JDBCTermMap termMap;
-	private DataTypeHelper dth;
-	//contains the cast type of the column, that would naturally be used (e.g. an tinyint will get for postgres NUMERIC)
-	private Map<String,String> colname2castType = new HashMap<String, String>(); 
-	
-	public SimpleCompatibilityChecker(JDBCTermMap tm, DBAccess dba, DataTypeHelper dth) {
-		this.termMap = tm;
-		this.dth = dth;
-		
-		//we now create the colname2castType
-		for(Expression expression: tm.getExpressions()){
-			if(DataTypeHelper.uncast(expression) instanceof Column){
-				Column column = (Column) DataTypeHelper.uncast(expression);
-				String columnName = column.getColumnName();
-				FromItem fi =null;
-				
-				for(FromItem fiToCheck : tm.getFromItems()){
-					if(fiToCheck.getAlias().equals(column.getTable().getAlias())){
-						fi = fiToCheck;
-					}
-				}
-				Integer dt = dba.getDataType(fi, columnName);
-				 
-				 colname2castType.put( columnName ,dth.getCastTypeString(dt));
-			}
-		}
-		
-		
-	}
+
 	
 
-	@Override
-	public boolean isCompatible(JDBCTermMap termMap2) {
-		
-		
-		boolean compatibleType = false;
-		
-		JDBCColumnHelper.getResourceExpressions(termMap.getExpressions());
-		
-		Expression termMapType = JDBCColumnHelper.getTermType(this.termMap.getExpressions());
-		Expression termMap2Type = JDBCColumnHelper.getTermType(termMap2.getExpressions());
+	
+  public boolean isCompatible(TermMap termMap1, TermMap termMap2) {
+    boolean isCompatible = true;
 
-		if(isCompatible(termMapType, termMap2Type)){
+    if (!termMap1.getTermTypeIRI().equals(termMap2.getTermTypeIRI())) {
+      isCompatible = false;
+    } else {
+      // we compare literal termMaps by comparing the data types.
+      if (termMap1.getTermTypeIRI().equals(R2RML.LITERAL_STRING)) {
+        String datatype1 = termMap1.getDatatypIRI();
+        String datatype2 = termMap2.getDatatypIRI();
+
+        if (!((datatype1 == null && datatype2 == null)
+            || (DataTypeHelper.isNumeric(datatype1) && DataTypeHelper.isNumeric(datatype2)) || (datatype1
+              .equals(datatype2)))) {
+          isCompatible = false;
+        }
+      } else {
+        // deal with resources here we can treat blank nodes and iri the same
+        // here.
+
+      }
+    }
+    // it is not the case that both term maps produce numeric values
+    return isCompatible;
+
+  }
+	  
 			
-			if(termMapType.equals(JDBCColumnHelper.COL_VAL_TYPE_LITERAL)){
-				//we check for datatype and language
-				
-				Expression datatype1  = JDBCColumnHelper.getDataType(termMap.getExpressions());
-				Expression datatype2  = JDBCColumnHelper.getDataType(termMap2.getExpressions());
-				
-				if(datatype1!=null && datatype2!=null){
-					if(!isCompatible(datatype1, datatype2)){
-						return false;
-					}
-				}else if(datatype1!=null && datatype2==null||datatype2!=null && datatype1==null){
-					return false;
-				}else{
-					throw new ImplementationException("Check non considered case");
-				}
-				
-			}else {
-				//is either blank node or resource, so we evaluate the resource constructor
-				
-				List<Expression> resourceExpr1 = JDBCColumnHelper.getResourceExpressions(termMap.getExpressions());
-				List<Expression> resourceExpr2 = JDBCColumnHelper.getResourceExpressions(termMap2.getExpressions());
-								
 
-				//the uri separator split list. Currently only split for  "/"
-				List<Object> splitUri1 = split(resourceExpr1);
-				List<Object> splitUri2 = split(resourceExpr2);
-				
-				return evaluateSplits(splitUri1,splitUri2);
-		
-			}
-		}else{
-			return false;
-		}
-		// fallback
-		
-		return true;
-	}
-	
+
+
+  private boolean isCompatible(List<TermMapTemplateStringColumn> sc1, List<TermMapTemplateStringColumn> sc2){
+    boolean result = true;
+    
+    //check first if one or both are column base term maps. in this case, they are always compatible.
+    
+    
+    
+    
+    
+    
+    return result;
+  }
 	
 	private boolean evaluateSplits(List<Object> splitUri1,
 		List<Object> splitUri2) {
@@ -379,24 +350,12 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 		return true;
 	}
 	
-	
-	public static boolean isCompatible(Expression e1, Expression e2){
-		Expression v1 = DataTypeHelper.uncast(e1);
-		Expression v2 = DataTypeHelper.uncast(e2);
-		
-		if(v1 instanceof Expression && v2 instanceof Expression){
-			return v2.equals(v1);
-			
-		}
-		
-		return true;
-	}
 
 	/**
 	 * simple implementation that checks only for simple equals statements 
 	 */
 	@Override
-	public boolean isCompatible(String var, Collection<Expr> exprs) {
+	public boolean isCompatible(TermMap termMap, String var, Collection<Expr> exprs) {
 		boolean isCompatible = true;
 		for(Expr expr : exprs){
 			if(expr instanceof E_Equals){
@@ -420,13 +379,5 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 			}
 		}
 		return isCompatible;
-		
-		
 	}
-
-	
-	
-	
-
-
 }

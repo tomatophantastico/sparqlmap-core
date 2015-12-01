@@ -1,7 +1,7 @@
 package org.aksw.sparqlmap.core;
 
 /**
- * something went wrong mapping.
+ * Indicates an invalid mapping
  * 
  * @author joerg
  * 

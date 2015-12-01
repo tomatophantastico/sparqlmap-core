@@ -1,74 +1,90 @@
 package org.aksw.sparqlmap.core.r2rml;
 
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
+public abstract class TermMap {
 
-public class TermMap {
-    private String[] template;
-    private String column;
-    private RDFNode constant;
-    private String lang;
-    private Resource datatypeuri;
-    private String inverseExpression;
-    private Resource termType;
-     
-   
-    public TermMap() {
-    }
+  private String lang;
+  private String datatypIRI;
+  private String termTypeIRI;
+  private QuadMap quadMap;
+  
+  
+  public String getLang() {
+    return lang;
+  }
 
-    public String[] getTemplate() {
-        return template;
-    }
+  public void setLang(String lang) {
+    this.lang = lang;
+  }
 
-    public void setTemplate(String[] template) {
-        this.template = template;
-    }
+  public String getDatatypIRI() {
+    return datatypIRI;
+  }
 
-    public String getColumn() {
-        return column;
-    }
+  public void setDatatypIRI(String datatypIRI) {
+    this.datatypIRI = datatypIRI;
+  }
 
-    public void setColumn(String column) {
-        this.column = column;
-    }
+  public String getTermTypeIRI() {
+    return termTypeIRI;
+  }
 
-    public RDFNode getConstant() {
-        return constant;
-    }
+  public void setTermTypeIRI(String termTypeIRI) {
+    this.termTypeIRI = termTypeIRI;
+  }
+  
+  
+  public QuadMap getQuadMap() {
+    return quadMap;
+  }
+  
+  
+  public void setQuadMap(QuadMap quadMap) {
+    this.quadMap = quadMap;
+  }
 
-    public void setConstant(RDFNode constant) {
-        this.constant = constant;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((datatypIRI == null) ? 0 : datatypIRI.hashCode());
+    result = prime * result + ((lang == null) ? 0 : lang.hashCode());
+    result = prime * result + ((quadMap == null) ? 0 : quadMap.hashCode());
+    result = prime * result + ((termTypeIRI == null) ? 0 : termTypeIRI.hashCode());
+    return result;
+  }
 
-    public String getLang() {
-        return lang;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    TermMap other = (TermMap) obj;
+    if (datatypIRI == null) {
+      if (other.datatypIRI != null)
+        return false;
+    } else if (!datatypIRI.equals(other.datatypIRI))
+      return false;
+    if (lang == null) {
+      if (other.lang != null)
+        return false;
+    } else if (!lang.equals(other.lang))
+      return false;
+    if (quadMap == null) {
+      if (other.quadMap != null)
+        return false;
+    } else if (!quadMap.equals(other.quadMap))
+      return false;
+    if (termTypeIRI == null) {
+      if (other.termTypeIRI != null)
+        return false;
+    } else if (!termTypeIRI.equals(other.termTypeIRI))
+      return false;
+    return true;
+  }
 
-    public void setLang(String lang) {
-        this.lang = lang;
-    }
+  
 
-    public Resource getDatatypeuri() {
-        return datatypeuri;
-    }
-
-    public void setDatatypeuri(Resource datatypeuri) {
-        this.datatypeuri = datatypeuri;
-    }
-
-    public String getInverseExpression() {
-        return inverseExpression;
-    }
-
-    public void setInverseExpression(String inverseExpression) {
-        this.inverseExpression = inverseExpression;
-    }
-
-    public Resource getTermType() {
-        return termType;
-    }
-
-    public void setTermType(Resource termType) {
-        this.termType = termType;
-    }
 }

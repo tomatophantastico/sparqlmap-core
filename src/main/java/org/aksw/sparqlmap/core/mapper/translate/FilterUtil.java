@@ -26,7 +26,7 @@ import net.sf.jsqlparser.schema.Column;
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
-import org.aksw.sparqlmap.core.r2rml.JDBCTermMapFactory;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMapBinder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +49,7 @@ public class FilterUtil {
 	private DataTypeHelper dth;
 	
 	@Autowired
-	private JDBCTermMapFactory tmf;
+	private JDBCTermMapBinder tmf;
 	
 
 	

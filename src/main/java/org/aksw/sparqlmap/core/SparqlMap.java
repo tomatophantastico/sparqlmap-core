@@ -19,7 +19,7 @@ import javax.annotation.PostConstruct;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.mapper.Mapper;
 import org.aksw.sparqlmap.core.r2rml.R2RML;
-import org.aksw.sparqlmap.core.r2rml.R2RMLModel;
+import org.aksw.sparqlmap.core.r2rml.JDBCMapping;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.LangBuilder;
 import org.apache.jena.riot.RDFDataMgr;
@@ -76,7 +76,7 @@ public class SparqlMap {
   private Mapper mapper;
 
   @Autowired
-  private R2RMLModel mapping;
+  private JDBCMapping mapping;
 
   @Autowired
   private DBAccess dbConf;
@@ -438,7 +438,7 @@ public class SparqlMap {
       if (s != null && p != null && o != null) {
         if(g!=null
             && !(g.equals(Quad.defaultGraphNodeGenerated)
-            || g.hasURI(R2RML.defaultGraph.getURI()))){
+            || g.hasURI(R2RML.DEFAULTGRAPH.getURI()))){
           Quad toadd = new Quad(g, s, p, o);
           dsg.add(toadd);
         }else{

@@ -34,6 +34,7 @@ import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.aksw.sparqlmap.core.mapper.translate.FilterUtil;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
@@ -41,16 +42,14 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 public class JDBCTermMap{
 	
-	org.slf4j.Logger log = LoggerFactory.getLogger(JDBCTermMap.class); 
+	private static Logger log = LoggerFactory.getLogger(JDBCTermMap.class); 
 	
-	DataTypeHelper dth;
+	private DataTypeHelper dth;
 
 	
 	//  for each fromItem 
-	protected Set<EqualsTo> joinConditions = new HashSet<EqualsTo>();
-	
-	protected JDBCTripleMap trm;
-		
+	private Set<EqualsTo> joinConditions = new HashSet<EqualsTo>();
+			
 	private CompatibilityChecker cchecker;
 	
 
@@ -63,28 +62,11 @@ public class JDBCTermMap{
 	public Expression literalValBool;
 	public Expression literalValBinary;
 	
-	public List<Expression> resourceColSeg = new ArrayList<Expression>(); 
+	private List<Expression> resourceColSeg = new ArrayList<Expression>(); 
 	
-	protected LinkedHashMap<String,FromItem> alias2fromItem = new LinkedHashMap<String, FromItem>();
+	private LinkedHashMap<String,FromItem> alias2fromItem = new LinkedHashMap<String, FromItem>();
 
 	
-
-//	public static TermMap createTermMap(DataTypeHelper dataTypeHelper,
-//			List<Expression> expressions, List<FromItem> fromItems,
-//			Set<EqualsTo> joinConditions, TripleMap trm) {
-//		TermMap tm = new TermMap(dataTypeHelper);
-//		tm.setExpressions(expressions);
-//
-//		tm.trm = trm;
-//		for (FromItem fi : fromItems) {
-//			tm.alias2fromItem.put(fi.getAlias(), fi);
-//		}
-//		if (joinConditions != null) {
-//			tm.joinConditions = joinConditions;
-//		}
-//		// expressions = new ArrayList<Expression>();
-//		return tm;
-//	}
 	
 	private void setExpressions(List<Expression> expressions) {
 		List<Expression> exprs = new ArrayList<Expression>(expressions); //clone it, so we can work with it
@@ -227,6 +209,10 @@ public class JDBCTermMap{
 		
 	}
 	
+	
+	public Set<EqualsTo> getJoinConditions() {
+    return joinConditions;
+  }
 	
 	protected DataTypeHelper getDataTypeHelper(){
 		return dth;
@@ -394,10 +380,6 @@ public class JDBCTermMap{
 	
 	
 	
-	public JDBCTripleMap getTripleMap() {
-		return trm;
-	}
-	
 	
 	public CompatibilityChecker getCompChecker() {
 		return cchecker;
@@ -460,9 +442,9 @@ public class JDBCTermMap{
 	public void setTermTyp(Resource tt){
 		if(tt.equals(R2RML.IRI)){
 			termType =dth.asInteger(JDBCColumnHelper.COL_VAL_TYPE_RESOURCE);
-		}else if (tt.equals(R2RML.BlankNode)) {
+		}else if (tt.equals(R2RML.BLANKNODE)) {
 			termType = dth.asInteger(JDBCColumnHelper.COL_VAL_TYPE_BLANK);
-		} else if (tt.equals(R2RML.Literal)) {
+		} else if (tt.equals(R2RML.LITERAL)) {
 			termType = dth.asInteger(JDBCColumnHelper.COL_VAL_TYPE_LITERAL);
 		}
 	}
@@ -476,17 +458,23 @@ public class JDBCTermMap{
 		if(tt.equals(JDBCColumnHelper.COL_VAL_TYPE_RESOURCE.toString())){
 			return R2RML.IRI;
 		}else if (tt.equals(JDBCColumnHelper.COL_VAL_TYPE_BLANK.toString())) {
-			return R2RML.BlankNode;
+			return R2RML.BLANKNODE;
 		} else{
-			return R2RML.Literal;
+			return R2RML.LITERAL;
 		}
 	}
 	
 	public void setLiteralDataType(String ldt){
-		if(ldt!=null&&!ldt.isEmpty()){
-			this.literalType = dth.cast(new StringValue("'"+ldt+"'"), dth.getStringCastType()); 
-		}
-		
+		this.literalType = dth.asString(ldt);
+
+	}
+	
+	public void setLiteralLang(Expression lang){
+	  this.literalLang = dth.asString(lang);
+	}
+	
+	public void setResourceExpression(List<Expression> resourceExpression){
+	  this.resourceColSeg = resourceExpression;
 	}
 	
 	
@@ -600,7 +588,11 @@ public class JDBCTermMap{
 
 
 	
-	
+	public LinkedHashMap<String, FromItem> getAlias2fromItem() {
+    return alias2fromItem;
+  }
+
+
 
 	
 }

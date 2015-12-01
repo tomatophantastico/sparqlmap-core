@@ -1,29 +1,14 @@
 package org.aksw.sparqlmap.r2rmltestcases;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Properties;
 
 import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
-import org.aksw.sparqlmap.core.db.Connector;
-import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
-import org.aksw.sparqlmap.core.db.impl.HSQLDBConnector;
 import org.aksw.sparqlmap.core.db.impl.HSQLDBDataTypeHelper;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.hsqldb.Server;
-import org.hsqldb.cmdline.SqlFile;
-import org.hsqldb.cmdline.SqlToolError;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
-
-import com.jolbox.bonecp.BoneCPDataSource;
 
 public class HSQLR2RMLTestCase extends R2RMLTest{
 	

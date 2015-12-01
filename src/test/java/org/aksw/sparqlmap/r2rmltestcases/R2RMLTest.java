@@ -1,8 +1,5 @@
 package org.aksw.sparqlmap.r2rmltestcases;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,13 +18,11 @@ import java.util.Properties;
 import jersey.repackaged.com.google.common.collect.Lists;
 
 import org.aksw.sparqlmap.DBHelper;
-import org.aksw.sparqlmap.TestHelper;
 import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
+import org.aksw.sparqlmap.TestHelper;
 import org.aksw.sparqlmap.core.SparqlMap;
 import org.aksw.sparqlmap.core.automapper.MappingGenerator;
-import org.aksw.sparqlmap.core.db.Connector;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
-import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.WebContent;
 import org.apache.metamodel.DataContext;
@@ -35,7 +30,6 @@ import org.apache.metamodel.MetaModelException;
 import org.apache.metamodel.jdbc.JdbcDataContext;
 import org.junit.Assert;
 import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -162,7 +156,7 @@ public abstract class R2RMLTest {
 		ctxt.getEnvironment().getPropertySources().addFirst(new PropertiesPropertySource("sm", sm));
 		ctxt.getEnvironment().getPropertySources().addFirst(new PropertiesPropertySource("db", getDBProperties()));
 		
-		ctxt.scan("org.aksw.sparqlmap");
+		ctxt.scan("org.aksw.sparqlmap.core");
 		ctxt.refresh();
 		
 		SparqlMap r2r = ctxt.getBean(SparqlMap.class);

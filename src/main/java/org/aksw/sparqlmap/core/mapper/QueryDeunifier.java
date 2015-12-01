@@ -15,8 +15,8 @@ import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 import org.aksw.sparqlmap.core.mapper.translate.ExpressionConverter;
 import org.aksw.sparqlmap.core.mapper.translate.OptimizationConfiguration;
 import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
-import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap;
-import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap.PO;
+import org.aksw.sparqlmap.core.r2rml.JDBCQuadMap;
+import org.aksw.sparqlmap.core.r2rml.QuadMapCompatible;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -44,7 +44,7 @@ public class QueryDeunifier extends TransformCopy{
 	ExpressionConverter exprconv;
 	JDBCColumnHelper colhelp;
 	OptimizationConfiguration fopt;
-	Map<Quad, Collection<JDBCTripleMap>> newbindingMap = new HashMap<Quad, Collection<JDBCTripleMap>>();
+	Map<Quad, Collection<JDBCQuadMap>> newbindingMap = new HashMap<Quad, Collection<JDBCQuadMap>>();
 	Op query;
 	public QueryDeunifier(QueryInformation qi,
 			MappingBinding queryBinding, DataTypeHelper dth,
@@ -87,7 +87,7 @@ public class QueryDeunifier extends TransformCopy{
 		boolean merge = false;
 		if( opBGP.getPattern().getList().size()==1){
 			Quad triple = opBGP.getPattern().getList().iterator().next();
-			for(JDBCTripleMap tm : queryBinding.getBindingMap().get(triple)){
+			for(QuadMapCompatible tm : queryBinding.getBindingMap().get(triple)){
 					if(tm.getPos().size()>1){
 						//yes we can merge them
 						merge = true;
@@ -102,7 +102,7 @@ public class QueryDeunifier extends TransformCopy{
 			Set<Op> unionops = new HashSet<Op>(); 
 			
 			
-			for(JDBCTripleMap tm : queryBinding.getBindingMap().get(triple)){
+			for(JDBCQuadMap tm : queryBinding.getBindingMap().get(triple)){
 				Set<Quad>  lefjointriples = new HashSet<Quad>();
 				int i = 0;
 				for(PO po: tm.getPos()){
@@ -114,7 +114,7 @@ public class QueryDeunifier extends TransformCopy{
 					
 					Quad newTriple = new Quad(triple.getGraph(), triple.getSubject(),Var.alloc(p),Var.alloc(o));
 					
-					JDBCTripleMap newTripleMap = tm.getShallowCopy();
+					JDBCQuadMap newTripleMap = tm.getShallowCopy();
 					newTripleMap.getPos().retainAll(Arrays.asList(po));
 					
 					newbindingMap.put(newTriple, Arrays.asList(newTripleMap));

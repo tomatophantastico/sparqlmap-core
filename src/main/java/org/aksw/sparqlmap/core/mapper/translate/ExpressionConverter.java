@@ -10,7 +10,7 @@ import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.OrderByExpressionElement;
 
 import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
-import org.aksw.sparqlmap.core.r2rml.JDBCTermMapFactory;
+import org.aksw.sparqlmap.core.r2rml.JDBCTermMapBinder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,7 +48,7 @@ public class ExpressionConverter {
 	OptimizationConfiguration optConf;
 	
 	@Autowired
-	JDBCTermMapFactory tmf;
+	JDBCTermMapBinder tmf;
 	
 	
 	/**

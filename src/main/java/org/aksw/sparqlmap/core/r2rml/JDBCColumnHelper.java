@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
-@Component
+
 public class JDBCColumnHelper {
 
   public static String R2R_COL_SUFFIX = "_R2R";
@@ -113,7 +113,7 @@ public class JDBCColumnHelper {
     return rdfType;
   }
 
-  public Expression asExpression(String string, DataTypeHelper dth) {
+  public static Expression asExpression(String string, DataTypeHelper dth) {
     return dth.cast(new StringValue("\"" + string + "\""), dth.getStringCastType());
   }
 

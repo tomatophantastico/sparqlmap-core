@@ -1,27 +1,15 @@
 package org.aksw.sparqlmap.r2rmltestcases;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Properties;
 
-import org.aksw.sparqlmap.DBHelper;
 import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
-import org.aksw.sparqlmap.core.db.Connector;
-import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
 import org.aksw.sparqlmap.core.db.impl.OracleConnector;
 import org.aksw.sparqlmap.core.db.impl.OracleDataTypeHelper;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.jolbox.bonecp.BoneCPDataSource;
 
 public class OracleR2RMLTestCase extends R2RMLTest{
 	

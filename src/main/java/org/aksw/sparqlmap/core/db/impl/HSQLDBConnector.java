@@ -1,12 +1,20 @@
 package org.aksw.sparqlmap.core.db.impl;
 
-import org.aksw.sparqlmap.core.db.Connector;
+import javax.sql.DataSource;
+
+import org.aksw.sparqlmap.core.db.DBAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HSQLDBConnector extends Connector {
+import com.jolbox.bonecp.BoneCPDataSource;
+
+public class HSQLDBConnector extends DBAccess {
 	
-	private String driverClass ="org.hsqldb.jdbcDriver" ;
+	public HSQLDBConnector() {
+    super(new HSQLDBDataTypeHelper());
+  }
+
+  private String driverClass ="org.hsqldb.jdbcDriver" ;
 	
 	
 	{

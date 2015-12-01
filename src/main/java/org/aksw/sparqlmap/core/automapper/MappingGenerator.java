@@ -66,12 +66,12 @@ public class MappingGenerator {
      
      String subjectTemplate = generateSubjectTemplate(table);
      Resource subjectMap = r2r.createResource();
-     r2r.add(triplesMap, R2RML.subjectMap, subjectMap);
-     r2r.add(subjectMap,R2RML.template,subjectTemplate);
+     r2r.add(triplesMap, R2RML.HASSUBJECTMAP, subjectMap);
+     r2r.add(subjectMap,R2RML.HASTEMPLATE,subjectTemplate);
      
      //if no primary present, generate a blank node
      if(table.getPrimaryKeys().length==0){
-         subjectMap.addProperty(R2RML.termType,R2RML.BlankNode);
+         subjectMap.addProperty(R2RML.TERMTYPE,R2RML.BLANKNODE);
       
      }
       
@@ -79,16 +79,16 @@ public class MappingGenerator {
      if(table.getPrimaryKeys().length==0&&rowidtemplate!=null){
        //add the subquery statement
        Resource rrSqlQuery = r2r.createResource();
-       r2r.add(triplesMap,R2RML.logicalTable,rrSqlQuery);
+       r2r.add(triplesMap,R2RML.HASLOGICALTABLE,rrSqlQuery);
        r2r.add(triplesMap,RDFS.comment,"Added subquery for having acccess to rowid functionality.");
-       r2r.add(rrSqlQuery,R2RML.sqlQuery,String.format(rowidtemplate, table.getName()));
+       r2r.add(rrSqlQuery,R2RML.HASSQLQUERY,String.format(rowidtemplate, table.getName()));
        
        
      }else{
        //add the logical Table statment
        Resource rrTableName = r2r.createResource();
-       r2r.add(triplesMap,R2RML.logicalTable,rrTableName);
-       r2r.add(rrTableName,R2RML.tableName, escapeName(table.getName()));
+       r2r.add(triplesMap,R2RML.HASLOGICALTABLE,rrTableName);
+       r2r.add(rrTableName,R2RML.HASTABLENAME, escapeName(table.getName()));
      }
     
      
@@ -96,14 +96,14 @@ public class MappingGenerator {
      
      
      // and the class statement
-     r2r.add(subjectMap,R2RML.hasClass,r2r.createResource(vocabularyPrefix + ues(table.getName())));
+     r2r.add(subjectMap,R2RML.HASCLASS,r2r.createResource(vocabularyPrefix + ues(table.getName())));
      
      
      // map all relations 
      for(Relationship relationship: table.getForeignKeyRelationships() ){
 
        Resource pomap  = r2r.createResource();
-       triplesMap.addProperty(R2RML.predicateObjectMap,pomap);
+       triplesMap.addProperty(R2RML.HASPREDICATEOBJECTMAP,pomap);
        
        // generate the property
        List<String> cols = Lists.transform(Lists.newArrayList(relationship.getForeignColumns()), new Function<Column,String>(){
@@ -113,30 +113,30 @@ public class MappingGenerator {
         }
        });
        String refMapPropertySuffix = Joiner.on(this.primaryKeySeparator).join(cols);
-       pomap.addProperty(R2RML.predicate, r2r.createResource(vocabularyPrefix +ues(relationship.getForeignTable().getName()) +"#ref-"+ refMapPropertySuffix));
+       pomap.addProperty(R2RML.HASPREDICATE, r2r.createResource(vocabularyPrefix +ues(relationship.getForeignTable().getName()) +"#ref-"+ refMapPropertySuffix));
        
        // generate the object triple map condition
        Resource objectMap = r2r.createResource();
-       pomap.addProperty(R2RML.objectMap, objectMap);
+       pomap.addProperty(R2RML.HASOBJECTMAP, objectMap);
        
-       objectMap.addProperty(R2RML.parentTriplesMap, r2r.createResource(mappingPrefix + "mapping/" + ues(relationship.getPrimaryTable().getName())));
+       objectMap.addProperty(R2RML.HASPARENTTRIPLESMAP, r2r.createResource(mappingPrefix + "mapping/" + ues(relationship.getPrimaryTable().getName())));
        
        for(int i = 0; i<relationship.getForeignColumns().length;i++  ){
          Resource joinCondition = r2r.createResource();
-         objectMap.addProperty(R2RML.joinCondition,joinCondition);
-         joinCondition.addLiteral(R2RML.parent, this.escapeName(relationship.getPrimaryColumns()[i].getName()));
-         joinCondition.addLiteral(R2RML.child, this.escapeName(relationship.getForeignColumns()[i].getName()));
+         objectMap.addProperty(R2RML.HASJOINCONDITION,joinCondition);
+         joinCondition.addLiteral(R2RML.HASPARENT, this.escapeName(relationship.getPrimaryColumns()[i].getName()));
+         joinCondition.addLiteral(R2RML.HASCHILD, this.escapeName(relationship.getForeignColumns()[i].getName()));
        }
      }
      
      // map all data columns 
      for(Column column : table.getColumns()){
        Resource pomap  = r2r.createResource();
-       triplesMap.addProperty(R2RML.predicateObjectMap,pomap);
-       pomap.addProperty(R2RML.predicate, r2r.createResource(vocabularyPrefix +ues(column.getTable().getName()) +"#"+ ues(column.getName())));       
+       triplesMap.addProperty(R2RML.HASPREDICATEOBJECTMAP,pomap);
+       pomap.addProperty(R2RML.HASPREDICATE, r2r.createResource(vocabularyPrefix +ues(column.getTable().getName()) +"#"+ ues(column.getName())));       
        Resource objectMap = r2r.createResource();
-       pomap.addProperty(R2RML.objectMap, objectMap);
-       objectMap.addProperty(R2RML.column, escapeName(column.getName()));
+       pomap.addProperty(R2RML.HASOBJECTMAP, objectMap);
+       objectMap.addProperty(R2RML.HASCOLUMN, escapeName(column.getName()));
      }
     
      

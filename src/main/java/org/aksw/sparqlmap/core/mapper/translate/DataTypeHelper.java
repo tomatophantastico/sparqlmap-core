@@ -131,7 +131,7 @@ public abstract  class DataTypeHelper {
 	  RDFDatatype dt = getRDFDataType(sdt);
 	  
 	  if(dt !=null){
-	    castString = getCastTypeString( ResourceFactory.createResource(dt.getURI()));
+	    castString = getCastTypeString(dt);
 	  }
 	  
 	  
@@ -144,7 +144,7 @@ public abstract  class DataTypeHelper {
 	
 	
 	
-	public String getCastTypeString(Resource datatype){
+	public String getCastTypeString(RDFDatatype datatype){
 	  String result=  null;
 	  if(datatype == null ){
 	    result = getStringCastType();
@@ -372,6 +372,12 @@ public abstract  class DataTypeHelper {
     return cast(new LongValue(intVal.toString()), getIntCastType());
   }
 	
+	public Expression asString(String string){
+    return cast(new StringValue(string), getStringCastType());
+  }
+	 public Expression asString(Expression string){
+	    return cast(string, getStringCastType());
+	  }
 	
 	public Expression getStringDefaultExpression(){
 	  return cast(new StringValue("''"),getStringCastType());
@@ -454,6 +460,21 @@ public abstract  class DataTypeHelper {
  * @return
  */
   public abstract Expression regexMatches(Expression literalValString, String regex, String flags);
+
+
+  public static boolean isNumeric(String datatype1) {
+    boolean result = false;
+    if(datatype1!=null
+        &&(
+           datatype1.equals(XSDDatatype.XSDinteger.getURI()) 
+           || datatype1.equals(XSDDatatype.XSDfloat.getURI())
+           || datatype1.equals(XSDDatatype.XSDdecimal.getURI())
+           || datatype1.equals(XSDDatatype.XSDdouble.getURI())
+            )){
+      result = true; 
+    }
+    return result;
+  }
 
 
 }
