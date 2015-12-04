@@ -161,7 +161,7 @@ public abstract class SparqlMapQueryBaseTest {
     
     sparqlMap = getSparqlMap();
     TestHelper.executeAndCompare(sparqlMap, query, this.dsName, testname);
-    
+        
   }
   
  

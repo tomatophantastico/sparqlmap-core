@@ -24,6 +24,7 @@ import org.aksw.sparqlmap.core.mapper.translate.FilterUtil;
 import org.aksw.sparqlmap.core.mapper.translate.OptimizationConfiguration;
 import org.aksw.sparqlmap.core.mapper.translate.QueryBuilderVisitor;
 import org.aksw.sparqlmap.core.normalizer.QueryNormalizer;
+import org.aksw.sparqlmap.core.normalizer.RenameExtractVisitor;
 import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
 import org.aksw.sparqlmap.core.r2rml.JDBCTermMapFactory;
 import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap;
@@ -74,8 +75,8 @@ public class AlgebraMapper implements Mapper {
 	
 
 	
+	QueryNormalizer normalizer = new QueryNormalizer();
 	
-
 
 
 	public void rewrite(TranslationContext context) {
@@ -84,13 +85,10 @@ public class AlgebraMapper implements Mapper {
 		if(log.isDebugEnabled()){
 			log.debug(origQuery.toString());
 		}
-		
-		//first we beautify the Query
-		QueryNormalizer normalizer = new QueryNormalizer(context);
-		
+
 		
 
-		context.setBeautifiedQuery( normalizer.compileToBeauty(origQuery)); // new  AlgebraGenerator().compile(beautified);
+		normalizer.compileToBeauty(context); // new  AlgebraGenerator().compile(beautified);
 		
 		
 		if(log.isDebugEnabled()){

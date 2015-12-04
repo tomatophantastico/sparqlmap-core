@@ -128,6 +128,8 @@ public class TranslationContext {
 	//private Stopwatch sw;
 	private String currentPhase;
 
+  private int propertypathsuffix = 0;
+
 	public void profileStartPhase(String phase) {
 //		if(sw == null){
 //			currentPhase = phase;
@@ -184,7 +186,10 @@ public class TranslationContext {
   public int getAndIncrementSubqueryCounter() {
    return this.subquerycounter++;
   }
-
+  
+  public String getPropertyPathPrefix() {
+    return "sm_pp_" +  this.propertypathsuffix ++;
+   }
 	
 	
 	
