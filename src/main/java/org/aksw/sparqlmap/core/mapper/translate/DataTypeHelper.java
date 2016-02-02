@@ -419,11 +419,41 @@ public abstract  class DataTypeHelper {
 	  
 	  
 	}
+	
+	
+	public Expression castInt(Expression expr){
+	  return cast(expr, getIntCastType());
+	}
+	public Expression castNumeric(Expression expr){
+    return cast(expr, getNumericCastType());
+  }
+	public Expression castString(Expression expr){
+    return cast(expr, getStringCastType());
+  } 
+	public Expression castBool(Expression expr){
+    return cast(expr, getBooleanCastType());
+  }
+	public Expression castBin(Expression expr){
+    return cast(expr, getBinaryDataType());
+  }
+	public Expression castDate(Expression expr){
+    return cast(expr, getDateCastType());
+  }
 
 
   public String getRowIdTemplate() {
     return null;
   }
+
+/**
+ * as there is no ansi-sql way of doing it, map here explicitly to the vendor specific versions.
+ * 
+ * @param literalValString
+ * @param regex
+ * @param flags
+ * @return
+ */
+  public abstract Expression regexMatches(Expression literalValString, String regex, String flags);
 
 
 }

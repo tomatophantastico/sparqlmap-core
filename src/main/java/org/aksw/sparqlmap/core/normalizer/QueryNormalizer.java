@@ -67,7 +67,7 @@ public class QueryNormalizer {
     query = AlgebraQuad.quadize(query);
     RenameExtractVisitor rev = new RenameExtractVisitor(context);
     Op newOp = Transformer.transform(rev, query);
-    LOGGER.debug("Op after renaming/extract rewriting is {}", query);
+    LOGGER.debug("Op after renaming/extract rewriting is {}", newOp);
 
     context.setBeautifiedQuery(newOp);
     

@@ -52,6 +52,7 @@ public class JDBCTermMap{
 	protected JDBCTripleMap trm;
 		
 	private CompatibilityChecker cchecker;
+	
 
 	public Expression termType;
 	public Expression literalType;
@@ -100,12 +101,26 @@ public class JDBCTermMap{
 				
 	}
 
+	
+	public static JDBCTermMap createNullTermMap(DataTypeHelper dth){
+	  JDBCTermMap tm = createTermMap(dth, Lists.newArrayList(
+        dth.castInt(new NullValue()),
+        dth.castString(new NullValue()),
+        dth.castString(new NullValue()),
+        dth.castString(new NullValue()),
+        dth.castNumeric(new NullValue()),
+        dth.castDate(new NullValue()),
+        dth.castBool(new NullValue()),
+        dth.castBin(new NullValue())
+        
+        ));
+	  return tm;
+	}
 
 	public static  JDBCTermMap createTermMap(DataTypeHelper dataTypeHelper, Collection<Expression> expressions) {
 		JDBCTermMap tm = new JDBCTermMap(dataTypeHelper);
 		tm.setExpressions(new ArrayList<Expression>(expressions));
-		
-		return tm;
+    return tm;
 			
 	}
 	
@@ -392,13 +407,7 @@ public class JDBCTermMap{
 	public void setCompChecker(CompatibilityChecker cchecker) {
 		this.cchecker = cchecker;
 	}
-	
-	public static JDBCTermMap createNullTermMap(DataTypeHelper dth){
-		JDBCTermMap nullTm = new JDBCTermMap(dth);
-		
-		return nullTm;
-		
-	}
+
 
 	public boolean isConstant() {
 		for(Expression ex: getExpressions()){
@@ -573,7 +582,23 @@ public class JDBCTermMap{
 	  
 	  return cols;
 	}
-	
+
+	/**
+	 * only true, if ALL cols are null
+	 * @return
+	 */
+  public boolean isNullTermMap() {
+    boolean result = true;
+    for(Expression expr: getExpressions()){
+      if(!(DataTypeHelper.uncast(expr) instanceof NullValue)){
+        result = false;
+        break;
+      }
+    }
+    return result;
+  }
+
+
 	
 	
 

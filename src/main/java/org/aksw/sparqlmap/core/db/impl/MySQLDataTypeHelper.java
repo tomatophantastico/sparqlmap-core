@@ -3,7 +3,10 @@ package org.aksw.sparqlmap.core.db.impl;
 import java.util.List;
 
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.StringExpression;
 
+import org.aksw.sparqlmap.core.UntranslatableQueryException;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 
 public class MySQLDataTypeHelper extends DataTypeHelper {
@@ -85,5 +88,23 @@ public class MySQLDataTypeHelper extends DataTypeHelper {
 	    
 	    return "select *, @sparqlmapCurRow := @sparqlmapCurRow + 1 AS sm_rowid  from \"%1$s\",(SELECT @sparqlmapCurRow := 0) sparqlmap_rowid;";
 	}
+
+  @Override
+  public Expression regexMatches(Expression literalValString, String regex, String flags) {
+    
+    if(flags==null || !flags.equals("i")){
+      throw new UntranslatableQueryException("MySQL REGEXP cannot deal with case sensitivity, please consider using the 'i' flag.");
+    
+    }
+    
+    
+    StringExpression regexp = new StringExpression(literalValString.toString()  +" REGEXP \"" + regex + "\"");
+    
+    
+    
+    Parenthesis regexParenthesis = new Parenthesis(regexp);
+    
+    return regexParenthesis;
+  }
 
 }

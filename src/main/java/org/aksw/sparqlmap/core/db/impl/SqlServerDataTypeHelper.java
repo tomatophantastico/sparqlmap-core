@@ -2,6 +2,7 @@ package org.aksw.sparqlmap.core.db.impl;
 
 import net.sf.jsqlparser.expression.Expression;
 
+import org.aksw.sparqlmap.core.UntranslatableQueryException;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 
 public class SqlServerDataTypeHelper extends DataTypeHelper{
@@ -60,6 +61,12 @@ public class SqlServerDataTypeHelper extends DataTypeHelper{
   @Override
   public Expression charCastPrep(Expression expr, Integer fieldlength) {
     return null;
+  }
+
+  @Override
+  public Expression regexMatches(Expression literalValString, String regex, String flags) {
+    
+    throw new UntranslatableQueryException("Regex is not supported on SQL Server");
   }
 
 

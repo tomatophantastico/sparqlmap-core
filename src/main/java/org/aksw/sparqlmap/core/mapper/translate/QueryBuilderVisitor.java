@@ -78,18 +78,19 @@ import com.hp.hpl.jena.sparql.algebra.op.OpUnion;
 import com.hp.hpl.jena.sparql.algebra.table.TableUnit;
 import com.hp.hpl.jena.sparql.core.Quad;
 import com.hp.hpl.jena.sparql.core.Var;
+import com.hp.hpl.jena.sparql.expr.E_NotExists;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.expr.ExprAggregator;
+import com.hp.hpl.jena.sparql.expr.ExprFunctionOp;
 import com.hp.hpl.jena.sparql.expr.ExprVar;
 import com.hp.hpl.jena.sparql.expr.aggregate.AggCount;
 import com.hp.hpl.jena.sparql.expr.aggregate.AggCountDistinct;
 import com.hp.hpl.jena.sparql.expr.aggregate.AggCountVar;
 import com.hp.hpl.jena.sparql.expr.aggregate.AggCountVarDistinct;
 import com.hp.hpl.jena.sparql.expr.aggregate.Aggregator;
-public class QueryBuilderVisitor extends QuadVisitorBase {
+public class QueryBuilderVisitor extends QuadVisitorVocal {
 	
 	
-	private DataTypeHelper dataTypeHelper;
 	private ExpressionConverter exprconv;
 	//defines if the filters should be pushed into the unions
 	private boolean pushFilters = true;
@@ -99,13 +100,15 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 			.getLogger(QueryBuilderVisitor.class);
 	
 	private Map<PlainSelect, PlainSelectWrapper> selectBody2Wrapper = new HashMap<PlainSelect, PlainSelectWrapper>();
-	private Stack<PlainSelect> selects = new Stack<PlainSelect>();
 	
-	JDBCTermMap crc;
-
-	private FilterUtil filterUtil;
-	private final TranslationContext translationContext;
-  private JDBCTermMapFactory tmf;
+	
+	//this stack is also required by the expression converter, for EXISTS and NOT EXISTS
+	protected Stack<PlainSelect> selects = new Stack<PlainSelect>();
+	
+	protected DataTypeHelper dataTypeHelper;
+	protected final FilterUtil filterUtil;
+	protected final TranslationContext translationContext;
+  protected JDBCTermMapFactory tmf;
 
 	public QueryBuilderVisitor(TranslationContext translationContext,	DataTypeHelper dataTypeHelper, ExpressionConverter expressionConverter, FilterUtil filterUtil, JDBCTermMapFactory tmf) {
 		this.filterUtil = filterUtil;
@@ -125,15 +128,15 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 		PlainSelectWrapper ps2 = (PlainSelectWrapper) selectBody2Wrapper
 				.get(selects.pop());
 		
-		if(ps1.getVar2TermMap().isEmpty()&& ps2.getVar2TermMap().isEmpty()){
-			log.error("For union, both queries are empty. This rather problematic");
+		if(ps1.isAllNull()&& ps2.isAllNull()){
+			log.debug("For union, both queries are empty, simply taking the first");
 			selects.push(ps1.getSelectBody());
 			
-		}else if (ps1.getVar2TermMap().isEmpty()){
+		}else if (ps1.isAllNull()){
 			log.info("found empty select for union, skipping it");
 			selects.push(ps2.getSelectBody());
 			
-		}else if(ps2.getVar2TermMap().isEmpty()){
+		}else if(ps2.isAllNull()){
 			log.info("found empty select for union, skipping it");
 			selects.push(ps1.getSelectBody());
 		}else{
@@ -141,7 +144,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 			union.addPlainSelectWrapper(ps1);
 			union.addPlainSelectWrapper(ps2);
 			
-			PlainSelectWrapper ps = new PlainSelectWrapper(selectBody2Wrapper, dataTypeHelper, exprconv, filterUtil, translationContext);
+			PlainSelectWrapper ps = new PlainSelectWrapper(selectBody2Wrapper, dataTypeHelper, filterUtil, translationContext);
 			ps.addSubselect(union, false);
 			selects.push(ps.getPlainSelect());
 		}
@@ -155,21 +158,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	  }
 
 	}
-	
-	public static class DummyBody extends PlainSelect{
 
-		@Override
-		public void accept(SelectVisitor selectVisitor) {
-			
-		}
-		
-		
-		@Override
-		public List<SelectItem> getSelectItems() {
-		  return Lists.newArrayList();
-		}
-		
-	}
 	
 	
 
@@ -219,8 +208,18 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 
 	}
 	
+	
+	
+	
+	@Override
+	public void visit(OpFilter opfilter){
+	  super.visit(opfilter);
+	  processFilterExpressions(opfilter.getExprs().getList());
+				
+	}
+	
 	private void processFilterExpressions(List<Expr> exprs){
-	  Wrapper wrap  =  this.selectBody2Wrapper.get(selects.peek());
+    Wrapper wrap  =  this.selectBody2Wrapper.get(selects.peek());
     
     if(wrap instanceof UnionWrapper){
       UnionWrapper unionWrap = (UnionWrapper) wrap;
@@ -238,10 +237,10 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
       if(unpushable){
         //so the filter could not be pushed, we need to evaluate in the upper select
         //we have to wrap the union uinto a plainselect;
-        PlainSelectWrapper ps = new PlainSelectWrapper(selectBody2Wrapper, dataTypeHelper, exprconv, filterUtil, translationContext);
+        PlainSelectWrapper ps = new PlainSelectWrapper(selectBody2Wrapper, dataTypeHelper, filterUtil, translationContext);
         ps.addSubselect(unionWrap, false);
         
-        ps.addFilterExpression(new ArrayList<Expr>(exprs));
+        ps.addFilterExpression(convert(exprs,ps));
         selects.pop();
         selects.push(ps.getSelectBody());
         
@@ -276,7 +275,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
           }
           if(unpushable){
             //so the filter could not be pushed, we need to evaluate in the upper select
-            pswrap.addFilterExpression(new ArrayList<Expr>(Arrays.asList(toPush)));
+            pswrap.addFilterExpression(convert(Lists.newArrayList(toPush),pswrap));
           }
         }
         
@@ -286,48 +285,54 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
       }else{
         //no filter pushing, just put it in
         
-        pswrap.addFilterExpression(new ArrayList<Expr>(exprs));
+        pswrap.addFilterExpression(convert(exprs, pswrap));
       }
     }
 
-	}
-	
-	
-	@Override
-	public void visit(OpFilter opfilter){
-	  processFilterExpressions(opfilter.getExprs().getList());
-				
-	}
+  }
 
-	public boolean pushIntoUnion(Expr toPush, Set<String> filterVars,
+	private boolean pushIntoUnion(Expr toPush, Set<String> filterVars,
 			Wrapper subSelectWrapper) {
 		boolean unpushable = false;
-		//do that now for all plainselects of the union
-		for(PlainSelect ps: ((UnionWrapper)subSelectWrapper).getUnion().getPlainSelects()){
-			PlainSelectWrapper psw = (PlainSelectWrapper) selectBody2Wrapper.get(ps);
-			Set<String> pswVars = psw.getVarsMentioned();
-			if(pswVars.containsAll(filterVars)){
-				// if all filter variables are covered by the triples of the subselect, it can answer it.
-				psw.addFilterExpression(Arrays.asList(toPush));
-			}else if(Collections.disjoint(filterVars, pswVars)){
-				//if none are shared, than this filter simply does not matter for this wrapper 
-			}else{
-				//if there only some variables of the filter covered by the wrapper, answering in the top opration is neccessary.
-				unpushable = true;
-			}
-			
-
+		
+		if(!(toPush instanceof ExprFunctionOp)){
+		
+  		//do that now for all plainselects of the union
+  		for(PlainSelect ps: ((UnionWrapper)subSelectWrapper).getUnion().getPlainSelects()){
+  			PlainSelectWrapper psw = (PlainSelectWrapper) selectBody2Wrapper.get(ps);
+  			Set<String> pswVars = psw.getVarsMentioned();
+  			if(pswVars.containsAll(filterVars)){
+  				// if all filter variables are covered by the triples of the subselect, it can answer it.
+  				psw.addFilterExpression(convert(Arrays.asList(toPush),psw));
+  			}else if(Collections.disjoint(filterVars, pswVars)){
+  				//if none are shared, than this filter simply does not matter for this wrapper 
+  			}else{
+  				//if there only some variables of the filter covered by the wrapper, answering in the top opration is neccessary.
+  				unpushable = true;
+  			}
+  			
+  
+  		}
 		}
 		return unpushable;
 	}
 	
+	
+	private Collection<Expression> convert(Collection<Expr> sparqlExprs, PlainSelectWrapper psw){
+	  Collection<Expression> sqlExpr = Lists.newArrayList();
+	  for(Expr sparqlExpr: sparqlExprs){
+	    sqlExpr.add(exprconv.asFilter(sparqlExpr,psw.getVar2TermMap(), this));
+	  }
+	  return sqlExpr;
+	  
+	}
 	
 	
 
 	@Override
 	public void visit(OpQuadPattern opQuad) {
 
-		PlainSelectWrapper bgpSelect = new PlainSelectWrapper(selectBody2Wrapper,dataTypeHelper,exprconv,filterUtil, translationContext);
+		PlainSelectWrapper bgpSelect = new PlainSelectWrapper(selectBody2Wrapper,dataTypeHelper,filterUtil, translationContext);
 
 		// PlainSelect bgpSelect = new PlainSelect();
 
@@ -346,10 +351,10 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 		super.visit(opQuad);
 	}
 	
+	
+	
+	
 	private void addTripleBindings( PlainSelectWrapper psw, Quad quad, boolean isOptional) {
-
-		
-		
 		Collection<JDBCTripleMap> trms = translationContext.getQueryBinding().getBindingMap().get(quad);
 		
 
@@ -384,7 +389,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 			for (JDBCTripleMap trm : trms) {
 				for (PO po : trm.getPos()) {
 
-					PlainSelectWrapper innerPlainSelect = new PlainSelectWrapper(this.selectBody2Wrapper,dataTypeHelper,exprconv,filterUtil, translationContext);
+					PlainSelectWrapper innerPlainSelect = new PlainSelectWrapper(this.selectBody2Wrapper,dataTypeHelper,filterUtil, translationContext);
 					//build a new sql select query for this pattern
 					innerPlainSelect.addTripleQuery(trm.getGraph(),quad.getGraph().getName(),trm.getSubject(), quad
 							.getSubject().getName(), po.getPredicate(),quad
@@ -406,16 +411,6 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 			
 			psw.addSubselect(union,isOptional);
 		}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-	
 
 	}
 
@@ -437,120 +432,6 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	
 	
 	
-	
-	public Select getSqlQuery() {
-		if (this.selects.size() != 1) {
-			throw new RuntimeException("Stack not stacked properly");
-		}
-
-		// we need to enforce projection and slicing & ordering
-
-		SelectBody sb = selects.pop();
-		PlainSelect toModify = null;
-
-		Map<String, JDBCTermMap> var2termMap = Maps.newHashMap();
-		
-		if(sb instanceof SetOperationList){
-			
-		
-			PlainSelectWrapper wrap = new PlainSelectWrapper(selectBody2Wrapper,dataTypeHelper,exprconv,filterUtil, translationContext);
-			
-			wrap.addSubselect(this.selectBody2Wrapper
-					.get(sb), false);
-			sb = wrap.getSelectBody();
-		}
-		
-		
-//		if (sb instanceof PlainSelect) {
-			toModify = (PlainSelect) sb;
-			
-			List<SelectExpressionItem> removeseis = new ArrayList<SelectExpressionItem>();
-			
-			List<String> projectVars = new ArrayList<String>();
-			
-			for(Var var: translationContext.getQueryInformation().getProject()
-					.getVars()){
-				projectVars.add(var.getName());
-			}
-					
-
-			for(Object o_sei:  ((PlainSelect) sb).getSelectItems()){
-				SelectExpressionItem sei = (SelectExpressionItem) o_sei;
-				String varname = JDBCColumnHelper.colnameBelongsToVar(sei.getAlias());
-				//eventuall clean from deunion
-				if(varname.contains("-du")){
-					varname = varname.substring(0, varname.length()-5);
-			    }
-				
-				if(!projectVars.contains(varname)){
-					removeseis.add(sei);
-				}
-			}
-			
-			((PlainSelect) sb).getSelectItems().removeAll(removeseis);
-			
-			PlainSelectWrapper psw = ((PlainSelectWrapper) selectBody2Wrapper.get(sb));
-			if(psw!=null){
-		     var2termMap = psw.getVar2TermMap();
-			}
-
-
-		if (translationContext.getQueryInformation().getOrder() != null && toModify.getOrderByElements() == null) {
-			// if the list is not set, we create a new set
-			List<OrderByElement> obys = exprconv.convert(
-					translationContext.getQueryInformation().getOrder(), var2termMap);
-			int i = 0;
-			for (OrderByElement orderByElement : obys) {
-				
-				
-				if(orderByElement instanceof OrderByExpressionElement){
-					//we check, if the appropriate expression is there.
-					OrderByExpressionElement obx = (OrderByExpressionElement) orderByElement;
-					Expression obExpr = obx.getExpression();
-					Expression matchingExp = null;
-					for (Object osei : toModify.getSelectItems()) {
-						SelectExpressionItem sei  = (SelectExpressionItem) osei; 
-						if(sei.getExpression().toString().equals(obExpr.toString())){
-							matchingExp = sei.getExpression();
-							break;
-						}
-						
-					}
-					
-					if(matchingExp==null){
-						//we need to add the order by column to the select item
-						SelectExpressionItem obySei = new SelectExpressionItem();
-						obySei.setAlias(JDBCColumnHelper.COL_NAME_LITERAL_NUMERIC + i++);
-						obySei.setExpression(obExpr);
-						toModify.getSelectItems().add(obySei);
-					}
-				}
-				
-			}
-			
-			
-			toModify.setOrderByElements(obys);
-		}
-
-		if (translationContext.getQueryInformation().getSlice() != null && toModify.getLimit() == null) {
-			
-			
-			toModify = dataTypeHelper.slice(toModify,translationContext.getQueryInformation().getSlice());
-			
-
-		}
-		
-		
-		if(translationContext.getQueryInformation().getDistinct()!=null){
-			toModify.setDistinct(new Distinct());
-		}
-
-		Select select = new Select();
-		select.setSelectBody(toModify);
-
-		return select;
-	}
-	
 
 	
 	@Override
@@ -565,59 +446,6 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 		
 	}
 	
-	@Override
-	public void visit(OpQuad opQuad) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
-
-	@Override
-	public void visit(OpPath opPath) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
-
-	@Override
-	public void visit(OpNull opNull) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
-
-	@Override
-	public void visit(OpProcedure opProc) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
-
-	@Override
-	public void visit(OpPropFunc opPropFunc) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
-
-	@Override
-	public void visit(OpService opService) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
-
-	@Override
-	public void visit(OpDatasetNames dsNames) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
-
-	@Override
-	public void visit(OpLabel opLabel) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
-
-	@Override
-	public void visit(OpAssign opAssign) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
 
 	@Override
 	public void visit(OpExtend opExtend) {
@@ -634,54 +462,32 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	  Expr expr = opExtend.getVarExprList().getExpr(var);
 	     
 	  
-	  JDBCTermMap termMap = this.exprconv.asTermMap(expr, psw.getVar2TermMap());
+	  JDBCTermMap termMap = this.exprconv.asTermMap(expr, psw.getVar2TermMap(),null);
 	  
 	  selectBody2Wrapper.get(ps).putTermMap(termMap, var.getName(), false);
 	  
 		
 	}
 
-	@Override
-	public void visit(OpDiff opDiff) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
 
-	@Override
-	public void visit(OpMinus opMinus) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
-
-	@Override
-	public void visit(OpConditional opCondition) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
 
 	@Override
 	public void visit(OpSequence opSequence) {
-		throw new ImplementationException("Unimplemented Function");
+	  
+	  
+	  //performing a join here
+    PlainSelect left = this.selects.pop();
+    PlainSelect right = this.selects.pop();
+    
+    PlainSelectWrapper leftWrapper = (PlainSelectWrapper) this.selectBody2Wrapper.get(left);
+    PlainSelectWrapper rightWrapper = (PlainSelectWrapper) this.selectBody2Wrapper.get(right);
+    leftWrapper.addSubselect(rightWrapper, false);
+    this.selects.push(left);
+    
+    
 		
 	}
 
-	@Override
-	public void visit(OpDisjunction opDisjunction) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
-
-	@Override
-	public void visit(OpExt opExt) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
-
-	@Override
-	public void visit(OpList opList) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
 
 	@Override
 	public void visit(OpOrder opOrder) {
@@ -698,11 +504,7 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 		
 	}
 
-	@Override
-	public void visit(OpReduced opReduced) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
+
 
 	@Override
 	public void visit(OpDistinct opDistinct) {
@@ -719,12 +521,6 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 
 	
 
-	@Override
-	public void visit(OpTopN opTop) {
-		throw new ImplementationException("Unimplemented Function");
-		
-	}
-	
 	@Override
 	public void visit(OpGroup opGroup) {
 	  
@@ -779,7 +575,140 @@ public class QueryBuilderVisitor extends QuadVisitorBase {
 	  //opGroup.getAggregators()
 	 
 	}
+	 
+  public static class DummyBody extends PlainSelect{
 
+    @Override
+    public void accept(SelectVisitor selectVisitor) {
+      
+    }
+    
+    
+    @Override
+    public List<SelectItem> getSelectItems() {
+      return Lists.newArrayList();
+    }
+    
+  }
+  
+  public Select getSqlQuery() {
+    if (this.selects.size() != 1) {
+      log.error("Currently on the stack ist:");
+      for(PlainSelect ps : selects){
+        log.error(ps.toString());
+      }
+      
+      
+      throw new RuntimeException("Stack not stacked properly, stack size is:" + selects.size() );
+    }
+
+    // we need to enforce projection and slicing & ordering
+
+    SelectBody sb = selects.pop();
+    PlainSelect toModify = null;
+
+    Map<String, JDBCTermMap> var2termMap = Maps.newHashMap();
+    
+    if(sb instanceof SetOperationList){
+      
+    
+      PlainSelectWrapper wrap = new PlainSelectWrapper(selectBody2Wrapper,dataTypeHelper,filterUtil, translationContext);
+      
+      wrap.addSubselect(this.selectBody2Wrapper
+          .get(sb), false);
+      sb = wrap.getSelectBody();
+    }
+    
+    
+//    if (sb instanceof PlainSelect) {
+      toModify = (PlainSelect) sb;
+      
+      List<SelectExpressionItem> removeseis = new ArrayList<SelectExpressionItem>();
+      
+      List<String> projectVars = new ArrayList<String>();
+      
+      for(Var var: translationContext.getQueryInformation().getProject()
+          .getVars()){
+        projectVars.add(var.getName());
+      }
+          
+
+      for(Object o_sei:  ((PlainSelect) sb).getSelectItems()){
+        SelectExpressionItem sei = (SelectExpressionItem) o_sei;
+        String varname = JDBCColumnHelper.colnameBelongsToVar(sei.getAlias());
+        //eventuall clean from deunion
+        if(varname.contains("-du")){
+          varname = varname.substring(0, varname.length()-5);
+          }
+        
+        if(!projectVars.contains(varname)){
+          removeseis.add(sei);
+        }
+      }
+      
+      ((PlainSelect) sb).getSelectItems().removeAll(removeseis);
+      
+      PlainSelectWrapper psw = ((PlainSelectWrapper) selectBody2Wrapper.get(sb));
+      if(psw!=null){
+         var2termMap = psw.getVar2TermMap();
+      }
+
+
+    if (translationContext.getQueryInformation().getOrder() != null && toModify.getOrderByElements() == null) {
+      // if the list is not set, we create a new set
+      List<OrderByElement> obys = exprconv.convert(
+          translationContext.getQueryInformation().getOrder(), var2termMap);
+      int i = 0;
+      for (OrderByElement orderByElement : obys) {
+        
+        
+        if(orderByElement instanceof OrderByExpressionElement){
+          //we check, if the appropriate expression is there.
+          OrderByExpressionElement obx = (OrderByExpressionElement) orderByElement;
+          Expression obExpr = obx.getExpression();
+          Expression matchingExp = null;
+          for (Object osei : toModify.getSelectItems()) {
+            SelectExpressionItem sei  = (SelectExpressionItem) osei; 
+            if(sei.getExpression().toString().equals(obExpr.toString())){
+              matchingExp = sei.getExpression();
+              break;
+            }
+            
+          }
+          
+          if(matchingExp==null){
+            //we need to add the order by column to the select item
+            SelectExpressionItem obySei = new SelectExpressionItem();
+            obySei.setAlias(JDBCColumnHelper.COL_NAME_LITERAL_NUMERIC + i++);
+            obySei.setExpression(obExpr);
+            toModify.getSelectItems().add(obySei);
+          }
+        }
+        
+      }
+      
+      
+      toModify.setOrderByElements(obys);
+    }
+
+    if (translationContext.getQueryInformation().getSlice() != null && toModify.getLimit() == null) {
+      
+      
+      toModify = dataTypeHelper.slice(toModify,translationContext.getQueryInformation().getSlice());
+      
+
+    }
+    
+    
+    if(translationContext.getQueryInformation().getDistinct()!=null){
+      toModify.setDistinct(new Distinct());
+    }
+
+    Select select = new Select();
+    select.setSelectBody(toModify);
+
+    return select;
+  }
 
 
 }

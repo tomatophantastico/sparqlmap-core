@@ -19,6 +19,8 @@ package org.aksw.sparqlmap.core.mapper;
 
 import java.util.Iterator;
 
+import org.aksw.sparqlmap.core.mapper.translate.QuadVisitorBase;
+
 import com.hp.hpl.jena.sparql.algebra.Op;
 import com.hp.hpl.jena.sparql.algebra.OpVisitor;
 import com.hp.hpl.jena.sparql.algebra.OpVisitorByType;
@@ -29,6 +31,10 @@ import com.hp.hpl.jena.sparql.algebra.op.OpExt;
 import com.hp.hpl.jena.sparql.algebra.op.OpFilter;
 import com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin;
 import com.hp.hpl.jena.sparql.algebra.op.OpN;
+import com.hp.hpl.jena.sparql.expr.E_NotExists;
+import com.hp.hpl.jena.sparql.expr.Expr;
+import com.hp.hpl.jena.sparql.expr.ExprFunctionOp;
+import com.hp.hpl.jena.sparql.expr.ExprList;
 
 /**
  * Apply a visitor to the whole structure of Ops, recursively. Visit sub Op
@@ -137,10 +143,30 @@ public class RightFirstWalker {
     protected void visitFilter(OpFilter op) {
 
       before(op);
+      
+      //visit all the Exist filters first
+      
+      for(Expr expr: op.getExprs()){
+        if(expr instanceof ExprFunctionOp){
+        
+          OpFilter tmpFilter = OpFilter.filterDirect(new ExprList(expr), op.getSubOp());
+          tmpFilter.visit(visitor);
+        }
+      }
+      
+      if(visitor !=null&&visitor instanceof QuadVisitorBase){
+        ((QuadVisitorBase) visitor).setVisitExists(false);
+      }
+      
+      
       if (op.getSubOp() != null)
         op.getSubOp().visit(this);
-      if (visitor != null)
+      if (visitor != null){
         op.visit(visitor);
+        if(visitor instanceof QuadVisitorBase){
+          ((QuadVisitorBase) visitor).setVisitExists(true);
+        }
+      }
       after(op);
 
     }
@@ -150,6 +176,8 @@ public class RightFirstWalker {
       visit2(op);
 
     }
+    
+    
 
   }
 }

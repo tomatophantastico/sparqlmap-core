@@ -7,8 +7,11 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionWithString;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.StringExpression;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 
+import org.aksw.sparqlmap.core.UntranslatableQueryException;
 import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
 
 
@@ -85,6 +88,26 @@ public class PostgreSQLDataTypeHelper extends DataTypeHelper {
 	  
 	  return "SELECT \"%1$s\".* , row_number() OVER () as sm_rowid FROM \"%1$s\";";
 	}
+
+  @Override
+  public Expression regexMatches(Expression literalValString, String regex, String flags) {
+    
+    String regexoperator = "~";
+    
+    if(flags!=null){
+      if(flags.equals("i")){
+        regexoperator += "*";
+      }else{
+        throw new UntranslatableQueryException("Postgres cannot deal with flags other than 'i'");
+      }
+    }
+    
+    StringExpression regexp = new StringExpression(literalValString.toString()  + regexoperator + "\"" + regex + "\"");
+    
+    Parenthesis regexParenthesis = new Parenthesis(regexp);
+    
+    return regexParenthesis;
+  }
 
 
 	

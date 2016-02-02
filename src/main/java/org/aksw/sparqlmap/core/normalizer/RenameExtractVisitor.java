@@ -159,8 +159,10 @@ public class RenameExtractVisitor extends TransformCopy {
 
   @Override
 	public Op transform(OpFilter opFilter, Op subOp) {
+    
+    OpFilter filter = OpFilter.filterDirect(opFilter.getExprs(), opFilter.getSubOp());
 
-		return opFilter.copy(subOp);
+		return filter;
 	}
   
   

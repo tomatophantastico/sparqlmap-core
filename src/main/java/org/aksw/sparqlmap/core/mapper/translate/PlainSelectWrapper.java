@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -38,7 +39,6 @@ import org.hamcrest.core.IsNull;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
-import com.hp.hpl.jena.sparql.expr.Expr;
 
 public class PlainSelectWrapper implements Wrapper{
 	
@@ -50,11 +50,10 @@ public class PlainSelectWrapper implements Wrapper{
 
 
 	public PlainSelectWrapper(Map<PlainSelect, PlainSelectWrapper> registerTo,
-			DataTypeHelper dth, ExpressionConverter exprconv,
+			DataTypeHelper dth,
 			FilterUtil filterUtil, TranslationContext translationContext) {
 		super();
 		this.translationContext = translationContext;
-		this.exprconv = exprconv;
 		this.dth = dth;
 		this.filterUtil = filterUtil;
 		this.registerTo = registerTo;
@@ -84,13 +83,12 @@ public class PlainSelectWrapper implements Wrapper{
 
 	private DataTypeHelper dth;
 
-	private ExpressionConverter exprconv;
 
 	private FilterUtil filterUtil;
 
 	private PlainSelect plainSelect;
 
-	private Map<SubSelect, Wrapper> subselects = new HashMap<SubSelect, Wrapper>();
+	private Map<SubSelect, Wrapper> subselects = new IdentityHashMap<SubSelect, Wrapper>();
 	
 
 	
@@ -332,28 +330,32 @@ public class PlainSelectWrapper implements Wrapper{
 
 	Set<Expression> filters = new HashSet<Expression>();
 	
-	public void addFilterExpression(Collection<Expr> exprs) {
-		for(Expr expr:exprs){
-			Expression filter = exprconv.asFilter(expr, var2termMap);
-			if(filter!=null && !(filter instanceof NullValue)){
-				this.filters.add(filter);
+	public void addFilterExpression(Collection<Expression> exprs) {
+		for(Expression expr:exprs){
+			if(expr!=null && !(expr instanceof NullValue)){
+				this.filters.add(expr);
 			}
 			
 		}
-		
-		
-		
 		createFilter();
-		
 	}
 	
 	private void createFilter() {
 	  setFilter();
 	  setNullForNonOptionals();
-    
   }
 
-
+	
+	public boolean isAllNull(){
+	  boolean result = true;
+	  for(JDBCTermMap tm : getVar2TermMap().values()){
+	    if(!tm.isNullTermMap()){
+	      result = false;
+	      break;
+	    }
+	  }
+	  return result;
+	}
 
 
 	public Map<String, JDBCTermMap> getVar2TermMap() {
@@ -589,7 +591,10 @@ public class PlainSelectWrapper implements Wrapper{
 	public Set<String> getFromItemAliases(){
 		
 		Set<String> fis = new HashSet<String>();
-		fis.add(this.plainSelect.getFromItem().getAlias());
+		if(this.plainSelect.getFromItem() != null){
+	    fis.add(this.plainSelect.getFromItem().getAlias());
+
+		}
 		for(Join join : this.plainSelect.getJoins()){
 			fis.add(join.getRightItem().getAlias());
 		}

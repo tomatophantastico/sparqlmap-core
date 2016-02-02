@@ -1,5 +1,7 @@
 package org.aksw.sparqlmap.core.normalizer;
 
+import java.util.List;
+
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
 
@@ -10,6 +12,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.sparql.algebra.Op;
 import com.hp.hpl.jena.sparql.algebra.TransformCopy;
 import com.hp.hpl.jena.sparql.algebra.op.OpBGP;
+import com.hp.hpl.jena.sparql.algebra.op.OpSequence;
 import com.hp.hpl.jena.sparql.algebra.op.OpUnion;
 import com.hp.hpl.jena.sparql.core.BasicPattern;
 import com.hp.hpl.jena.sparql.core.TriplePath;
@@ -36,6 +39,7 @@ public class PropertyPathRewriter extends TransformCopy {
   }
 
 
+  
   @Override
   public Op transform(com.hp.hpl.jena.sparql.algebra.op.OpPath opPath) {
     Op result = null;
