@@ -14,7 +14,7 @@ import net.sf.jsqlparser.statement.select.FromItem;
  * @author joerg
  *
  */
-public class JDBCQuadMap implements QuadMapCompatible {
+public class JDBCQuadMap implements BoundQuadMap {
 		
 	private String uri;
 	private JDBCTermMap subject;

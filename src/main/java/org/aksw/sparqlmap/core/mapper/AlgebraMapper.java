@@ -29,8 +29,7 @@ import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
 import org.aksw.sparqlmap.core.r2rml.JDBCTermMapBinder;
 import org.aksw.sparqlmap.core.r2rml.JDBCQuadMap;
 import org.aksw.sparqlmap.core.r2rml.JDBCMapping;
-import org.aksw.sparqlmap.core.r2rml.JDBCQuadMap.PO;
-import org.aksw.sparqlmap.core.r2rml.QuadMapCompatible;
+import org.aksw.sparqlmap.core.r2rml.BoundQuadMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -107,8 +106,7 @@ public class AlgebraMapper implements Mapper {
 		
 		
 		if(fopt.isOptimizeProjectPush()){
-			context.getQueryInformation().setProjectionPushable( checkProjectionPush(origQuery, context.getQueryBinding()));
-			
+			QueryPushOptimization.setProjectionPush(context);
 		}
 		
 		
@@ -123,6 +121,9 @@ public class AlgebraMapper implements Mapper {
 			context.setQueryBinding( unionOpt.getQueryBinding());
 			}
 		}
+		
+		
+		// Backend unspecific processing ends here, 
 		
 		QueryBuilderVisitor builderVisitor = new QueryBuilderVisitor(context,dth,exprconv,filterUtil,tmf);
 		
@@ -161,63 +162,8 @@ public class AlgebraMapper implements Mapper {
 
 
 
-
-	private boolean checkProjectionPush(Query origQuery,
-			MappingBinding queryBinding) {
-		// check here if we can projection push
-		if (!origQuery.isDistinct()) {
-			return false;
-		}
-			// check if all bindings for projected variables are constant
-			List<Var> pvars = origQuery.getProjectVars();
-
-			for (Var pvar : pvars) {
-				for (Quad quad : queryBinding.getBindingMap().keySet()) {
-					if (quad.getSubject().equals(pvar)) {
-						// now check all bindings
-						for (JDBCQuadMap tripleMap : queryBinding.getBindingMap()
-								.get(quad)) {
-							if (!tripleMap.getSubject().isConstant()) {
-								return false;
-							}
-						}
-					}
-					if (quad.getGraph().equals(pvar)) {
-						// now check all bindings
-						for (JDBCQuadMap tripleMap : queryBinding.getBindingMap()
-								.get(quad)) {
-							if (!tripleMap.getGraph().isConstant()) {
-								return false;
-							}
-						}
-					}
-					if (quad.getPredicate().equals(pvar)) {
-						for (QuadMapCompatible tripleMap : queryBinding.getBindingMap()
-								.get(quad)) {
-							for (PO po : tripleMap.getPos()) {
-								if (!po.getPredicate().isConstant()) {
-									return false;
-								}
-							}
-
-						}
-					}
-					if (quad.getObject().equals(pvar)) {
-						for (QuadMapCompatible tripleMap : queryBinding.getBindingMap()
-								.get(quad)) {
-							for (PO po : tripleMap.getPos()) {
-								if (!po.getObject().isConstant()) {
-									return false;
-								}
-							}
-
-						}
-					}
-				}
-			}
-
-		return true;
-	}
+	
+	
 	
 	
 	

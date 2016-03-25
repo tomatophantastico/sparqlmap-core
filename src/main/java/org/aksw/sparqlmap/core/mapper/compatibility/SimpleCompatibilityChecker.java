@@ -21,6 +21,7 @@ import org.aksw.sparqlmap.core.r2rml.R2RML;
 import org.aksw.sparqlmap.core.r2rml.TermMap;
 import org.aksw.sparqlmap.core.r2rml.TermMapTemplateStringColumn;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.metamodel.schema.Schema;
 
 import util.QuadPosition;
 
@@ -33,11 +34,16 @@ import com.hp.hpl.jena.sparql.expr.ExprVar;
 import com.hp.hpl.jena.sparql.expr.NodeValue;
 import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueNode;
 
-public class SimpleCompatibilityChecker implements CompatibilityChecker{
+public class SimpleCompatibilityChecker {
 	
 
+	private Schema schema;
 	
-
+	public SimpleCompatibilityChecker(Schema schema) {
+	  this.schema = schema;
+	}
+  
+ 
 	
   public boolean isCompatible(TermMap termMap1, TermMap termMap2) {
     boolean isCompatible = true;
@@ -235,7 +241,7 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 		
 
 
-	@Override
+	
 	public boolean isCompatible(Node n) {
 		if(n.isVariable()){
 			return true;
@@ -256,7 +262,7 @@ public class SimpleCompatibilityChecker implements CompatibilityChecker{
 	}
 
 
-	private boolean isCompatibleUri(Node n) {
+	private boolean isCompatibleUri(Node n, TermMap termMap) {
 		List<Expression> tmExprs = termMap.getResourceColSeg();
 		
 		if(tmExprs.isEmpty()){

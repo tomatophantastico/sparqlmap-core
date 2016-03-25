@@ -16,7 +16,7 @@ import org.aksw.sparqlmap.core.mapper.translate.ExpressionConverter;
 import org.aksw.sparqlmap.core.mapper.translate.OptimizationConfiguration;
 import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
 import org.aksw.sparqlmap.core.r2rml.JDBCQuadMap;
-import org.aksw.sparqlmap.core.r2rml.QuadMapCompatible;
+import org.aksw.sparqlmap.core.r2rml.BoundQuadMap;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -33,7 +33,14 @@ import com.hp.hpl.jena.sparql.core.Quad;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.Expr;
 
-
+/**
+ * For queries that contain unions on the same table, these can be in certain cases be translated to a simple select statement, castly accelerating query processing.
+ * 
+ * A Query deemed optimizable in this way, can have this optimization 
+ * 
+ * @author joerg
+ *
+ */
 public class QueryDeunifier extends TransformCopy{
 
 	private Multimap<String, String> var2varname = HashMultimap.create();
@@ -87,7 +94,7 @@ public class QueryDeunifier extends TransformCopy{
 		boolean merge = false;
 		if( opBGP.getPattern().getList().size()==1){
 			Quad triple = opBGP.getPattern().getList().iterator().next();
-			for(QuadMapCompatible tm : queryBinding.getBindingMap().get(triple)){
+			for(BoundQuadMap tm : queryBinding.getBindingMap().get(triple)){
 					if(tm.getPos().size()>1){
 						//yes we can merge them
 						merge = true;

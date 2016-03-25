@@ -50,8 +50,8 @@ public class JDBCMapping {
 	/**
 	 * get the jdbc quad map which was bound by the given R2RML quad map
 	 */
-	public QuadMapCompatible getBoundMap(QuadMap quadMap){
-	  QuadMapCompatible result = null;
+	public BoundQuadMap getBoundMap(QuadMap quadMap){
+	  BoundQuadMap result = null;
 	  
 	  for(JDBCQuadMap jQuadMap: boundQuadMaps.values()){
 	    if(jQuadMap.getBoundFrom().equals(quadMap)){

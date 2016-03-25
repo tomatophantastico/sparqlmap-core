@@ -329,7 +329,7 @@ public class JDBCTermMapBinder {
 
   }
 
-  public JDBCTermMap bindRefMap(TermMap termMap, QuadMapCompatible jQuadMap,JDBCMapping jdbcmapping, Map<LogicalTable,FromItem> fromItems ) {
+  public JDBCTermMap bindRefMap(TermMap termMap, BoundQuadMap jQuadMap,JDBCMapping jdbcmapping, Map<LogicalTable,FromItem> fromItems ) {
     
     
     TermMapReferencing termMapRef = (TermMapReferencing) termMap;

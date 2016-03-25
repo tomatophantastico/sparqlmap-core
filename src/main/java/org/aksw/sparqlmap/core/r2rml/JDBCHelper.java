@@ -147,7 +147,7 @@ public class JDBCHelper {
   
   
   
-  private static  JDBCTermMap replaceColumn(JDBCTermMap tm,QuadMapCompatible trm, Map<String,Column> name2Col, List<Table> tables, List<EqualsTo> joinConditions, DataTypeHelper dth){
+  private static  JDBCTermMap replaceColumn(JDBCTermMap tm,BoundQuadMap trm, Map<String,Column> name2Col, List<Table> tables, List<EqualsTo> joinConditions, DataTypeHelper dth){
     List<Expression> expressions =  new ArrayList<Expression>();
     //we use this to make sure constant value triple maps do not get the column set.
     boolean hasReplaced = false;

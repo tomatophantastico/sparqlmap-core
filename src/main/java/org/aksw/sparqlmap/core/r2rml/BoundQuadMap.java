@@ -4,8 +4,8 @@ import org.aksw.sparqlmap.core.mapper.compatibility.CompatibilityChecker;
 
 import util.QuadPosition;
 
-public interface QuadMapCompatible {
+public interface BoundQuadMap {
   
   public abstract CompatibilityChecker getCompatibilityChecker(QuadPosition qpos);
-
+  
 }

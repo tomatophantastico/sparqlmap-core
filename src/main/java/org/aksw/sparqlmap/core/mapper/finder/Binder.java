@@ -13,7 +13,7 @@ import org.aksw.sparqlmap.core.mapper.translate.QuadVisitorBase;
 import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
 import org.aksw.sparqlmap.core.r2rml.JDBCQuadMap;
 import org.aksw.sparqlmap.core.r2rml.JDBCMapping;
-import org.aksw.sparqlmap.core.r2rml.QuadMapCompatible;
+import org.aksw.sparqlmap.core.r2rml.BoundQuadMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
