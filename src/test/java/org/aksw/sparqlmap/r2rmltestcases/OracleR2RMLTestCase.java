@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
 import org.aksw.sparqlmap.core.db.impl.OracleConnector;
 import org.aksw.sparqlmap.core.db.impl.OracleDataTypeHelper;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;

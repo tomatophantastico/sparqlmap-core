@@ -23,8 +23,9 @@ import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.aksw.sparqlmap.core.TranslationContextJDBC;
 import org.aksw.sparqlmap.core.r2rml.R2RMLValidationException;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,8 @@ public abstract class DBAccess {
 
 
 
-  public com.hp.hpl.jena.query.ResultSet executeSQL(TranslationContext context, String baseUri) throws SQLException{
+  public org.apache.jena.query.ResultSet executeSQL(TranslationContextJDBC jcontext, String baseUri) throws SQLException{
+    TranslationContext context = jcontext.getContext();
 		context.profileStartPhase("Connection Acquisition");
 		Connection connect  = getConnection();
 		java.sql.Statement stmt = connect.createStatement();
@@ -64,17 +66,17 @@ public abstract class DBAccess {
 		
 		
 		if(log.isDebugEnabled()){
-			log.debug("Executing translated Query: " +  context.getSqlQuery());
+			log.debug("Executing translated Query: " +  jcontext.getSqlQuery());
 		}
 		context.profileStartPhase("Query Execution");
-		com.hp.hpl.jena.query.ResultSet wrap;
+		org.apache.jena.query.ResultSet wrap;
 		try {
-			ResultSet rs = stmt.executeQuery(context.getSqlQuery());
+			ResultSet rs = stmt.executeQuery(jcontext.getSqlQuery());
 			
 			wrap = new DeUnionResultWrapper(new  SQLResultSetWrapper(rs, connect,
 					dataTypeHelper, baseUri, context));
 		} catch (SQLException e) {
-			log.error("Error executing Query: " + context.getSqlQuery());
+			log.error("Error executing Query: " + jcontext.getSqlQuery());
 			throw new SQLException(e);
 		}
 		

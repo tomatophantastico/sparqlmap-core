@@ -15,13 +15,13 @@ import net.sf.jsqlparser.JSQLParserException;
 
 import org.aksw.sparqlmap.core.automapper.MappingGenerator;
 import org.aksw.sparqlmap.core.db.DBAccess;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
-import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
-import org.aksw.sparqlmap.core.r2rml.JDBCMapping;
-import org.aksw.sparqlmap.core.r2rml.JDBCMappingBinder;
 import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
 import org.aksw.sparqlmap.core.r2rml.R2RMLModelLoader;
 import org.aksw.sparqlmap.core.r2rml.R2RMLValidationException;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCColumnHelper;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCMapping;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCMappingBinder;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.metamodel.DataContext;
@@ -34,9 +34,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.util.FileManager;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.util.FileManager;
 /**
  * This class deals with the loading and binding of the R2RML model.
  * 
@@ -81,7 +81,7 @@ public class R2RMLModelConfigurator {
 		
 		
 		
-		R2RMLMapping r2rmlmapping = R2RMLModelLoader.loadModel(mapping, schema);
+		R2RMLMapping r2rmlmapping = R2RMLModelLoader.loadModel(mapping, schema,baseUri);
 		
 		JDBCMappingBinder jdbcBinder = new JDBCMappingBinder(r2rmlmapping, dbaccess);
 

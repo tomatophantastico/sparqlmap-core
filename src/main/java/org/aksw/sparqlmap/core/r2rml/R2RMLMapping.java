@@ -1,13 +1,18 @@
 package org.aksw.sparqlmap.core.r2rml;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+
+import org.aksw.sparqlmap.core.r2rml.QuadMap.LogicalTable;
+import org.apache.commons.collections.MultiMap;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.MultiHashtable;
+import com.google.common.collect.TreeMultimap;
+
+import org.apache.jena.rdf.model.Resource;
 
 
 /**
@@ -29,12 +34,14 @@ public class R2RMLMapping {
     this.quadMaps.put(quadMap.getTriplesMapUri(), quadMap);
   }
 
-  public void addQuadMaps(Set<QuadMap> load) {
+  public void addQuadMaps(Collection<QuadMap> load) {
    for(QuadMap qm: load){
      addQuadMap(qm);
    }
     
   }
-  
-  
+  public void setQuadMaps(Multimap<String, QuadMap> quadMaps) {
+    this.quadMaps = quadMaps;
+  }
+
 }

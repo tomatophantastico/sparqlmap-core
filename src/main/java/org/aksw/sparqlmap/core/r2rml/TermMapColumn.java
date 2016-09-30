@@ -1,47 +1,43 @@
 package org.aksw.sparqlmap.core.r2rml;
 
-public class TermMapColumn  extends TermMap{
-  
+import org.apache.jena.graph.Node;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class TermMapColumn extends TermMap {
+
   private String column;
 
-  public String getColumn() {
-    return column;
-  }
-
-  public void setColumn(String column) {
+  @Builder
+  public TermMapColumn(String lang, String datatypIRI, String termTypeIRI, String column) {
+    super(lang, datatypIRI, termTypeIRI);
     this.column = column;
   }
 
-  // included super.hashCode()
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + super.hashCode();
-    result = prime * result + ((column == null) ? 0 : column.hashCode());
-    return result;
+  public boolean isConstant() {
+    return false;
   }
-  //included call to super.equals
+
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    if (! super.equals(obj)) 
-      return false;
-    TermMapColumn other = (TermMapColumn) obj;
-    if (column == null) {
-      if (other.column != null)
-        return false;
-    } else if (!column.equals(other.column))
-      return false;
+  public boolean isColumn() {
     return true;
   }
-  
-  
+
+  @Override
+  public boolean isTemplate() {
+    return false;
+  }
+
+  @Override
+  public boolean isReferencing() {
+    return false;
+  }
 
 
+  
 }

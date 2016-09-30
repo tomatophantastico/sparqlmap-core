@@ -9,7 +9,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.aksw.sparqlmap.core.db.DBAccess;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,18 +18,30 @@ import org.springframework.core.env.Environment;
 import com.jolbox.bonecp.BoneCPConfig;
 import com.jolbox.bonecp.BoneCPDataSource;
 
-@Configuration
 public class DBAccessConfigurator {
+  
+  static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DBAccessConfigurator.class);
 
-  @Autowired
-  private Environment env;
+  
 
-  private String dbname;
+  static public DBAccess getDBAccess(String dbUrl, String username, String password, Integer poolminconnections,
+      Integer poolmaxconnections) throws SQLException{
+    
+    BoneCPConfig config = createConfig(dbUrl, username, password, poolminconnections, poolmaxconnections);
+    BoneCPDataSource bcp = new BoneCPDataSource(config);
 
-  private BoneCPDataSource bcp;
+    Connection conn = bcp.getConnection();
+    String dbname = conn.getMetaData().getDatabaseProductName();
+    conn.close();
+    
+    
+    return getDBAccess(dbname,bcp);
+    
+    
+  }
 
-  @PostConstruct
-  public void setUpConnection() throws SQLException {
+  
+  static public DBAccess getDBAccess(Environment env) throws SQLException {
 
     String dbUrl = env.getProperty("jdbc.url");
     String username = env.getProperty("jdbc.username");
@@ -40,11 +52,14 @@ public class DBAccessConfigurator {
         .getProperty("jdbc.poolmaxconnections")) : null;
 
     BoneCPConfig config = createConfig(dbUrl, username, password, poolminconnections, poolmaxconnections);
-    bcp = new BoneCPDataSource(config);
+    BoneCPDataSource bcp = new BoneCPDataSource(config);
 
     Connection conn = bcp.getConnection();
-    dbname = conn.getMetaData().getDatabaseProductName();
+    String dbname = conn.getMetaData().getDatabaseProductName();
     conn.close();
+    
+    
+    return getDBAccess(dbname,bcp);
 
   }
 
@@ -67,17 +82,9 @@ public class DBAccessConfigurator {
     return config;
   }
 
-  static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DBAccessConfigurator.class);
 
-  @Bean
-  public DataTypeHelper getDataTypeHelper(DBAccess dba) {
-
-    return dba.getDataTypeHelper();
-
-  }
-
-  @Bean
-  public DBAccess getDBAccess() {
+ 
+  private static DBAccess getDBAccess(String dbname, BoneCPDataSource bcp) {
 
     Iterator<DBAccess> conns = ServiceLoader.load(DBAccess.class).iterator();
     DBAccess connToUse = null;
@@ -103,13 +110,11 @@ public class DBAccessConfigurator {
     return connToUse;
   }
 
-  public String getDBName() {
-    return dbname;
-  }
+  
+  
+  
+  
 
-  @PreDestroy
-  public void closeConnectionPool() {
-    bcp.close();
-  }
+
 
 }

@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
 import org.aksw.sparqlmap.core.db.impl.HSQLDBDataTypeHelper;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

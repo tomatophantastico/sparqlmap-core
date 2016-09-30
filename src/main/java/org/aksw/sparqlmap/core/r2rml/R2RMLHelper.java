@@ -3,15 +3,11 @@ package org.aksw.sparqlmap.core.r2rml;
 import java.util.Arrays;
 import java.util.List;
 
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.metamodel.schema.MutableColumn;
+import org.apache.metamodel.schema.Table;
 
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sf.jsqlparser.statement.select.SelectVisitor;
-import net.sf.jsqlparser.util.BaseSelectVisitor;
 import jersey.repackaged.com.google.common.collect.Lists;
 /**
  * contains classes which deal with R2RML constructs and their mapping onto the SparqlMap classes.
@@ -21,9 +17,9 @@ import jersey.repackaged.com.google.common.collect.Lists;
  */
 public class R2RMLHelper {
   
- public static List<TermMapTemplateStringColumn> splitTemplate(String template) {
+ public static List<TermMapTemplateTuple> splitTemplate(String template) {
     
-    List<TermMapTemplateStringColumn> templateSplits = Lists.newArrayList();
+    List<TermMapTemplateTuple> templateSplits = Lists.newArrayList();
     
 
     List<String> altSeq = Arrays.asList(template
@@ -38,9 +34,9 @@ public class R2RMLHelper {
       } else {
         // static part, no need to change anything, just remove the
         // escape patterns;
-         TermMapTemplateStringColumn sc = new TermMapTemplateStringColumn();
+         
          String fixedPart =  value.replaceAll("\\\\", "");
-         sc.setString(fixedPart);
+         TermMapTemplateTuple sc = TermMapTemplateTuple.builder().prefix(fixedPart).build();
          templateSplits.add(sc);
 
 

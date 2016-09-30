@@ -8,18 +8,18 @@ import java.util.UUID;
 import jersey.repackaged.com.google.common.collect.Lists;
 
 import com.google.common.collect.Maps;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
-import com.hp.hpl.jena.update.GraphStoreFactory;
-import com.hp.hpl.jena.update.UpdateExecutionFactory;
-import com.hp.hpl.jena.update.UpdateFactory;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.impl.StatementImpl;
+import org.apache.jena.update.GraphStoreFactory;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.vocabulary.RDF;
 
 /**
  * 
@@ -32,7 +32,7 @@ public class R2RMLModelLoader {
     
   public static final String BNODE_RESOLV_PREFIX = "http://aksw.org/Projects/SparqlMap/bnodeResolv/";
   
-  public static R2RMLMapping loadModel(Model toLoad, Model r2rmlspec){
+  public static R2RMLMapping loadModel(Model toLoad, Model r2rmlspec, String baseIri){
     
     toLoad = ModelFactory.createRDFSModel(r2rmlspec, toLoad);
     
@@ -50,7 +50,7 @@ public class R2RMLModelLoader {
     
     //load the triples maps
     R2RMLMapping mapping = new R2RMLMapping();
-    mapping.addQuadMaps(QuadMapLoader.load(toLoad));
+    mapping.setQuadMaps(QuadMapLoader.load(toLoad, baseIri));
     
       
     return mapping;

@@ -19,22 +19,22 @@ package org.aksw.sparqlmap.core.mapper;
 
 import java.util.Iterator;
 
-import org.aksw.sparqlmap.core.mapper.translate.QuadVisitorBase;
+import org.aksw.sparqlmap.core.translate.jdbc.QuadVisitorBase;
 
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.algebra.OpVisitor;
-import com.hp.hpl.jena.sparql.algebra.OpVisitorByType;
-import com.hp.hpl.jena.sparql.algebra.op.Op0;
-import com.hp.hpl.jena.sparql.algebra.op.Op1;
-import com.hp.hpl.jena.sparql.algebra.op.Op2;
-import com.hp.hpl.jena.sparql.algebra.op.OpExt;
-import com.hp.hpl.jena.sparql.algebra.op.OpFilter;
-import com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin;
-import com.hp.hpl.jena.sparql.algebra.op.OpN;
-import com.hp.hpl.jena.sparql.expr.E_NotExists;
-import com.hp.hpl.jena.sparql.expr.Expr;
-import com.hp.hpl.jena.sparql.expr.ExprFunctionOp;
-import com.hp.hpl.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpVisitor;
+import org.apache.jena.sparql.algebra.OpVisitorByType;
+import org.apache.jena.sparql.algebra.op.Op0;
+import org.apache.jena.sparql.algebra.op.Op1;
+import org.apache.jena.sparql.algebra.op.Op2;
+import org.apache.jena.sparql.algebra.op.OpExt;
+import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpLeftJoin;
+import org.apache.jena.sparql.algebra.op.OpN;
+import org.apache.jena.sparql.expr.E_NotExists;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprFunctionOp;
+import org.apache.jena.sparql.expr.ExprList;
 
 /**
  * Apply a visitor to the whole structure of Ops, recursively. Visit sub Op

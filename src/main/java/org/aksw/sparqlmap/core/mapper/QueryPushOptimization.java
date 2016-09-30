@@ -4,19 +4,18 @@ import java.util.List;
 
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
-import org.aksw.sparqlmap.core.r2rml.JDBCQuadMap;
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
 import org.aksw.sparqlmap.core.r2rml.BoundQuadMap;
 import org.aksw.sparqlmap.core.r2rml.TermMap;
 import org.aksw.sparqlmap.core.r2rml.TermMapConstant;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCQuadMap;
+import org.aksw.sparqlmap.core.util.JenaHelper;
+import org.aksw.sparqlmap.core.util.QuadPosition;
 
-import util.JenaHelper;
-import util.QuadPosition;
-
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.core.Var;
+import org.apache.jena.graph.Node;
+import org.apache.jena.query.Query;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.core.Var;
 /**
  * If the prohjected variables bind exclusively to values from the mapping, the underlying database does not have to be fully query.
  * 
@@ -55,8 +54,8 @@ public class QueryPushOptimization {
           for(QuadPosition pos: QuadPosition.values()){
             Node quadNode = JenaHelper.getField(quad, pos);
             if(pvar.equals(quadNode)){
-              for(BoundQuadMap qmc : queryBinding.getBindingMap().get(quad)){
-                TermMap tm = qmc.getTermMap(pos);
+              for(QuadMap qmc : queryBinding.getBindingMap().get(quad)){
+                TermMap tm = qmc.get(pos);
                 if(!(tm instanceof TermMapConstant)){
                   pushable = false;
                   break projectvarloop;

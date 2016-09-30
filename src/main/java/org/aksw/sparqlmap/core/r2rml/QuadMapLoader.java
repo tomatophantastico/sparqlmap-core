@@ -4,21 +4,25 @@ import java.util.List;
 import java.util.Set;
 
 import org.aksw.sparqlmap.core.r2rml.QuadMap.LogicalTable;
+import org.aksw.sparqlmap.core.r2rml.TermMapReferencing.JoinOn;
+import org.aksw.sparqlmap.core.util.QuadPosition;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 import jersey.repackaged.com.google.common.collect.Sets;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.vocabulary.RDF;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.vocabulary.RDF;
 
 public class QuadMapLoader {
 
-  public static Set<QuadMap> load(Model model) {
-    Set<QuadMap> quadMaps = Sets.newHashSet();
+  public static Multimap<String,QuadMap> load(Model model, String baseIri) {
+    Multimap<String,QuadMap> quadMaps = HashMultimap.create();
 
     for (Resource triplesMapUri : model.listResourcesWithProperty(RDF.type, R2RML.TRIPLESMAP).toList()) {
       
@@ -38,7 +42,7 @@ public class QuadMapLoader {
 
       StmtIterator subjectMaps = model.listStatements(triplesMapUri, R2RML.HASSUBJECTMAP, (RDFNode) null);
       Resource subjectMap = LoaderHelper.getSingleResourceObject(subjectMaps);
-      TermMap subject = TermMapLoader.load(model, subjectMap);
+      TermMap subject = TermMapLoader.load(model, subjectMap,baseIri);
 
       // here we store the graph maps declared on the subject, and therefore
       // triples map level.
@@ -47,7 +51,7 @@ public class QuadMapLoader {
       // and load the respective term maps
       List<Statement> graphMaps = subjectMap.listProperties(R2RML.HASGRAPHMAP).toList();
       for (Statement graphMapStmnt : graphMaps) {
-        triplesMapGraphMaps.add(TermMapLoader.load(model, graphMapStmnt.getObject().asResource()));
+        triplesMapGraphMaps.add(TermMapLoader.load(model, graphMapStmnt.getObject().asResource(),baseIri));
       }
 
       // get the pos
@@ -62,18 +66,23 @@ public class QuadMapLoader {
 
         Resource predicateMap = LoaderHelper.getSingleResourceObject(
             model.listStatements(poMap, R2RML.HASPREDICATEMAP, (RDFNode) null));
-        TermMap predicate = TermMapLoader.load(model, predicateMap);
+        TermMap predicate = TermMapLoader.load(model, predicateMap, baseIri);
 
         Resource objectMap = LoaderHelper.getSingleResourceObject(
              model.listStatements(poMap, R2RML.HASOBJECTMAP, (RDFNode) null));
-        TermMap object = TermMapLoader.load(model, objectMap);
+        TermMap object = TermMapLoader.load(model, objectMap, baseIri);
 
         List<TermMap> pographs = Lists.newArrayList();
         // and load the respective term maps
         List<Statement> pographMaps = poMap.listProperties(R2RML.HASGRAPHMAP).toList();
         for (Statement pographMapStmnt : pographMaps) {
-          triplesMapGraphMaps.add(TermMapLoader.load(model, pographMapStmnt.getObject().asResource()));
+          triplesMapGraphMaps.add(TermMapLoader.load(model, pographMapStmnt.getObject().asResource(),baseIri));
         }
+        
+        // resolve referencing maps
+        
+        resolveTermMapReferencing(quadMaps);
+        
 
         // collect all the graph information
         Set<TermMap> graphs = Sets.newHashSet();
@@ -87,27 +96,63 @@ public class QuadMapLoader {
         
         
         for(TermMap graph : graphs){
-          QuadMap quadMap = new QuadMap();
-          quadMap.setTriplesMapUri(triplesMapUri.getURI());
-          quadMap.setGraph(graph);
-          quadMap.setSubject(subject);
-          quadMap.setPredicate(predicate);
-          quadMap.setObject(object);
+          QuadMap quadMap = QuadMap.builder().
+          triplesMapUri(triplesMapUri.getURI()).
+          graph(graph).
+          subject(subject).
+          predicate(predicate).
+          object(object).build();
           
-          LogicalTable ltab = new LogicalTable();
-          ltab.setTablename(tablename);
-          ltab.setQuery(query);
-          ltab.setVersion(version);
+          LogicalTable ltab = LogicalTable.builder()
+            .tablename(tablename)
+            .query(query)
+            .version(version).build();
           quadMap.setLogicalTable(ltab);
-          quadMaps.add(quadMap);
+          quadMaps.put(quadMap.getTriplesMapUri(), quadMap);
         }
 
       }
 
     }
     
+    
+    
     return quadMaps;
 
+  }
+  
+//  /**
+//   * ensure that every termmap knows its quad map
+//   * 
+//   * @param quadMaps
+//   */
+//  private static void setQuadMap(Multimap<String,QuadMap> quadMaps){
+//    for(QuadMap quadMap: quadMaps.values()){
+//      for(TermMap tm: quadMap.getTermMaps()){
+//        tm.setQuadMap(quadMap);
+//      }
+//    }
+//    
+//    
+//  }
+  
+  /**
+   * resolve parent triples maps later, as all other maps have to be loaded first.
+   */
+  private static void resolveTermMapReferencing(Multimap<String,QuadMap> quadMaps){
+    
+    for(QuadMap quadMap: quadMaps.values()){
+      for(QuadPosition pos: QuadPosition.values()){
+        
+        TermMap tm = quadMap.get(pos);
+        if (tm instanceof TermMapReferencing) {
+          TermMapReferencing tmf = (TermMapReferencing) tm;
+          
+          TermMap parent =  quadMaps.get(tmf.getParentMapUri()).iterator().next().getSubject();          
+          tmf.setParent(parent);
+        }
+      }
+    }
   }
 
 }

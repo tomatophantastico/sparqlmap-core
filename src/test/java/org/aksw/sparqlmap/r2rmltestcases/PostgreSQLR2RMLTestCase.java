@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.aksw.sparqlmap.DockerHelper;
 import org.aksw.sparqlmap.core.db.impl.PostgreSQLDataTypeHelper;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;

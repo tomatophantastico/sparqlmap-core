@@ -12,8 +12,8 @@ import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 
 import org.aksw.sparqlmap.core.UntranslatableQueryException;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
-import org.aksw.sparqlmap.core.mapper.translate.FilterUtil;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
+import org.aksw.sparqlmap.core.translate.jdbc.FilterUtil;
 
 public class HSQLDBDataTypeHelper extends DataTypeHelper {
 	

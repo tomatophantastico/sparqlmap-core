@@ -1,6 +1,6 @@
 package org.aksw.sparqlmap.core.r2rml;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 public class R2RMLValidator {
   

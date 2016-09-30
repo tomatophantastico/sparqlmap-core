@@ -6,28 +6,39 @@ import org.aksw.sparqlmap.core.r2rml.TermMapReferencing.JoinOn;
 import org.apache.metamodel.data.FirstRowDataSet;
 
 import com.google.common.collect.Lists;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
+
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.sparql.core.Quad;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TermMapLoader {
     
 
 
-    public static TermMap load(Model r2rmlmodel, Resource termMap) {
+    public static TermMap load(Model r2rmlmodel, Resource termMap, String baseIri) {
       
       TermMap result = null;
       
-      String defaultPrefix = r2rmlmodel.getNsPrefixURI("");
+  
       
-      Resource termType = LoaderHelper.getSingleResourceObject(
+      
+      Resource termTypeRes = LoaderHelper.getSingleResourceObject(
           r2rmlmodel.listStatements(termMap, R2RML.TERMTYPE, (RDFNode) null));
+      String termType = (termTypeRes == null?null:termTypeRes.getURI());
+      
       
       String column = LoaderHelper.getSingleLiteralObjectValue(
           r2rmlmodel.listStatements(termMap, R2RML.HASCOLUMN, (RDFNode) null));
       String template = LoaderHelper.getSingleLiteralObjectValue(
           r2rmlmodel.listStatements(termMap, R2RML.HASTEMPLATE, (RDFNode) null));
+      
+      if(template != null && !template.contains(":")){
+        template = baseIri + template;
+      }
       
       RDFNode constant = LoaderHelper.getSingleRDFNode(
           r2rmlmodel.listStatements(termMap, R2RML.HASCONSTANT, (RDFNode) null));
@@ -46,56 +57,55 @@ public class TermMapLoader {
       if(termType==null){
         if(r2rmlmodel.contains(null, R2RML.HASOBJECTMAP, termMap)){
           if(column!=null || language != null || datatype !=null){
-            termType = R2RML.LITERAL;
+            termType = R2RML.LITERAL_STRING;
           }else{
             
           }
-        }else{
-          termType = R2RML.IRI;
         }
+      }
+      //defaults to iri
+      if(termType == null){
+        termType = R2RML.IRI_STRING;
       }
       
       
       if(column!=null&&template==null&&constant==null&&parentMap==null){
-        TermMapColumn tmCol = new TermMapColumn();
-        tmCol.setColumn(R2RMLHelper.unescape(column));
-        result = tmCol;
-      }else if(column==null&&template!=null&&constant==null&&parentMap==null){
-        TermMapTemplate tmTemplate = new TermMapTemplate();
-        tmTemplate.setTemplate(R2RMLHelper.splitTemplate(template));
-        // expand the template with the base prefix
-        String firstTemplateString = tmTemplate.getTemplate().get(0).getString();
-        if(!firstTemplateString.contains(":")){
-          String newTemplateString = defaultPrefix + firstTemplateString;
-          tmTemplate.getTemplate().get(0).setString(newTemplateString);
-        }
+        result = TermMapColumn.builder()
+            .column(R2RMLHelper.unescape(column))
+            .termTypeIRI(termType)
+            .build();
         
-        result = tmTemplate;
+       
+      }else if(column==null&&template!=null&&constant==null&&parentMap==null){
+        List<TermMapTemplateTuple> templateTuples =  R2RMLHelper.splitTemplate(template);
+        // expand the template with the base prefix
+        
+        result = TermMapTemplate.builder()
+            .template(templateTuples)
+            .termTypeIRI(termType)
+            .build();
+        
+        
       }else if(column==null&&template==null&&constant!=null&&parentMap==null){
-        TermMapConstant tmConst = new TermMapConstant();
+        TermMapConstant tmConst = null;
         if(constant.isURIResource()){
-          tmConst.setConstantIRI(constant.asResource().getURI());
+          tmConst = TermMapConstant.builder().termTypeIRI(termType).constantIRI(constant.asResource().getURI()).build();
         }else if(constant.isLiteral()){
-          tmConst.setConstantLiteral(constant.asLiteral().getLexicalForm());
-          tmConst.setLang(constant.asLiteral().getLanguage());
-          tmConst.setDatatypIRI(constant.asLiteral().getDatatypeURI());
+          tmConst = TermMapConstant.builder()
+                .constantLiteral(constant.asLiteral().getLexicalForm())
+                .lang(constant.asLiteral().getLanguage())
+                .datatypIRI(constant.asLiteral().getDatatypeURI())
+                .termTypeIRI(R2RML.LITERAL_STRING)
+                .build();
+
         }else{
           throw new R2RMLValidationException("Blank node is not valid constant value for term map");
         }
         result = tmConst;
       }else if(column==null&&template==null&&constant==null&&parentMap!=null){
-          TermMapReferencing tmRef = new TermMapReferencing();
-          
-          
-          //and the table or query
-          
-          Resource logicaTable = LoaderHelper.getSingleResourceObject(
-              r2rmlmodel.listStatements(parentMap, R2RML.HASLOGICALTABLE, (RDFNode) null));
-          String table = LoaderHelper.getSingleLiteralObjectValue(
-              r2rmlmodel.listStatements(logicaTable, R2RML.HASTABLENAME,(RDFNode) null));
-          String query = LoaderHelper.getSingleLiteralObjectValue(
-              r2rmlmodel.listStatements(logicaTable, R2RML.HASSQLQUERY,(RDFNode) null));
-
+         
+          //only setting the join conditions here, parent map might not be loaded yet.
+        
           //get all the join conditions
           List<TermMapReferencing.JoinOn> joinons = Lists.newArrayList();
           List<Statement> conditions = parentMap.listProperties(R2RML.HASJOINCONDITION).toList();
@@ -113,11 +123,15 @@ public class TermMapLoader {
               joinons.add(joinon);
             }
           }
-          tmRef.setConditions(joinons);
           
-          // get the query or table name
+          result = TermMapReferencing.builder()
+              .parentMapUri(parentMap.getURI())
+              .conditions(joinons)
+              .termTypeIRI(termType)
+              .build();
+              
           
-          result = tmRef;
+      
         
       }else{  
         throw new R2RMLValidationException("Check termmap definition for multiple or lacking definitons of rr:constant, rr:template or rr:column");
@@ -130,8 +144,9 @@ public class TermMapLoader {
     
     
     public static TermMap defaultGraphTermMap(){
-      TermMapConstant dgTermMap = new TermMapConstant();
-      dgTermMap.setConstantIRI(R2RML.DEFAULTGRAPH_STRING);
+      TermMapConstant dgTermMap = TermMapConstant.builder()
+          .termTypeIRI(R2RML.IRI_STRING)
+          .constantIRI(Quad.defaultGraphNodeGenerated.getURI()).build();
       return dgTermMap;
     }
 }

@@ -1,12 +1,12 @@
 package org.aksw.sparqlmap.core;
 
 /**
- * Indicates an invalid mapping
+ * Indicates an invalid mapping.
  * 
  * @author joerg
  * 
  */
-public class MappingException extends RuntimeException {
+public class MappingException extends SparqlMapException {
   
   /**
    * Constructs a new Exception. 

@@ -7,10 +7,13 @@ import java.sql.SQLException;
  * @author joerg
  *
  */
-public class BindingException extends RuntimeException {
+public class BindingException extends SparqlMapException {
 
-  public BindingException(String string, SQLException e) {
+  public BindingException(String string, Exception e) {
     super(string,e);
+  }
+  public BindingException(String string) {
+    super(string);
   }
 
 }

@@ -1,27 +1,29 @@
 package org.aksw.sparqlmap.core.mapper.finder;
 
-import static util.JenaHelper.getField;
+import static org.aksw.sparqlmap.core.util.JenaHelper.getField;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jersey.repackaged.com.google.common.collect.Lists;
+import jersey.repackaged.com.google.common.collect.Maps;
 import jersey.repackaged.com.google.common.collect.Sets;
 
-import org.aksw.sparqlmap.core.r2rml.JDBCQuadMap;
-import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
-import org.aksw.sparqlmap.core.r2rml.BoundQuadMap;
+import org.aksw.sparqlmap.core.mapper.compatibility.CompatibilityChecker;
+import org.aksw.sparqlmap.core.r2rml.QuadMap;
+import org.aksw.sparqlmap.core.util.QuadPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import util.QuadPosition;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.expr.Expr;
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.expr.Expr;
 
 /**
  * Provides a fluent api for performing operations on triple bindings is a wrapper around the quad bindings
@@ -31,13 +33,15 @@ import com.hp.hpl.jena.sparql.expr.Expr;
  */
 public class MappingBinding {
 
-	private Multimap<Quad, BoundQuadMap> bindingMap = HashMultimap.create();
+	private Multimap<Quad, QuadMap> bindingMap = HashMultimap.create();
 	private Map<Quad, Map<String, Collection<Expr>>> quads2variables2expressions;
-  private Collection<BoundQuadMap> quadMaps;
+  private Collection<QuadMap> quadMaps;
+  
+  private CompatibilityChecker cchecker = new CompatibilityChecker();
 
   private static Logger log  = LoggerFactory.getLogger(MappingBinding.class);
 
-	public MappingBinding(Map<Quad, Map<String, Collection<Expr>>> quads2variables2expressions,Collection<BoundQuadMap> quadMaps) {
+	public MappingBinding(Map<Quad, Map<String, Collection<Expr>>> quads2variables2expressions,Collection<QuadMap> quadMaps) {
     super();
     this.quads2variables2expressions = quads2variables2expressions;
     this.quadMaps = quadMaps;
@@ -51,16 +55,20 @@ public class MappingBinding {
 		Set<Quad> quads = this.bindingMap.keySet();
 		for (Quad quad: quads) {
 			sb.append("* " + quad.toString() + "\n");
-			for (BoundQuadMap tm : this.bindingMap.get(quad)) {
+			for (QuadMap tm : this.bindingMap.get(quad)) {
 				sb.append("    QuadMap: " + tm.toString() + "\n");
 				
 			}
 		}
+		if(isEmpty()){
+		  sb.append("<empty>");
+		}
+		
 		return sb.toString();
 	}
 	
 	
-	public Multimap<Quad, BoundQuadMap> getBindingMap() {
+	public Multimap<Quad, QuadMap> getBindingMap() {
 		return bindingMap;
 	}
 	
@@ -103,20 +111,20 @@ public class MappingBinding {
   
     // iterate over the subjects and remove them if they are not
     // compatible
-    for (BoundQuadMap tripleMap: quadMaps) {
+    for (QuadMap quadmap: quadMaps) {
       boolean allCompatible = true;
       
       if(!(
-             tripleMap.getCompatibilityChecker(QuadPosition.graph).isCompatible(gname,gxprs)
-          && tripleMap.getCompatibilityChecker(QuadPosition.subject).isCompatible(sname,sxprs)
-          && tripleMap.getCompatibilityChecker(QuadPosition.predicate).isCompatible(pname,pxprs)
-          && tripleMap.getCompatibilityChecker(QuadPosition.object).isCompatible(oname,oxprs)
+             cchecker.isCompatible(quadmap.get(QuadPosition.graph),gname,gxprs)
+          && cchecker.isCompatible(quadmap.get(QuadPosition.subject),sname,sxprs)
+          && cchecker.isCompatible(quadmap.get(QuadPosition.predicate),pname,pxprs)
+          && cchecker.isCompatible(quadmap.get(QuadPosition.object),oname,oxprs)
           )){
         allCompatible = false;
         continue;
         }
       if(allCompatible){
-        bindingMap.put(quad, tripleMap);
+        bindingMap.put(quad, quadmap);
       }
  
       }
@@ -128,8 +136,8 @@ public class MappingBinding {
 	/**
    * merges the bindings. performs the join 
    */
-  public boolean mergeBinding(Map<Quad, Collection<JDBCQuadMap>> binding1,
-      Map<Quad, Collection<JDBCQuadMap>> binding2) {
+  public boolean mergeBinding(Map<Quad, Collection<QuadMap>> binding1,
+      Map<Quad, Collection<QuadMap>> binding2) {
     
 
     boolean wasmerged = false;
@@ -146,16 +154,16 @@ public class MappingBinding {
           
                 Node n1 = getField(quad1, f1);
                 Node n2 = getField(quad2, f2);
-                Collection<JDBCQuadMap> triplemaps1 = binding1
+                Collection<QuadMap> triplemaps1 = binding1
                     .get(quad1);
-                Collection<JDBCQuadMap> triplemaps1_copy= null;
+                Collection<QuadMap> triplemaps1_copy= null;
                 if(log.isDebugEnabled()){
-                  triplemaps1_copy = new HashSet<JDBCQuadMap>(binding1
+                  triplemaps1_copy = new HashSet<QuadMap>(binding1
                       .get(quad1));
                 }
                     
                 
-                Collection<JDBCQuadMap> triplemaps2 = binding2
+                Collection<QuadMap> triplemaps2 = binding2
                     .get(quad2);
                 if (matches(n1, n2)) {
                   wasmergedthisrun = mergeTripleMaps(f1, f2,
@@ -169,7 +177,7 @@ public class MappingBinding {
                       log.debug("Removed the following triple maps:");
                       
                       triplemaps1_copy.removeAll(triplemaps1);
-                      for (BoundQuadMap tripleMap : triplemaps1_copy) {
+                      for (QuadMap tripleMap : triplemaps1_copy) {
                         log.debug("" +  tripleMap);
                       }
                     }else{
@@ -207,50 +215,20 @@ public class MappingBinding {
    * @param triplemaps2
    */
   private boolean mergeTripleMaps(QuadPosition f1, QuadPosition f2,
-      Set<BoundQuadMap> triplemaps1, Set<BoundQuadMap> triplemaps2) {
+      Collection<QuadMap> triplemaps1, Collection<QuadMap> triplemaps2) {
     // we keep track if a modification was performed. Needed later to notify
     // the siblings.
-    boolean mergedSomething = false;
     
-    Set<BoundQuadMap> toRemove1 = Sets.newHashSet(); 
-    for(BoundQuadMap qmc1: triplemaps1){
+    Set<QuadMap> toRemove1 = Sets.newHashSet(); 
+    for(QuadMap qmc1: triplemaps1){
       
-      for(BoundQuadMap qmc2: triplemaps2){
-        if(qmc1.getCompatibilityChecker(f1).isCompatible(qmc2.getCompatibilityChecker(f2))){
-          
-        }
-        
-        
-      }
-    }
-    
-
-    // we iterate over all triplemaps of both (join-style)
-    for (BoundQuadMap triplemap1 : new HashSet<JDBCQuadMap>(triplemaps1)) {
-      Set<PO> toRetain = new HashSet<JDBCQuadMap.PO>();
-      for (PO po1 : new HashSet<PO>(triplemap1.getPos())) {
-        for (BoundQuadMap triplemap2 : triplemaps2) {
-          // we iterate over the PO, as each generates a triple per
-          // row.
-          for (PO po2 : triplemap2.getPos()) {
-            JDBCTermMap tm1 = getTermMap(po1, f1);
-            JDBCTermMap tm2 = getTermMap(po2, f2);
-            if (tm1.getCompChecker().isCompatible(tm2)) {
-              // they are compatible! we keep!
-              toRetain.add(po1);
-
-            }
-          }
+      for(QuadMap qmc2: triplemaps2){
+        if(!(cchecker.isCompatible(qmc1.get(f1),qmc2.get(f2)))){
+         toRemove1.add(qmc1);
         }
       }
-      mergedSomething = triplemap1.getPos().retainAll(toRetain);
-
-      if (triplemap1.getPos().size() == 0) {
-        triplemaps1.remove(triplemap1);
-      }
     }
-    return mergedSomething;
-
+    return triplemaps1.removeAll(toRemove1);
   }
   
 
@@ -270,4 +248,56 @@ public class MappingBinding {
     }
     return result;
   }
+  
+  
+  
+  /**
+   * Creates a List of Mapping bindings, in which every quad is quaranteed to be only associated to one quadmap.
+   * This is performed by calculating the cartesian product.
+   * 
+   * @return
+   */
+  
+  public Set<Map<Quad,QuadMap>> asMaps(){
+    //convert the sets to Lists
+  
+    return asMaps(Lists.newArrayList(bindingMap.keySet()));
+    
+  }
+  
+  private Set<Map<Quad,QuadMap>> asMaps(List<Quad> qml){
+    
+    Set<Map<Quad,QuadMap>> result = Sets.newHashSet();
+    
+    if(qml.size()==1){
+      
+      Quad quad =  qml.get(0);
+      for(QuadMap qm :  bindingMap.get(quad)){
+        Map<Quad,QuadMap> binding = Maps.newHashMap();
+        binding.put(quad, qm);
+        result.add(binding);
+      }
+    }else if(qml.size()>1){
+      Set<Map<Quad,QuadMap>> toMultiplies =  asMaps(qml.subList(1, qml.size()));
+      Set<Map<Quad,QuadMap>> resultsNew = Sets.newHashSet();
+      for(Map<Quad,QuadMap> toMultiply: toMultiplies){
+        for(Map<Quad,QuadMap> res: result){
+          Map<Quad,QuadMap> binding = Maps.newHashMap();
+          binding.putAll(toMultiply);
+          binding.putAll(res);
+          resultsNew.add(binding);
+        }
+      }
+      result = resultsNew;
+    }
+    
+    
+    
+    return result;
+    
+    
+   
+  }
+  
+   
 }

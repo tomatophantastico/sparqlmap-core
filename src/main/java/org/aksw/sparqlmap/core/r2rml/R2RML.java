@@ -1,8 +1,8 @@
 package org.aksw.sparqlmap.core.r2rml;
 
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 /**
  * This class encapsulates the R2RML vocabulary.
  * @author joerg

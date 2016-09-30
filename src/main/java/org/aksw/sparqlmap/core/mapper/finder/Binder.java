@@ -9,30 +9,27 @@ import java.util.Stack;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.mapper.translate.QuadVisitorBase;
-import org.aksw.sparqlmap.core.r2rml.JDBCTermMap;
-import org.aksw.sparqlmap.core.r2rml.JDBCQuadMap;
-import org.aksw.sparqlmap.core.r2rml.JDBCMapping;
-import org.aksw.sparqlmap.core.r2rml.BoundQuadMap;
+import org.aksw.sparqlmap.core.r2rml.QuadMap;
+import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
+import org.aksw.sparqlmap.core.translate.jdbc.QuadVisitorBase;
+import org.aksw.sparqlmap.core.util.JenaHelper;
+import org.aksw.sparqlmap.core.util.QuadPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import util.QuadPosition;
-import util.JenaHelper;
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpWalker;
+import org.apache.jena.sparql.algebra.op.OpJoin;
+import org.apache.jena.sparql.algebra.op.OpLeftJoin;
+import org.apache.jena.sparql.algebra.op.OpQuadPattern;
+import org.apache.jena.sparql.algebra.op.OpTable;
+import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.algebra.table.TableUnit;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.expr.Expr;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.algebra.OpWalker;
-import com.hp.hpl.jena.sparql.algebra.op.OpJoin;
-import com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin;
-import com.hp.hpl.jena.sparql.algebra.op.OpQuadPattern;
-import com.hp.hpl.jena.sparql.algebra.op.OpTable;
-import com.hp.hpl.jena.sparql.algebra.op.OpUnion;
-import com.hp.hpl.jena.sparql.algebra.table.TableUnit;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.expr.Expr;
-
-import static util.JenaHelper.*;
+import static org.aksw.sparqlmap.core.util.JenaHelper.*;
 
 
 /**
@@ -43,26 +40,25 @@ import static util.JenaHelper.*;
 public class Binder {
 	private static Logger log = LoggerFactory.getLogger(Binder.class);
 	
-	private TranslationContext tc;
-	private JDBCMapping mapconf;
+	private R2RMLMapping mapconf;
 
 	
-	public Binder(JDBCMapping mappingConf, TranslationContext tc) {
+	public Binder(R2RMLMapping mappingConf) {
 		this.mapconf = mappingConf;
-		this.tc = tc;
 	}
 
 
-	public MappingBinding bind(Op op){
+	public MappingBinding bind(TranslationContext tc){
+	  Op op = tc.getBeautifiedQuery();
 	  
-	  MappingBinding binding = new MappingBinding(tc.getQueryInformation().getFiltersforvariables(),(Collection) mapconf.getTripleMaps());
+	  MappingBinding binding = new MappingBinding(tc.getQueryInformation().getFiltersforvariables(), mapconf.getQuadMaps().values());
 		
 		
 		OpWalker.walk(op, new BinderVisitor(binding));
 		
 		
 
-		return new MappingBinding(bindingMap);
+		return binding;
 	}
 	
 	
@@ -164,7 +160,7 @@ public class Binder {
 			// now merge them
 			boolean hasMerged = false;
 			do{
-				hasMerged = mergeBinding(partitionBindings(opQuadBlock.getPattern().getList()), partitionBindings(opQuadBlock.getPattern().getList()));
+				hasMerged = binding.mergeBinding(partitionBindings(opQuadBlock.getPattern().getList()), partitionBindings(opQuadBlock.getPattern().getList()));
 			}while(hasMerged);
 			
 		}
@@ -174,10 +170,10 @@ public class Binder {
 		 * 
 		 * @return
 		 */
-		private Map<Quad,Collection<JDBCQuadMap>> partitionBindings(Collection<Quad> quads){
-			Map<Quad,Collection<JDBCQuadMap>> subset = new HashMap<Quad, Collection<JDBCQuadMap>>();
+		private Map<Quad,Collection<QuadMap>> partitionBindings(Collection<Quad> quads){
+			Map<Quad,Collection<QuadMap>> subset = new HashMap<Quad, Collection<QuadMap>>();
 			for(Quad quad : quads){
-				subset.put(quad, binding.get(quad));
+				subset.put(quad, binding.getBindingMap().get(quad));
 			}
 			
 			return subset;
@@ -197,11 +193,7 @@ public class Binder {
 	      throw new ImplementationException("Values/Table not implmeneted");
 
 	    }
-
 	  }
-	  
-		
-		
 	}
 	
 	
