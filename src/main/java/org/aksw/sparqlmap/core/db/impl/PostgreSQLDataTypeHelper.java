@@ -12,7 +12,7 @@ import net.sf.jsqlparser.expression.StringExpression;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 
 import org.aksw.sparqlmap.core.UntranslatableQueryException;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 
 
 public class PostgreSQLDataTypeHelper extends DataTypeHelper {

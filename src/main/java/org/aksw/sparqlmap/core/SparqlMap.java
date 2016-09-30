@@ -1,55 +1,44 @@
 package org.aksw.sparqlmap.core;
 
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.mapper.Mapper;
-import org.aksw.sparqlmap.core.r2rml.R2RML;
-import org.aksw.sparqlmap.core.r2rml.R2RMLModel;
+import org.aksw.sparqlmap.core.mapper.finder.Binder;
+import org.aksw.sparqlmap.core.mapper.finder.FilterFinder;
+import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
+import org.aksw.sparqlmap.core.mapper.finder.QueryInformation;
+import org.aksw.sparqlmap.core.normalizer.QueryNormalizer;
+import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
+import org.aksw.sparqlmap.core.translate.metamodel.DumperMetaModel;
+import org.aksw.sparqlmap.core.translate.metamodel.MetaModelContext;
+import org.aksw.sparqlmap.core.translate.metamodel.MetaModelQueryExecution;
+import org.aksw.sparqlmap.core.translate.metamodel.TranslationContextMetaModel;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.LangBuilder;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
+import org.apache.metamodel.DataContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.sparql.algebra.OpVars;
-import com.hp.hpl.jena.sparql.core.DatasetGraph;
-import com.hp.hpl.jena.sparql.core.DatasetGraphFactory;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
-import com.hp.hpl.jena.sparql.graph.GraphFactory;
-import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
-import com.hp.hpl.jena.sparql.resultset.ResultsFormat;
-import com.hp.hpl.jena.sparql.syntax.Template;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.graph.GraphFactory;
+import org.apache.jena.sparql.resultset.ResultsFormat;
+import org.apache.jena.sparql.syntax.Template;
 
 /**
  *  The main class of Sparqlmap.
@@ -57,45 +46,160 @@ import com.hp.hpl.jena.sparql.syntax.Template;
  * @author joerg
  *
  */
-@Component
 public class SparqlMap {
   
   private static Logger log = LoggerFactory.getLogger(SparqlMap.class);
 
   /** total queries translated by this instance.*/
   private Integer querycount = 0;
-
-  private String baseUri;
-
-  private boolean continueWithInvalidUris = true;
-
-  @Autowired
-  private Environment env;
-
-  @Autowired
-  private Mapper mapper;
-
-  @Autowired
-  private R2RMLModel mapping;
-
-  @Autowired
-  private DBAccess dbConf;
-
   
-  @PostConstruct
-  public void init() {
-    baseUri = env.getProperty("sm.baseuri");
-    continueWithInvalidUris = new Boolean(env.getProperty("sm.continuewithinvaliduris", "true"));
+  private ContextConfiguration contextConf;
+  
+  private Mapper mapper;
+  
+  private R2RMLMapping mapping;
+ 
+  /**
+   * the pure sql data access
+   */
+  private DBAccess jdbcAccess;
+  
+  /**
+   * the meta model access
+   */
+  private DataContext dataContext;
+  
+     
+
+
+  public DBAccess getJdbcAccess() {
+    return jdbcAccess;
   }
+
+  public void setSqlAccess(DBAccess jdbcAccess) {
+    this.jdbcAccess = jdbcAccess;
+  }
+
+  public DataContext getDataContext() {
+    return dataContext;
+  }
+
+  public void setDataContext(DataContext dataContext) {
+    this.dataContext = dataContext;
+  }
+  
+  public void setMapping(R2RMLMapping mapping) {
+    this.mapping = mapping;
+  }
+  
+  public R2RMLMapping getMapping() {
+    return mapping;
+  }
+  
+  protected Mapper getMapper() {
+    return mapper;
+  }
+  
+  public ContextConfiguration getContextConf() {
+    return contextConf;
+  }
+  
+  public void setContextConf(ContextConfiguration contextConf) {
+    this.contextConf = contextConf;
+  }
+
+  public org.apache.jena.query.QueryExecution execute(String query){
+    TranslationContext tcontext = new  TranslationContext();
+    tcontext.setQueryString(query);
+    return execute(tcontext);
+    
+  }
+  
+  public QueryExecution execute(TranslationContext tcontext){
+    QueryExecution result = null;
+    //Perform the common tasks
+    
+    //check if the query is compiled
+    if(tcontext.getQuery()==null){
+      tcontext.profileStartPhase("parse");
+      tcontext.setQuery(QueryFactory.create(tcontext.getQueryString()));
+    }
+    
+    if(log.isDebugEnabled()){
+      log.debug(tcontext.getQuery().toString());
+    }
+    QueryNormalizer.normalize(tcontext); 
+    
+    
+    
+    
+    if(log.isDebugEnabled()){
+      log.debug(tcontext.getBeautifiedQuery().toString());
+    }
+    
+    tcontext.profileStartPhase("bind");
+
+    //Analyze Query
+    QueryInformation qi = FilterFinder.getQueryInformation(tcontext.getBeautifiedQuery());
+    tcontext.setQueryInformation(qi);
+    
+    
+    Binder binder = new Binder(this.mapping);
+    MappingBinding mb = binder.bind(tcontext);
+    tcontext.setQueryBinding(mb);
+    if(log.isDebugEnabled()){
+      log.debug(tcontext.getQueryBinding().toString());
+    }
+
+    //delegate to the backend.
+    
+    
+    if(dataContext!=null){
+      // use the metamodel backend
+      
+      TranslationContextMetaModel mmtc = new TranslationContextMetaModel(tcontext);
+      MetaModelQueryExecution mmqe = new MetaModelQueryExecution(mmtc, dataContext);
+      
+      
+      
+      result = mmqe;
+    }
+    
+    
+    return result;
+    
+  }
+  
+  
+  
+  public Dumper getDumpExecution(){
+    Dumper result = null;
+    if(dataContext!=null){
+      result = new DumperMetaModel(new MetaModelContext(dataContext, contextConf),mapping);
+    }
+    
+    
+    
+    return result;
+    
+    
+  }
+  
+  
+  
+  
 
   /**
    * Returns the result of a SPARQL query as a String.
+   * Use {@link SparqlMap.execute()} instead.
+   * 
    * 
    * @param qstring
    * @param rt
    * @return
    * @throws SQLException
    */
+  @Deprecated
   public String executeSparql(String qstring, Object rt) throws SQLException {
     ByteArrayOutputStream resBos = new ByteArrayOutputStream();
     executeSparql(qstring, rt, resBos);
@@ -105,11 +209,14 @@ public class SparqlMap {
   /**
    * Executes a SPARQL query and writes its result into the Outputstream.
    * 
+   * Use {@link SparqlMap.execute()} instead.
+   * 
    * @param qstring the query
    * @param rt the Return type, either as Lang or as ResultsFormat.
    * @param out the stream into which the result gets written into.
    * @throws SQLException thrown if an db error occurs.
    */
+  @Deprecated
   public void executeSparql(String qstring, Object rt, OutputStream out) throws SQLException {
     executeSparql(qstring, rt, out, "Unnamed query " + this.querycount++);
   }
@@ -125,6 +232,7 @@ public class SparqlMap {
    *          the result gets printed into this stream.
    * @throws SQLException thrown if an db error occurs.
    */
+  @Deprecated
   protected void executeSparql(String qstring, Object rf, OutputStream out, String queryname) throws SQLException {
 
     TranslationContext context = new TranslationContext();
@@ -132,7 +240,7 @@ public class SparqlMap {
     context.setQueryName(queryname);
     context.profileStartPhase("Query Compile");
     context.setQuery(QueryFactory.create(qstring));
-    context.setTargetContentType(rf);
+    context.setTarget(rf);
 
     try {
       if (context.getQuery().isAskType()) {
@@ -143,11 +251,11 @@ public class SparqlMap {
       }
       if (context.getQuery().isConstructType()) {
 
-        if (context.getTargetContentType() != null && context.getTargetContentType().equals(Lang.NTRIPLES)) {
+        if (context.getTarget() != null && context.getTarget().equals(Lang.NTRIPLES)) {
           executeConstruct(context, out);
         } else {
           Model model = executeConstruct(context);
-          RDFDataMgr.write(out, model, (Lang) context.getTargetContentType());
+          RDFDataMgr.write(out, model, (Lang) context.getTarget());
 
         }
 
@@ -155,18 +263,18 @@ public class SparqlMap {
       if (context.getQuery().isSelectType()) {
         ResultSet rs = executeSelect(context);
 
-        if (context.getTargetContentType() == null) {
-          context.setTargetContentType(ResultsFormat.FMT_RDF_XML);
+        if (context.getTarget() == null) {
+          context.setTarget(ResultsFormat.FMT_RDF_XML);
         }
 
-        ResultSetFormatter.output(out, rs, (ResultsFormat) context.getTargetContentType());
+        ResultSetFormatter.output(out, rs, (ResultsFormat) context.getTarget());
 
       }
       if (context.getQuery().isDescribeType()) {
 
        Model model = executeDescribe(context);
 
-        RDFDataMgr.write(out, model, (Lang) context.getTargetContentType());
+        RDFDataMgr.write(out, model, (Lang) context.getTarget());
 
       }
 
@@ -176,28 +284,32 @@ public class SparqlMap {
     }
 
   }
-  
+  /**
+   * Use {@link SparqlMap.execute()} instead.
+   */
+  @Deprecated
   public boolean executeAsk(String query) throws SQLException{
     TranslationContext context = new TranslationContext();
     context.setQueryString(query);
-    try {
-
-      context.setQuery(QueryFactory.create(query));
-      return executeAsk(context);
-    } catch (SQLException e) {
-      context.setProblem(e);
-      log.error(context.toString());
-      throw e;
-    }
+    context.setQuery(QueryFactory.create(query));
+    return executeAsk(context);
+    
   }
   
-  
-  public boolean executeAsk(TranslationContext context) throws SQLException{
-    context.getQuery().setLimit(1);
-    ResultSet rs = executeSelect(context);
-    return rs.hasNext();
+  /**
+   * Use {@link SparqlMap.execute()} instead.
+   * 
+   * @param context
+   * @return
+   */
+  @Deprecated 
+  public boolean executeAsk(TranslationContext context){
+    
+    return execute(context).execAsk();
+    
   }
 
+  @Deprecated
   public Model executeConstruct(String query) throws SQLException {
     TranslationContext context = new TranslationContext();
     context.setQueryString(query);
@@ -212,33 +324,10 @@ public class SparqlMap {
     }
 
   }
-
+  
+  @Deprecated
   public Model executeConstruct(TranslationContext context) throws SQLException {
-    Model model = ModelFactory.createDefaultModel();
-    Template template = context.getQuery().getConstructTemplate();
-    context.getQuery().setQueryResultStar(true);
-    // execute it
-
-    ResultSet rs = executeSelect(context);
-
-    while (rs.hasNext()) {
-      Set<Triple> generatedTriples = new HashSet<Triple>();
-      Map<Node, Node> bNodeMap = new HashMap<Node, Node>();
-      Binding binding = rs.nextBinding();
-      template.subst(generatedTriples, bNodeMap, binding);
-
-      for (Triple generatedTriple : generatedTriples) {
-        if (generatedTriple.isConcrete()) {
-          model.getGraph().add(generatedTriple);
-        } else {
-          log.warn("Unconcrete triple created by template, skipping: " + generatedTriple.toString());
-        }
-
-      }
-
-    }
-
-    return model;
+    return execute(context).execConstruct();
 
   }
 
@@ -252,6 +341,7 @@ public class SparqlMap {
    * @param out
    * @throws SQLException
    */
+  @Deprecated
   public void executeConstruct(TranslationContext context, OutputStream out) throws SQLException {
     // take the graph pattern and convert it into a select query.
     Template template = context.getQuery().getConstructTemplate();
@@ -274,14 +364,22 @@ public class SparqlMap {
       }
 
       if (++i % 1000 != 0) {
-        RDFDataMgr.write(out, graph, LangBuilder.create().contentType(context.getTargetContentType().toString()).build());
+        RDFDataMgr.write(out, graph, LangBuilder.create().contentType(context.getTarget().toString()).build());
       }
     }
-    RDFDataMgr.write(out, graph, LangBuilder.create().contentType(context.getTargetContentType().toString()).build());
+    RDFDataMgr.write(out, graph, LangBuilder.create().contentType(context.getTarget().toString()).build());
 
   }
   
+  /**
+   * Execute a describe query on this context.
+   * 
+   * @param query
+   * @return
+   * @throws SQLException
+   */
   
+  @Deprecated
   public Model executeDescribe(String query) throws SQLException{
     TranslationContext context = new TranslationContext();
     context.setQueryString(query);
@@ -294,7 +392,6 @@ public class SparqlMap {
       log.error(context.toString());
       throw e;
     }
-    
   }
   
   /**
@@ -307,155 +404,17 @@ public class SparqlMap {
    * @return
    * @throws SQLException
    */
+  @Deprecated
   public Model executeDescribe(TranslationContext context) throws SQLException{
-    if (context.getTargetContentType() == null) {
-      context.setTargetContentType(Lang.TURTLE);
-    }
-
-    Model model = ModelFactory.createDefaultModel();
-    List<Node> iris = context.getQuery().getResultURIs();
-    if ((iris == null || iris.isEmpty())) {
-      Var var = context.getQuery().getProjectVars().get(0);
-
-
-      ResultSet rs = executeSelect(context);
-      while (rs.hasNext()) {
-        QuerySolution qs = rs.next();
-        if(qs.contains(var.getName())){
-          iris.add(qs.get(var.getName()).asNode());
-        }
-      }
-
-    }
-
-    for (Node node : iris) {
-      String con1 =
-        "CONSTRUCT {?s_sm ?p_sm <" + node.getURI() + "> } WHERE { ?s_sm ?p_sm <" + node.getURI() + "> }";
-      
-      TranslationContext subCon1 = new TranslationContext();
-      subCon1.setTargetContentType(context.getTargetContentType());
-      subCon1.setQueryString(con1);
-      subCon1.setQueryName("construct incoming query");
-      subCon1.setQuery(copyFromAndFromNamedGraph(QueryFactory.create(con1), context.getQuery()) );
-
-      model.add(executeConstruct(subCon1));
-      String con2 = "CONSTRUCT { <" + node.getURI() + "> ?p_sm ?o_sm} WHERE { <" + node.getURI() + "> ?p_sm ?o_sm}";
-      TranslationContext subCon2 = new TranslationContext();
-      subCon2.setTargetContentType(context.getTargetContentType());
-      subCon2.setQueryString(con2);
-      subCon2.setQuery(copyFromAndFromNamedGraph(QueryFactory.create(con2),context.getQuery()));
-      subCon2.setQueryName("construct outgoing query");
-
-      model.add(executeConstruct(subCon2));
-
-    }
-    
-    return model;
+    return execute(context).execDescribe();
     
   }
   
-  private Query copyFromAndFromNamedGraph(Query into, Query source){
-    
-    
-    for(String from: source.getGraphURIs()){
-      into.addGraphURI(from);
-    }
-    for(String fromNamed: source.getNamedGraphURIs()){
-      into.addNamedGraphURI(fromNamed);
-    }
-    
-    return into;
-  }
 
   
 
-  /**
-   * dumps into the whole config into the writer.
-   * 
-   * @param writer
-   * @throws SQLException
-   */
-
-  public void dump(OutputStream out, String format) throws SQLException {
-    PrintStream writer = new PrintStream(out);
-
-    List<TranslationContext> contexts = mapper.dump();
-    for (TranslationContext context : contexts) {
-
-      log.info("SQL: " + context.getSqlQuery());
-      com.hp.hpl.jena.query.ResultSet rs = dbConf.executeSQL(context, baseUri);
-      DatasetGraph graph = DatasetGraphFactory.createMem();
-      int i = 0;
-      while (rs.hasNext()) {
-      
-        Binding bind = rs.nextBinding();
-        addDumpBindingToDataset(bind, graph);
-          
-        if (++i % 10000 == 0) {
-          RDFDataMgr.write(out, graph, RDFFormat.NQUADS);
-          graph.deleteAny(null, null, null, null);
-        }
-      }
-      RDFDataMgr.write(out, graph, RDFFormat.NQUADS);
-    
-
-      writer.flush();
-    }
-  }
-
-	/**
-	 * dumps into the whole config into the writer.
-	 * 
-	 * @param writer
-	 * @throws SQLException
-	 */
-
-	public DatasetGraph dump() throws SQLException {
-
-		DatasetGraph dataset = DatasetGraphFactory.createMem();
-
-		List<TranslationContext> contexts = mapper.dump();
-		for (TranslationContext context : contexts) {
-			log.debug("SQL: " + context.getSqlQuery());
-			com.hp.hpl.jena.query.ResultSet rs = dbConf.executeSQL(context,
-					baseUri);
-			while (rs.hasNext()) {
-				Binding bind = rs.nextBinding();
-				addDumpBindingToDataset(bind, dataset);
-			}
-		}
-		return dataset;
-	}
-	
-	
-	private void addDumpBindingToDataset(Binding bind, DatasetGraph dsg){
-	  
-    try {
-      Node g = bind.get(Var.alloc("g"));
-      Node s = bind.get(Var.alloc("s"));
-      Node p = bind.get(Var.alloc("p"));
-      Node o = bind.get(Var.alloc("o"));
-      if (s != null && p != null && o != null) {
-        if(g!=null
-            && !(g.equals(Quad.defaultGraphNodeGenerated)
-            || g.hasURI(R2RML.defaultGraph.getURI()))){
-          Quad toadd = new Quad(g, s, p, o);
-          dsg.add(toadd);
-        }else{
-          Triple triple = new Triple(s, p, o);
-          dsg.getDefaultGraph().add(triple);
-        }
-       
-      }
-    } catch (Exception e) {
-
-      log.error("Error:", e);
-      if (!continueWithInvalidUris) {
-        throw new RuntimeException(e);
-      }
-    }
-	}
-
+  
+  @Deprecated
   public ResultSet executeSelect(String query) throws SQLException {
 
     TranslationContext context = new TranslationContext();
@@ -465,97 +424,22 @@ public class SparqlMap {
     return executeSelect(context);
 
   }
-
+  
+  @Deprecated
   public ResultSet executeSelect(final TranslationContext context) throws SQLException {
-
-    try {
-      context.profileStartPhase("Rewriting");
-
-      mapper.rewrite(context);
-      
-      ResultSet rs = null;
-      
-      // if we got an empty binding, we can shortcut the translation process
-      if(!context.getQueryBinding().isEmpty()){
-        LoggerFactory.getLogger("sqllog").debug("SQL " + context.getQueryName() + " " + context.getSqlQuery());
-
-        rs = dbConf.executeSQL(context, baseUri);
-      }else{
-        //create an empty result set with the query vars
-        rs = new ResultSet() {
-          
-          @Override
-          public QuerySolution nextSolution() {
-            return null;
-          }
-          
-          @Override
-          public Binding nextBinding() {
-            return null;
-          }
-          
-          @Override
-          public QuerySolution next() {
-            return null;
-          }
-          
-          @Override
-          public boolean hasNext() {
-            return false;
-          }
-          
-          @Override
-          public int getRowNumber() {
-            return 0;
-          }
-          
-          @Override
-          public List<String> getResultVars() {
-            
-            List<Var>  vars = context.getQueryInformation().getProject().getVars();
-            List<String> stringVars = new ArrayList<String>();
-            
-            for(Var var :vars){
-              stringVars.add(var.getName());
-            }
-
-            return stringVars;
-          }
-          
-          @Override
-          public Model getResourceModel() {
-            return null;
-          }
-          
-          @Override
-          public void remove() {
-            throw new UnsupportedOperationException();
-          }
-          
-        };
-      }
-
-     
-
-      return rs;
-
-    } catch (Throwable e) {
-      context.setProblem(e);
-
-      log.error(context.toString());
-
-      throw e;
-    }
-
+    return execute(context).execSelect();
   }
-
-  protected Mapper getMapper() {
-    return mapper;
+  
+public void close(){
+  
+    if(jdbcAccess!=null){
+      jdbcAccess.close();
+    }
+    
+  
   }
 
   
-  public void close(){
-    this.dbConf.close();
-    
-  }
+
+
 }

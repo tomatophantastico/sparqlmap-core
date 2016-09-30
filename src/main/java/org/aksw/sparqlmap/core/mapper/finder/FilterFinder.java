@@ -5,22 +5,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.aksw.sparqlmap.core.mapper.translate.QuadVisitorBase;
+import org.aksw.sparqlmap.core.translate.jdbc.QuadVisitorBase;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.algebra.OpWalker;
-import com.hp.hpl.jena.sparql.algebra.op.OpDistinct;
-import com.hp.hpl.jena.sparql.algebra.op.OpFilter;
-import com.hp.hpl.jena.sparql.algebra.op.OpOrder;
-import com.hp.hpl.jena.sparql.algebra.op.OpProject;
-import com.hp.hpl.jena.sparql.algebra.op.OpQuadPattern;
-import com.hp.hpl.jena.sparql.algebra.op.OpReduced;
-import com.hp.hpl.jena.sparql.algebra.op.OpSlice;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpWalker;
+import org.apache.jena.sparql.algebra.op.OpDistinct;
+import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpOrder;
+import org.apache.jena.sparql.algebra.op.OpProject;
+import org.apache.jena.sparql.algebra.op.OpQuadPattern;
+import org.apache.jena.sparql.algebra.op.OpReduced;
+import org.apache.jena.sparql.algebra.op.OpSlice;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.Expr;
 
 public class FilterFinder{
 	

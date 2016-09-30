@@ -6,7 +6,7 @@ package org.aksw.sparqlmap.core;
  * @author joerg
  * 
  */
-public class ImplementationException extends RuntimeException {
+public class ImplementationException extends SparqlMapException {
   
   /**
    * Only construct with a message.

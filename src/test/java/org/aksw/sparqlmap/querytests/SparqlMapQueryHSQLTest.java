@@ -1,26 +1,20 @@
 package org.aksw.sparqlmap.querytests;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.aksw.sparqlmap.DBHelper;
 import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
 import org.aksw.sparqlmap.core.SparqlMap;
-import org.aksw.sparqlmap.core.db.Connector;
-import org.aksw.sparqlmap.core.db.DBAccessConfigurator;
+import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.db.impl.HSQLDBConnector;
 import org.aksw.sparqlmap.core.spring.ContextSetup;
-import org.apache.jena.atlas.logging.Log;
+import org.aksw.sparqlmap.core.spring.DBAccessConfigurator;
 import org.hsqldb.Server;
-import org.hsqldb.cmdline.SqlFile;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
@@ -105,7 +99,7 @@ public class SparqlMapQueryHSQLTest extends SparqlMapQueryBaseTest{
   
  
 
-  public Connector getConnector() {
+  public DBAccess getConnector() {
     BoneCPDataSource ds = new BoneCPDataSource(
         DBAccessConfigurator.createConfig(
             getDBProperties().getProperty("jdbc.url"), getDBProperties().getProperty("jdbc.username"), getDBProperties().getProperty("jdbc.password"), 1, 2));

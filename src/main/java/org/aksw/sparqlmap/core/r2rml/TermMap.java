@@ -1,74 +1,53 @@
 package org.aksw.sparqlmap.core.r2rml;
 
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
+import java.util.Objects;
 
-public class TermMap {
-    private String[] template;
-    private String column;
-    private RDFNode constant;
-    private String lang;
-    private Resource datatypeuri;
-    private String inverseExpression;
-    private Resource termType;
-     
-   
-    public TermMap() {
-    }
+import org.aksw.sparqlmap.core.ImplementationException;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeVisitor;
 
-    public String[] getTemplate() {
-        return template;
-    }
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-    public void setTemplate(String[] template) {
-        this.template = template;
-    }
+@Data
+//@AllArgsConstructor
+public abstract class TermMap {
 
-    public String getColumn() {
-        return column;
+  private String lang;
+  private String datatypIRI;
+  private String termTypeIRI;
+  
+  public TermMap(String lang, String datatypIRI, String termTypeIRI) {
+    super();
+    if(termTypeIRI==null){
+      throw new ImplementationException("provide termtype");
     }
+    this.lang = lang;
+    this.datatypIRI = datatypIRI;
+    this.termTypeIRI = termTypeIRI;
+  }
+  
+  
+  
+  public boolean isIRI(){
+    return termTypeIRI.equals(R2RML.IRI_STRING);
+  }
+  public boolean isLiteral(){
+    return termTypeIRI.equals(R2RML.LITERAL_STRING);
+  }
+  public boolean isBlank(){
+    return termTypeIRI.equals(R2RML.BLANKNODE_STRING);
+  } 
+  
+  public abstract boolean isConstant();
+  public abstract boolean isColumn();
+  public abstract boolean isTemplate();
+  public abstract boolean isReferencing();
 
-    public void setColumn(String column) {
-        this.column = column;
-    }
+  
+ 
 
-    public RDFNode getConstant() {
-        return constant;
-    }
+  
 
-    public void setConstant(RDFNode constant) {
-        this.constant = constant;
-    }
 
-    public String getLang() {
-        return lang;
-    }
-
-    public void setLang(String lang) {
-        this.lang = lang;
-    }
-
-    public Resource getDatatypeuri() {
-        return datatypeuri;
-    }
-
-    public void setDatatypeuri(Resource datatypeuri) {
-        this.datatypeuri = datatypeuri;
-    }
-
-    public String getInverseExpression() {
-        return inverseExpression;
-    }
-
-    public void setInverseExpression(String inverseExpression) {
-        this.inverseExpression = inverseExpression;
-    }
-
-    public Resource getTermType() {
-        return termType;
-    }
-
-    public void setTermType(Resource termType) {
-        this.termType = termType;
-    }
 }

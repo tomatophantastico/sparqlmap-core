@@ -4,14 +4,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.algebra.op.OpDistinct;
-import com.hp.hpl.jena.sparql.algebra.op.OpOrder;
-import com.hp.hpl.jena.sparql.algebra.op.OpProject;
-import com.hp.hpl.jena.sparql.algebra.op.OpReduced;
-import com.hp.hpl.jena.sparql.algebra.op.OpSlice;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.op.OpDistinct;
+import org.apache.jena.sparql.algebra.op.OpOrder;
+import org.apache.jena.sparql.algebra.op.OpProject;
+import org.apache.jena.sparql.algebra.op.OpReduced;
+import org.apache.jena.sparql.algebra.op.OpSlice;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.expr.Expr;
 
 
 

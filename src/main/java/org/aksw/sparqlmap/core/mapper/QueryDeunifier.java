@@ -11,29 +11,36 @@ import java.util.Set;
 import org.aksw.sparqlmap.core.mapper.finder.FilterFinder;
 import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
 import org.aksw.sparqlmap.core.mapper.finder.QueryInformation;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
-import org.aksw.sparqlmap.core.mapper.translate.ExpressionConverter;
-import org.aksw.sparqlmap.core.mapper.translate.OptimizationConfiguration;
-import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
-import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap;
-import org.aksw.sparqlmap.core.r2rml.JDBCTripleMap.PO;
+import org.aksw.sparqlmap.core.r2rml.QuadMap;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCColumnHelper;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCQuadMap;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
+import org.aksw.sparqlmap.core.translate.jdbc.ExpressionConverter;
+import org.aksw.sparqlmap.core.translate.jdbc.JDBCOptimizationConfiguration;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.algebra.TransformCopy;
-import com.hp.hpl.jena.sparql.algebra.Transformer;
-import com.hp.hpl.jena.sparql.algebra.op.OpFilter;
-import com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin;
-import com.hp.hpl.jena.sparql.algebra.op.OpQuadBlock;
-import com.hp.hpl.jena.sparql.algebra.op.OpQuadPattern;
-import com.hp.hpl.jena.sparql.algebra.op.OpTable;
-import com.hp.hpl.jena.sparql.algebra.op.OpUnion;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.TransformCopy;
+import org.apache.jena.sparql.algebra.Transformer;
+import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpLeftJoin;
+import org.apache.jena.sparql.algebra.op.OpQuadBlock;
+import org.apache.jena.sparql.algebra.op.OpQuadPattern;
+import org.apache.jena.sparql.algebra.op.OpTable;
+import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.Expr;
 
-
+/**
+ * For queries that contain unions on the same table, these can be in certain cases be translated to a simple select statement, castly accelerating query processing.
+ * 
+ * A Query deemed optimizable in this way, can have this optimization 
+ * 
+ * @author joerg
+ *
+ */
 public class QueryDeunifier extends TransformCopy{
 
 	private Multimap<String, String> var2varname = HashMultimap.create();
@@ -43,13 +50,13 @@ public class QueryDeunifier extends TransformCopy{
 	DataTypeHelper dth;
 	ExpressionConverter exprconv;
 	JDBCColumnHelper colhelp;
-	OptimizationConfiguration fopt;
-	Map<Quad, Collection<JDBCTripleMap>> newbindingMap = new HashMap<Quad, Collection<JDBCTripleMap>>();
+	JDBCOptimizationConfiguration fopt;
+	Map<Quad, Collection<JDBCQuadMap>> newbindingMap = new HashMap<Quad, Collection<JDBCQuadMap>>();
 	Op query;
 	public QueryDeunifier(QueryInformation qi,
 			MappingBinding queryBinding, DataTypeHelper dth,
 			ExpressionConverter exprconv, JDBCColumnHelper colhelp,
-			OptimizationConfiguration fopt) {
+			JDBCOptimizationConfiguration fopt) {
 		this.queryBinding = queryBinding;
 		this.qi =qi;
 		this.dth = dth;
@@ -87,13 +94,13 @@ public class QueryDeunifier extends TransformCopy{
 		boolean merge = false;
 		if( opBGP.getPattern().getList().size()==1){
 			Quad triple = opBGP.getPattern().getList().iterator().next();
-			for(JDBCTripleMap tm : queryBinding.getBindingMap().get(triple)){
-					if(tm.getPos().size()>1){
+			
+					if(queryBinding.getBindingMap().get(triple).size()>1){
 						//yes we can merge them
 						merge = true;
 						
 					}
-			}
+			
 		}
 		
 		//as we can, we do it now
@@ -102,7 +109,7 @@ public class QueryDeunifier extends TransformCopy{
 			Set<Op> unionops = new HashSet<Op>(); 
 			
 			
-			for(JDBCTripleMap tm : queryBinding.getBindingMap().get(triple)){
+			for(JDBCQuadMap tm : queryBinding.getBindingMap().get(triple)){
 				Set<Quad>  lefjointriples = new HashSet<Quad>();
 				int i = 0;
 				for(PO po: tm.getPos()){
@@ -114,7 +121,7 @@ public class QueryDeunifier extends TransformCopy{
 					
 					Quad newTriple = new Quad(triple.getGraph(), triple.getSubject(),Var.alloc(p),Var.alloc(o));
 					
-					JDBCTripleMap newTripleMap = tm.getShallowCopy();
+					JDBCQuadMap newTripleMap = tm.getShallowCopy();
 					newTripleMap.getPos().retainAll(Arrays.asList(po));
 					
 					newbindingMap.put(newTriple, Arrays.asList(newTripleMap));

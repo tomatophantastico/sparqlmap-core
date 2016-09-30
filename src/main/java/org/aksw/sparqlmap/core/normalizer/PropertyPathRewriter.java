@@ -5,21 +5,21 @@ import java.util.List;
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.algebra.TransformCopy;
-import com.hp.hpl.jena.sparql.algebra.op.OpBGP;
-import com.hp.hpl.jena.sparql.algebra.op.OpSequence;
-import com.hp.hpl.jena.sparql.algebra.op.OpUnion;
-import com.hp.hpl.jena.sparql.core.BasicPattern;
-import com.hp.hpl.jena.sparql.core.TriplePath;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.path.P_OneOrMore1;
-import com.hp.hpl.jena.sparql.path.P_Path0;
-import com.hp.hpl.jena.sparql.path.Path;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.TransformCopy;
+import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpSequence;
+import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.core.BasicPattern;
+import org.apache.jena.sparql.core.TriplePath;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.path.P_OneOrMore1;
+import org.apache.jena.sparql.path.P_Path0;
+import org.apache.jena.sparql.path.Path;
 
 public class PropertyPathRewriter extends TransformCopy {
   
@@ -41,7 +41,7 @@ public class PropertyPathRewriter extends TransformCopy {
 
   
   @Override
-  public Op transform(com.hp.hpl.jena.sparql.algebra.op.OpPath opPath) {
+  public Op transform(org.apache.jena.sparql.algebra.op.OpPath opPath) {
     Op result = null;
         
     if(opPath.getTriplePath().getPath() instanceof P_OneOrMore1){

@@ -5,13 +5,18 @@ apply plugin: 'jacoco'
 
 
 //basics
-group 'org.aksw.sparqlmap'
-version '0.6.4-SNAPSHOT'
+group 'org.aksw.sparqlmap.sparqlmap-core'
+version '0.7.0-SNAPSHOT'
+
+configurations.all {
+    // Check for updates every build
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
 
 
-// We use Java 7
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+// We use Java 8
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 // maven publication
 
@@ -53,6 +58,7 @@ boolean shouldPublish(){
 
 buildscript {
     repositories {
+
         mavenCentral()
     }
     dependencies {
@@ -81,7 +87,7 @@ task testJar(type: Jar) {
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.5'
-    compile "org.apache.jena:jena-arq:2.12.1"
+    compile "org.apache.jena:jena-arq:3.1.0"
     compile "com.google.guava:guava:18.0"
     compile "net.sf.jsqlparser:jsqlparser:0.8.1.SPARQLMAP-SNAPSHOT"
     compile 'org.hsqldb:hsqldb:2.3.3'
@@ -91,12 +97,13 @@ dependencies {
     compile 'com.jolbox:bonecp:0.8.0.RELEASE'
     compile 'net.sf.supercsv:super-csv:2.1.0'
     compile 'joda-time:joda-time:2.1'
-    compile 'org.apache.metamodel:MetaModel-jdbc:4.4.0'
-
+    compile 'com.aol.simplereact:cyclops-react:1.0.0-RC4'
+    compile ('org.apache.metamodel:MetaModel-full:4.5.4') { changing = true}
+    compileOnly "org.projectlombok:lombok:1.16.10"
     testCompile 'com.spotify:docker-client:2.7.7'
     testCompile 'junit:junit:4.11'
     testCompile 'org.hsqldb:sqltool:2.3.3'
-    testCompile "org.apache.jena:jena-tdb:1.1.1"
+    testCompile "org.apache.jena:jena-tdb:3.1.0"
     testCompile 'mysql:mysql-connector-java:5.1.36'
 }
 

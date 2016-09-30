@@ -13,32 +13,31 @@ import java.util.Locale;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
-import org.aksw.sparqlmap.core.r2rml.JDBCColumnHelper;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCColumnHelper;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.jena.iri.IRIException;
-import org.apache.jena.riot.system.IRILib;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
-import com.hp.hpl.jena.datatypes.RDFDatatype;
-import com.hp.hpl.jena.datatypes.TypeMapper;
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.rdf.model.AnonId;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.sparql.core.ResultBinding;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
-import com.hp.hpl.jena.sparql.engine.binding.BindingFactory;
-import com.hp.hpl.jena.sparql.engine.binding.BindingMap;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.TypeMapper;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.AnonId;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.core.ResultBinding;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingFactory;
+import org.apache.jena.sparql.engine.binding.BindingMap;
+import org.apache.jena.vocabulary.RDFS;
 
-public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
+public class SQLResultSetWrapper implements org.apache.jena.query.ResultSet {
 
   private static org.slf4j.Logger log = org.slf4j.LoggerFactory
     .getLogger(SQLResultSetWrapper.class);
@@ -311,7 +310,7 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
         // column derived valued
         String segment = rs.getString(colname);
         if (segment != null) {
-            uri.append(IRILib.encodeUriComponent(segment));
+            uri.append(org.apache.jena.atlas.lib.IRILib.encodeUriComponent(segment));
         }
       }
     }
@@ -336,7 +335,7 @@ public class SQLResultSetWrapper implements com.hp.hpl.jena.query.ResultSet {
           node = NodeFactory.createURI(uri.toString());
         }
       } else {
-        node = NodeFactory.createAnon(new AnonId(uri.toString()));
+        node = NodeFactory.createBlankNode(uri.toString());
       }
 
     }

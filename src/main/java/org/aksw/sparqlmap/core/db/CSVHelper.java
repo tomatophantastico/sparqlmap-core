@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import org.aksw.sparqlmap.core.SystemInitializationError;
 import org.slf4j.LoggerFactory;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ParseDouble;
@@ -59,7 +58,7 @@ public class CSVHelper {
               "Inconsistent col count detected. row: %d has has %d cols. As separator '%s' was used. If the file has varying col count use the appropriate option.",
               rowCount, colCountMax, csvconf.fs);
         reader.close();
-        throw new SystemInitializationError(message);
+        throw new Error(message);
       }
 
       if (colCountMax < row.size()) {

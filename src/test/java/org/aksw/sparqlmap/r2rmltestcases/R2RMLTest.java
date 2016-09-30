@@ -1,8 +1,5 @@
 package org.aksw.sparqlmap.r2rmltestcases;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,13 +18,11 @@ import java.util.Properties;
 import jersey.repackaged.com.google.common.collect.Lists;
 
 import org.aksw.sparqlmap.DBHelper;
-import org.aksw.sparqlmap.TestHelper;
 import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
+import org.aksw.sparqlmap.TestHelper;
 import org.aksw.sparqlmap.core.SparqlMap;
 import org.aksw.sparqlmap.core.automapper.MappingGenerator;
-import org.aksw.sparqlmap.core.db.Connector;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
-import org.apache.jena.riot.Lang;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.WebContent;
 import org.apache.metamodel.DataContext;
@@ -35,7 +30,6 @@ import org.apache.metamodel.MetaModelException;
 import org.apache.metamodel.jdbc.JdbcDataContext;
 import org.junit.Assert;
 import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,15 +38,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.sparql.core.DatasetGraph;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
 
 @RunWith(value = Parameterized.class)
 public abstract class R2RMLTest {
@@ -162,11 +156,11 @@ public abstract class R2RMLTest {
 		ctxt.getEnvironment().getPropertySources().addFirst(new PropertiesPropertySource("sm", sm));
 		ctxt.getEnvironment().getPropertySources().addFirst(new PropertiesPropertySource("db", getDBProperties()));
 		
-		ctxt.scan("org.aksw.sparqlmap");
+		ctxt.scan("org.aksw.sparqlmap.core");
 		ctxt.refresh();
 		
 		SparqlMap r2r = ctxt.getBean(SparqlMap.class);
-		r2r.dump(new FileOutputStream(new File(outputLocation)),WebContent.contentTypeNTriples);
+		r2r.getDumpExecution().streamDump(new FileOutputStream(new File(outputLocation)));
 		ctxt.close();
 	}
 	
@@ -187,7 +181,7 @@ public abstract class R2RMLTest {
 				
 				// get the direct mapping test cases
 				
-				com.hp.hpl.jena.query.ResultSet dmRS = 
+				org.apache.jena.query.ResultSet dmRS = 
 						QueryExecutionFactory.create(QueryFactory.create("PREFIX test: <http://www.w3.org/2006/03/test-description#> \n" + 
 								"PREFIX dcterms: <http://purl.org/dc/elements/1.1/> \n" + 
 								"PREFIX  rdb2rdftest: <http://purl.org/NET/rdb2rdf-test#> " +
@@ -222,7 +216,7 @@ public abstract class R2RMLTest {
 				// get the regular test cases
 				
 				
-				com.hp.hpl.jena.query.ResultSet r2rRs = 
+				org.apache.jena.query.ResultSet r2rRs = 
 						QueryExecutionFactory.create(QueryFactory.create("PREFIX test: <http://www.w3.org/2006/03/test-description#> \n" + 
 								"PREFIX dcterms: <http://purl.org/dc/elements/1.1/> \n" + 
 								"PREFIX  rdb2rdftest: <http://purl.org/NET/rdb2rdf-test#> " +

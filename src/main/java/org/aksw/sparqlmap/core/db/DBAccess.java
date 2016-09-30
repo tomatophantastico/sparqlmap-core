@@ -1,6 +1,7 @@
 package org.aksw.sparqlmap.core.db;
 
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PreDestroy;
+import javax.sql.DataSource;
 
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.FromItem;
@@ -21,9 +23,14 @@ import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.mapper.translate.DataTypeHelper;
+import org.aksw.sparqlmap.core.TranslationContextJDBC;
 import org.aksw.sparqlmap.core.r2rml.R2RMLValidationException;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.jolbox.bonecp.BoneCPDataSource;
 
 /**
  * A small wrapper around the connection pool that provides allows the execution of the translated SQL.
@@ -31,40 +38,45 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author joerg
  *
  */
-public class DBAccess {
+public abstract class DBAccess {
 	
-	@Autowired
 	private DataTypeHelper dataTypeHelper;
 	
 	static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DBAccess.class);
-	
-	public DBAccess(Connector dbConnector) {
-		super();
-		this.dbConnector = dbConnector;
-	}
+	 
+  public static final String DRIVER_NA = "Driver not avalilable";
 
-	private Connector dbConnector;
+  protected DataSource connectionPool = null;
+  
 
 
-	public com.hp.hpl.jena.query.ResultSet executeSQL(TranslationContext context, String baseUri) throws SQLException{
+	public DBAccess(DataTypeHelper dataTypeHelper) {
+    this.dataTypeHelper = dataTypeHelper;
+  }
+
+
+
+
+  public org.apache.jena.query.ResultSet executeSQL(TranslationContextJDBC jcontext, String baseUri) throws SQLException{
+    TranslationContext context = jcontext.getContext();
 		context.profileStartPhase("Connection Acquisition");
-		Connection connect  = dbConnector.getConnection();
+		Connection connect  = getConnection();
 		java.sql.Statement stmt = connect.createStatement();
 		
 		
 		
 		if(log.isDebugEnabled()){
-			log.debug("Executing translated Query: " +  context.getSqlQuery());
+			log.debug("Executing translated Query: " +  jcontext.getSqlQuery());
 		}
 		context.profileStartPhase("Query Execution");
-		com.hp.hpl.jena.query.ResultSet wrap;
+		org.apache.jena.query.ResultSet wrap;
 		try {
-			ResultSet rs = stmt.executeQuery(context.getSqlQuery());
+			ResultSet rs = stmt.executeQuery(jcontext.getSqlQuery());
 			
 			wrap = new DeUnionResultWrapper(new  SQLResultSetWrapper(rs, connect,
 					dataTypeHelper, baseUri, context));
 		} catch (SQLException e) {
-			log.error("Error executing Query: " + context.getSqlQuery());
+			log.error("Error executing Query: " + jcontext.getSqlQuery());
 			throw new SQLException(e);
 		}
 		
@@ -72,21 +84,12 @@ public class DBAccess {
 	}
 
 
-
-
-	@PreDestroy
-	public void close() {
-		log.info("Closing the connections");
-		dbConnector.close();
-		
-	}
-
 	public void validateFromItem(FromItem fromItem) throws SQLException {
 		String from = fromItemToString(fromItem);
 		
 		String query = dataTypeHelper.getValidateFromQuery(from);
 		
-		   Connection conn = dbConnector.getConnection();
+		   Connection conn = getConnection();
 			ResultSet rs =  conn.createStatement().executeQuery(query);
 			rs.close();
 			conn.close();	
@@ -94,24 +97,25 @@ public class DBAccess {
 	
 	
 
-	public String getColumnName(FromItem fromItem, String unescapedColname) {
-		String query= null;
-		   try {
-			Connection conn = dbConnector.getConnection();
-			
-			query = dataTypeHelper.getColnameQuery(conn.getMetaData().getIdentifierQuoteString()+unescapedColname +conn.getMetaData().getIdentifierQuoteString(),  fromItemToString(fromItem) );
+  public String getColumnName(FromItem fromItem, String unescapedColname) {
+    String query = null;
+    try {
+      Connection conn = getConnection();
 
-				ResultSet rs =  conn.createStatement().executeQuery(query);
-				String name = rs.getMetaData().getColumnName(1);
-				rs.close();
-				conn.close();
-				
-				return name;
-		} catch (SQLException e) {
-			log.error("Error validating the column name, using the query: " + query + ".\n Does this column exist?");
-			throw new R2RMLValidationException("Column name in virtual table mismatching definition in term map.",e);
-		}
-	}
+      query = dataTypeHelper.getColnameQuery(conn.getMetaData().getIdentifierQuoteString() + unescapedColname
+          + conn.getMetaData().getIdentifierQuoteString(), fromItemToString(fromItem));
+
+      ResultSet rs = conn.createStatement().executeQuery(query);
+      String name = rs.getMetaData().getColumnName(1);
+      rs.close();
+      conn.close();
+
+      return name;
+    } catch (SQLException e) {
+      log.error("Error validating the column name, using the query: " + query + ".\n Does this column exist?");
+      throw new R2RMLValidationException("Column name in virtual table mismatching definition in term map.", e);
+    }
+  }
 	
 	public Map<String,Map<String,Integer>> alias_col2datatype = new HashMap<String, Map<String,Integer>>();
 	public Map<String,Map<String,Integer>> alias_col2precision = new HashMap<String, Map<String,Integer>>();
@@ -145,7 +149,7 @@ public class DBAccess {
 		String query = dataTypeHelper.getDataTypeQuery(colname, fromItemToString(fromItem) ) ;
 		
 		try {
-			Connection conn = dbConnector.getConnection();
+			Connection conn = getConnection();
 			java.sql.ResultSet rs = conn.createStatement().executeQuery(query);
 			Integer resInteger = rs.getMetaData().getColumnType(1);
 			Integer precision = rs.getMetaData().getPrecision(1);
@@ -207,26 +211,7 @@ public class DBAccess {
 	}
 	
 	
-	
-	
-//	/* (non-Javadoc)
-//	 * @see org.aksw.sparqlmap.config.syntax.IDBAccess#getExpressionDeParser(java.lang.StringBuffer)
-//	 */
-//	
-//	public ExpressionDeParser getExpressionDeParser(StringBuilder fromItemSb) {
-//		return getExpressionDeParser(getSelectDeParser(fromItemSb), fromItemSb);
-//		
-//	}
-	
-	
-	/* (non-Javadoc)
-	 * @see org.aksw.sparqlmap.config.syntax.IDBAccess#getConenction()
-	 */
-	
-	public Connection getConnection() throws SQLException {
-		return this.dbConnector.getConnection();
 
-	}
 	
 	
 	/* (non-Javadoc)
@@ -243,26 +228,6 @@ public class DBAccess {
 			return selectDeParser;
 
 	}
-	
-	
-	/* (non-Javadoc)
-	 * @see org.aksw.sparqlmap.config.syntax.IDBAccess#getExpressionDeParser(net.sf.jsqlparser.util.deparser.SelectDeParser, java.lang.StringBuffer)
-	 */
-	
-//	public ExpressionDeParser getExpressionDeParser(SelectDeParser selectDeParser, StringBuilder out) {
-//		
-//		return new ExpressionDeParser(selectDeParser, out);
-//		//return new AnsiQuoteExpressionDeParser(selectDeParser, out);
-////		if(dbname.equals(MYSQL)){
-////			return new ExpressionDeParser(selectDeParser, out);
-////		} else if(dbname.equals(POSTGRES)||dbname.equals(HSQLDB)){
-////			
-////			
-////		}
-////		log.warn("Selected default expresseiondeparser");
-////		return new ExpressionDeParser(selectDeParser,out);
-//	}
-
 
 
 	
@@ -272,9 +237,64 @@ public class DBAccess {
 	}
 
 	
-	
-	
-	
+
+
+  public void setDs(BoneCPDataSource ds){
+    this.connectionPool =ds; 
+  }
+  
+
+  public Connection getConnection() throws SQLException{
+    return connectionPool.getConnection(); 
+  }
+  
+
+  public abstract String getDBName();
+  
+  public abstract String getDriverClassString();
+
+
+
+  
+    
+   public String getDriverVersion() {
+      String result = null;
+      
+      try {
+        Driver driver =(Driver)  Class.forName(getDriverClassString()).newInstance();
+        
+        result  = driver.getClass().getName() +  driver.getMajorVersion() + "." + driver.getMinorVersion();
+      } catch (InstantiationException | IllegalAccessException
+          | ClassNotFoundException e) {
+        result  = DBAccess.DRIVER_NA;
+      } 
+      
+      return result;
+    }
+   
+   public DataTypeHelper getDataTypeHelper() {
+    return dataTypeHelper;
+  }
+
+
+
+
+  public void close() {
+    if(connectionPool instanceof BoneCPDataSource){
+      ((BoneCPDataSource) connectionPool).close();
+    }
+  }
+  
+  
+  private int viewCounter = 0;
+/**
+ *  counter for aliasing views and tables in the database.
+ *  Ensures that the id is unique per dbaccess
+ *  
+ */
+	public int getIncrementalViewId(){
+	  return viewCounter++;
+	}
 	
 	
 	
