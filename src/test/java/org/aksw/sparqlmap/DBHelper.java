@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
-import org.apache.metamodel.UpdateCallback;
-import org.apache.metamodel.UpdateScript;
 import org.apache.metamodel.UpdateableDataContext;
 import org.apache.metamodel.drop.DropTable;
 import org.apache.metamodel.jdbc.JdbcDataContext;

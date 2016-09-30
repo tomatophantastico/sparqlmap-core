@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
 import org.aksw.sparqlmap.core.ImplementationException;
@@ -12,12 +11,6 @@ import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
 import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
 import org.aksw.sparqlmap.core.translate.jdbc.QuadVisitorBase;
-import org.aksw.sparqlmap.core.util.JenaHelper;
-import org.aksw.sparqlmap.core.util.QuadPosition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpWalker;
 import org.apache.jena.sparql.algebra.op.OpJoin;
@@ -27,9 +20,8 @@ import org.apache.jena.sparql.algebra.op.OpTable;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.algebra.table.TableUnit;
 import org.apache.jena.sparql.core.Quad;
-import org.apache.jena.sparql.expr.Expr;
-
-import static org.aksw.sparqlmap.core.util.JenaHelper.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**

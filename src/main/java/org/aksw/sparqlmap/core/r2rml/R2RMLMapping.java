@@ -1,18 +1,9 @@
 package org.aksw.sparqlmap.core.r2rml;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-
-import org.aksw.sparqlmap.core.r2rml.QuadMap.LogicalTable;
-import org.apache.commons.collections.MultiMap;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
-
-import org.apache.jena.rdf.model.Resource;
 
 
 /**

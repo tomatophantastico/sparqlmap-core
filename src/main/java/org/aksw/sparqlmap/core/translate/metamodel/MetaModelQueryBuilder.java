@@ -3,17 +3,13 @@ package org.aksw.sparqlmap.core.translate.metamodel;
 import java.util.Map;
 
 import org.aksw.sparqlmap.core.mapper.RightFirstWalker;
-import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
 import org.aksw.sparqlmap.core.translate.jdbc.QuadVisitorVocal;
-import org.apache.metamodel.query.Query;
-
 import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.OpWalker;
-import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpQuadPattern;
 import org.apache.jena.sparql.core.Quad;
+import org.apache.metamodel.query.Query;
 
 public class MetaModelQueryBuilder extends QuadVisitorVocal{
   

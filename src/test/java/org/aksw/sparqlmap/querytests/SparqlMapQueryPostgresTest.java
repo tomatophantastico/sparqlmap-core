@@ -1,34 +1,16 @@
 package org.aksw.sparqlmap.querytests;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import org.aksw.sparqlmap.DockerHelper;
-import org.aksw.sparqlmap.TestHelper;
-import org.aksw.sparqlmap.core.SparqlMap;
-import org.aksw.sparqlmap.core.db.impl.MySQLConnector;
 import org.aksw.sparqlmap.core.db.impl.PostgreSQLConnector;
-import org.aksw.sparqlmap.core.spring.ContextSetup;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 
-import com.google.common.collect.Lists;
-import com.mysql.jdbc.Statement;
-import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerException;
 
 /**

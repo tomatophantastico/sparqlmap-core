@@ -15,16 +15,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import jersey.repackaged.com.google.common.collect.Lists;
-
 import org.aksw.sparqlmap.DBHelper;
 import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
 import org.aksw.sparqlmap.TestHelper;
 import org.aksw.sparqlmap.core.SparqlMap;
 import org.aksw.sparqlmap.core.automapper.MappingGenerator;
 import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.WebContent;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.metamodel.DataContext;
 import org.apache.metamodel.MetaModelException;
 import org.apache.metamodel.jdbc.JdbcDataContext;
@@ -38,15 +44,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 
-import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.Node;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.Binding;
+import jersey.repackaged.com.google.common.collect.Lists;
 
 @RunWith(value = Parameterized.class)
 public abstract class R2RMLTest {

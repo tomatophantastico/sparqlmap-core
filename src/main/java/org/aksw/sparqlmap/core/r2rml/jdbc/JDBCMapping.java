@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jersey.repackaged.com.google.common.collect.Sets;
-
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.r2rml.BoundQuadMap;
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
@@ -17,6 +15,8 @@ import org.aksw.sparqlmap.core.util.QuadPosition;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+
+import jersey.repackaged.com.google.common.collect.Sets;
 
 public class JDBCMapping {
 	

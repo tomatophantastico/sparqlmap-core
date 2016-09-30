@@ -1,7 +1,5 @@
 package org.aksw.sparqlmap.core;
 
-import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
-
 public class ContextConfiguration {
   
   

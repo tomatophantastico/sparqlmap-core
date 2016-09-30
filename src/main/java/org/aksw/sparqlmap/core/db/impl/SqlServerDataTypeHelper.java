@@ -1,9 +1,9 @@
 package org.aksw.sparqlmap.core.db.impl;
 
-import net.sf.jsqlparser.expression.Expression;
-
 import org.aksw.sparqlmap.core.UntranslatableQueryException;
 import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
+
+import net.sf.jsqlparser.expression.Expression;
 
 public class SqlServerDataTypeHelper extends DataTypeHelper{
 

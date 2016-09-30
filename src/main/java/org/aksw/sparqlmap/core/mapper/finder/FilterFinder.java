@@ -6,9 +6,6 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.aksw.sparqlmap.core.translate.jdbc.QuadVisitorBase;
-
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpWalker;
 import org.apache.jena.sparql.algebra.op.OpDistinct;
@@ -21,6 +18,9 @@ import org.apache.jena.sparql.algebra.op.OpSlice;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.Expr;
+
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 
 public class FilterFinder{
 	

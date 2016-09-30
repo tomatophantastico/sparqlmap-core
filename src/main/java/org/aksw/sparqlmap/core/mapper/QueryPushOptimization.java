@@ -5,13 +5,10 @@ import java.util.List;
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
-import org.aksw.sparqlmap.core.r2rml.BoundQuadMap;
 import org.aksw.sparqlmap.core.r2rml.TermMap;
 import org.aksw.sparqlmap.core.r2rml.TermMapConstant;
-import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCQuadMap;
 import org.aksw.sparqlmap.core.util.JenaHelper;
 import org.aksw.sparqlmap.core.util.QuadPosition;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.core.Quad;

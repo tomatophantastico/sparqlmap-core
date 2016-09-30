@@ -9,17 +9,25 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.aksw.sparqlmap.core.ImplementationException;
+import org.aksw.sparqlmap.core.r2rml.R2RML;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.jena.rdf.model.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
+
 import net.sf.jsqlparser.expression.CastExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionWithString;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.NullValue;
-import net.sf.jsqlparser.expression.Parenthesis;
-import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.FromItem;
@@ -27,19 +35,6 @@ import net.sf.jsqlparser.statement.select.FromItemVisitor;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SubJoin;
 import net.sf.jsqlparser.statement.select.SubSelect;
-
-import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.mapper.compatibility.CompatibilityChecker;
-import org.aksw.sparqlmap.core.r2rml.R2RML;
-import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
-import org.aksw.sparqlmap.core.translate.jdbc.FilterUtil;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
-import org.apache.jena.rdf.model.Resource;
 
 public class JDBCTermMap{
 	

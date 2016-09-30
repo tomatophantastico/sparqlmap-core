@@ -8,8 +8,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.aksw.sparqlmap.core.ImplementationException;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCColumnHelper;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCTermMap;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
+
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectBody;
@@ -19,15 +27,6 @@ import net.sf.jsqlparser.statement.select.SetOperation;
 import net.sf.jsqlparser.statement.select.SetOperationList;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.select.UnionOp;
-
-import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCColumnHelper;
-import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCTermMap;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
 
 public class UnionWrapper implements Wrapper {
 	

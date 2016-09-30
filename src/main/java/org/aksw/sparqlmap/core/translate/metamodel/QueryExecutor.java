@@ -1,38 +1,23 @@
 package org.aksw.sparqlmap.core.translate.metamodel;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.QueryExecutionException;
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
-import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
-import org.aksw.sparqlmap.core.r2rml.QuadMap.LogicalTable;
-import org.aksw.sparqlmap.core.r2rml.TermMap;
-import org.aksw.sparqlmap.core.util.QuadPosition;
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.core.Quad;
 import org.apache.metamodel.DataContext;
-import org.apache.metamodel.data.AbstractRow;
-import org.apache.metamodel.data.DataSetHeader;
 import org.apache.metamodel.data.Row;
-import org.apache.metamodel.data.Style;
-import org.apache.metamodel.query.Query;
-import org.apache.metamodel.query.SelectItem;
-import org.elasticsearch.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-import org.apache.jena.graph.Node;
-import org.apache.jena.sparql.core.Quad;
 
 
 

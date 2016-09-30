@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
-
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Quad;
 

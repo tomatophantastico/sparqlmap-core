@@ -2,13 +2,11 @@ package org.aksw.sparqlmap.core.mapper.compatibility;
 
 import java.util.Map;
 
-import jersey.repackaged.com.google.common.collect.Maps;
-import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-
-import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.r2rml.TermMapTemplateTuple;
 
 import com.google.common.collect.PeekingIterator;
+
+import jersey.repackaged.com.google.common.collect.Maps;
 
 class TermMapTemplateWalker{
   

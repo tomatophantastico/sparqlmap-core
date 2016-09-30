@@ -4,31 +4,20 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.StringValue;
-import net.sf.jsqlparser.expression.TimestampValue;
-import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.FromItem;
-
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.r2rml.BoundQuadMap;
-import org.aksw.sparqlmap.core.r2rml.QuadMap;
+import org.aksw.sparqlmap.core.r2rml.QuadMap.LogicalTable;
 import org.aksw.sparqlmap.core.r2rml.R2RML;
 import org.aksw.sparqlmap.core.r2rml.TermMap;
 import org.aksw.sparqlmap.core.r2rml.TermMapColumn;
 import org.aksw.sparqlmap.core.r2rml.TermMapConstant;
 import org.aksw.sparqlmap.core.r2rml.TermMapReferencing;
+import org.aksw.sparqlmap.core.r2rml.TermMapReferencing.JoinOn;
 import org.aksw.sparqlmap.core.r2rml.TermMapTemplate;
 import org.aksw.sparqlmap.core.r2rml.TermMapTemplateTuple;
-import org.aksw.sparqlmap.core.r2rml.QuadMap.LogicalTable;
-import org.aksw.sparqlmap.core.r2rml.TermMapReferencing.JoinOn;
 import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 import org.aksw.sparqlmap.core.translate.jdbc.FilterUtil;
-
-import com.google.common.collect.Lists;
 import org.apache.jena.datatypes.BaseDatatype;
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
@@ -36,6 +25,16 @@ import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.impl.LiteralLabelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDFS;
+
+import com.google.common.collect.Lists;
+
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.TimestampValue;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.FromItem;
 
 /**
  * This factory creates JDBC TermMaps, i.e. TermMaps that are bound to a

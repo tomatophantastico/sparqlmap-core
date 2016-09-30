@@ -2,10 +2,19 @@ package org.aksw.sparqlmap.core.translate.jdbc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import org.aksw.sparqlmap.core.ImplementationException;
+import org.aksw.sparqlmap.core.db.DBAccess;
+import org.aksw.sparqlmap.core.mapper.compatibility.URIHelper;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCTermMap;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCTermMapBinder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Lists;
 
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
@@ -22,18 +31,6 @@ import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
-
-import org.aksw.sparqlmap.core.ImplementationException;
-import org.aksw.sparqlmap.core.db.DBAccess;
-import org.aksw.sparqlmap.core.mapper.compatibility.URIHelper;
-import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCTermMap;
-import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCTermMapBinder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import com.google.common.collect.Lists;
-
-import org.apache.jena.datatypes.RDFDatatype;
 
 @Component
 public class FilterUtil {

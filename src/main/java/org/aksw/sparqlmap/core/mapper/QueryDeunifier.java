@@ -11,15 +11,11 @@ import java.util.Set;
 import org.aksw.sparqlmap.core.mapper.finder.FilterFinder;
 import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
 import org.aksw.sparqlmap.core.mapper.finder.QueryInformation;
-import org.aksw.sparqlmap.core.r2rml.QuadMap;
 import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCColumnHelper;
 import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCQuadMap;
 import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 import org.aksw.sparqlmap.core.translate.jdbc.ExpressionConverter;
 import org.aksw.sparqlmap.core.translate.jdbc.JDBCOptimizationConfiguration;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.TransformCopy;
 import org.apache.jena.sparql.algebra.Transformer;
@@ -32,6 +28,9 @@ import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.Expr;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * For queries that contain unions on the same table, these can be in certain cases be translated to a simple select statement, castly accelerating query processing.

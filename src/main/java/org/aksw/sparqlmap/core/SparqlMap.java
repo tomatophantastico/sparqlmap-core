@@ -20,13 +20,6 @@ import org.aksw.sparqlmap.core.translate.metamodel.DumperMetaModel;
 import org.aksw.sparqlmap.core.translate.metamodel.MetaModelContext;
 import org.aksw.sparqlmap.core.translate.metamodel.MetaModelQueryExecution;
 import org.aksw.sparqlmap.core.translate.metamodel.TranslationContextMetaModel;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.LangBuilder;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.metamodel.DataContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
@@ -35,10 +28,16 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.LangBuilder;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 import org.apache.jena.sparql.syntax.Template;
+import org.apache.metamodel.DataContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *  The main class of Sparqlmap.

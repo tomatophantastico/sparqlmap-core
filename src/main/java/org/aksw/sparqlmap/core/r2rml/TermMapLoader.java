@@ -3,17 +3,13 @@ package org.aksw.sparqlmap.core.r2rml;
 import java.util.List;
 
 import org.aksw.sparqlmap.core.r2rml.TermMapReferencing.JoinOn;
-import org.apache.metamodel.data.FirstRowDataSet;
-
-import com.google.common.collect.Lists;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.sparql.core.Quad;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 public class TermMapLoader {
     

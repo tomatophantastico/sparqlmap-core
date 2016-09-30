@@ -11,27 +11,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.WithItem;
-import net.sf.jsqlparser.util.deparser.SelectDeParser;
-
 import org.aksw.sparqlmap.core.ContextConfiguration;
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.db.DBAccess;
+import org.aksw.sparqlmap.core.mapper.QueryDeunifier;
 import org.aksw.sparqlmap.core.mapper.finder.FilterFinder;
 import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
 import org.aksw.sparqlmap.core.mapper.finder.QueryInformation;
 import org.aksw.sparqlmap.core.r2rml.R2RML;
 import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCQuadMap;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.sparql.algebra.AlgebraGenerator;
 import org.apache.jena.sparql.algebra.AlgebraQuad;
 import org.apache.jena.sparql.algebra.Op;
@@ -43,6 +37,12 @@ import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.WithItem;
+import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 public class JDBCDumper {
   

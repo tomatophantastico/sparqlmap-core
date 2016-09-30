@@ -1,7 +1,9 @@
 package org.aksw.sparqlmap.core.db.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.aksw.sparqlmap.core.UntranslatableQueryException;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 import net.sf.jsqlparser.expression.Expression;
@@ -10,10 +12,6 @@ import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-
-import org.aksw.sparqlmap.core.UntranslatableQueryException;
-import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
-import org.aksw.sparqlmap.core.translate.jdbc.FilterUtil;
 
 public class HSQLDBDataTypeHelper extends DataTypeHelper {
 	

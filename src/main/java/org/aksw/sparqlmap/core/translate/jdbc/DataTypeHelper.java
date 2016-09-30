@@ -3,10 +3,16 @@ package org.aksw.sparqlmap.core.translate.jdbc;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+
+import org.aksw.sparqlmap.core.db.DBAccess;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCColumnHelper;
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.sparql.algebra.op.OpSlice;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import net.sf.jsqlparser.expression.CastExpression;
 import net.sf.jsqlparser.expression.DateValue;
@@ -21,17 +27,6 @@ import net.sf.jsqlparser.expression.TimestampValue;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.Limit;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-
-import org.aksw.sparqlmap.core.db.DBAccess;
-import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCColumnHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.apache.jena.datatypes.RDFDatatype;
-import org.apache.jena.datatypes.xsd.XSDDatatype;
-import org.apache.jena.graph.impl.AdhocDatatype;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.sparql.algebra.op.OpSlice;
 
 public abstract  class DataTypeHelper {
 	

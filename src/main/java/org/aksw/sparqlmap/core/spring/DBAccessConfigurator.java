@@ -5,14 +5,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import org.aksw.sparqlmap.core.db.DBAccess;
-import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import com.jolbox.bonecp.BoneCPConfig;

@@ -2,7 +2,6 @@ package org.aksw.sparqlmap.core.translate.jdbc;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -12,10 +11,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.aksw.sparqlmap.core.TranslationContext;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCColumnHelper;
+import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCTermMap;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
+
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.Parenthesis;
-import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
@@ -30,15 +36,6 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.util.BaseSelectVisitor;
-
-import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCColumnHelper;
-import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCTermMap;
-import org.hamcrest.core.IsNull;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
 
 public class PlainSelectWrapper implements Wrapper{
 	

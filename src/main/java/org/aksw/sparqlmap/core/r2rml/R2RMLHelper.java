@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.metamodel.schema.MutableColumn;
-import org.apache.metamodel.schema.Table;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 /**

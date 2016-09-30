@@ -2,44 +2,27 @@ package org.aksw.sparqlmap.core.translate.metamodel;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
 import org.aksw.sparqlmap.core.r2rml.TermMap;
-import org.aksw.sparqlmap.core.r2rml.TermMapColumn;
 import org.aksw.sparqlmap.core.r2rml.TermMapConstant;
 import org.aksw.sparqlmap.core.r2rml.TermMapReferencing;
-import org.aksw.sparqlmap.core.r2rml.TermMapTemplate;
 import org.aksw.sparqlmap.core.r2rml.TermMapReferencing.JoinOn;
 import org.aksw.sparqlmap.core.util.JenaHelper;
 import org.aksw.sparqlmap.core.util.QuadPosition;
-import org.apache.commons.collections.BidiMap;
-import org.apache.metamodel.DataContext;
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.core.Quad;
 import org.apache.metamodel.query.FilterItem;
 import org.apache.metamodel.query.FromItem;
 import org.apache.metamodel.query.JoinType;
 import org.apache.metamodel.query.OperatorType;
 import org.apache.metamodel.query.Query;
 import org.apache.metamodel.query.SelectItem;
-import org.apache.metamodel.query.builder.FilterBuilder;
-import org.apache.metamodel.schema.Column;
 import org.elasticsearch.common.collect.Lists;
-import org.glassfish.jersey.internal.inject.ReferencingFactory;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ArrayTable;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Table;
-import org.apache.jena.graph.Node;
-import org.apache.jena.sparql.core.Quad;
-import org.apache.jena.sparql.expr.Expr;
 
 public class MetaModelQueryWrapper {
   

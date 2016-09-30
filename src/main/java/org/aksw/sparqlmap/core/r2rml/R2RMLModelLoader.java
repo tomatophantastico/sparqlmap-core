@@ -1,13 +1,9 @@
 package org.aksw.sparqlmap.core.r2rml;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import jersey.repackaged.com.google.common.collect.Lists;
-
-import com.google.common.collect.Maps;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
@@ -20,6 +16,10 @@ import org.apache.jena.update.GraphStoreFactory;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.vocabulary.RDF;
+
+import com.google.common.collect.Maps;
+
+import jersey.repackaged.com.google.common.collect.Lists;
 
 /**
  * 

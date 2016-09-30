@@ -3,7 +3,6 @@ package org.aksw.sparqlmap.core.translate.metamodel;
 import java.util.Iterator;
 import java.util.List;
 
-import org.aksw.sparqlmap.core.ContextConfiguration;
 import org.aksw.sparqlmap.core.r2rml.R2RML;
 import org.aksw.sparqlmap.core.r2rml.TermMap;
 import org.aksw.sparqlmap.core.r2rml.TermMapColumn;
@@ -11,15 +10,15 @@ import org.aksw.sparqlmap.core.r2rml.TermMapConstant;
 import org.aksw.sparqlmap.core.r2rml.TermMapReferencing;
 import org.aksw.sparqlmap.core.r2rml.TermMapTemplate;
 import org.aksw.sparqlmap.core.r2rml.TermMapTemplateTuple;
+import org.apache.jena.datatypes.BaseDatatype;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.riot.system.IRIResolver;
 import org.apache.metamodel.data.Row;
 import org.apache.metamodel.query.SelectItem;
 
 import com.google.common.collect.Lists;
-import org.apache.jena.datatypes.BaseDatatype;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.rdf.model.AnonId;
 
 /**
  * This class translates tuples from {@link Row}s into RDF {@link Node}s.

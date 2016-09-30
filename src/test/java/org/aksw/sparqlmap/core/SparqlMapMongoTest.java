@@ -1,28 +1,19 @@
 package org.aksw.sparqlmap.core;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import jersey.repackaged.com.google.common.collect.Maps;
-
-import org.apache.avro.data.Json;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.bson.BsonArray;
 import org.bson.Document;
-import org.bson.codecs.BsonArrayCodec;
-import org.bson.json.JsonReader;
 import org.elasticsearch.common.collect.Lists;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -30,17 +21,13 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-import com.google.common.io.Resources;
-import org.apache.jena.rdf.model.Model;
 import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.util.JSON;
+
+import jersey.repackaged.com.google.common.collect.Maps;
 
 
 @RunWith(value = Parameterized.class)

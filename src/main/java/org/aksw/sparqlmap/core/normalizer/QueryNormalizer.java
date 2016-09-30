@@ -4,18 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.algebra.AlgebraGenerator;
 import org.apache.jena.sparql.algebra.AlgebraQuad;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.algebra.Transformer;
 import org.apache.jena.sparql.core.Var;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class QueryNormalizer {

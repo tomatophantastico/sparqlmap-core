@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import jersey.repackaged.com.google.common.collect.Lists;
-
 import org.aksw.sparqlmap.core.r2rml.R2RML;
 import org.aksw.sparqlmap.core.r2rml.TermMap;
 import org.aksw.sparqlmap.core.r2rml.TermMapColumn;
@@ -23,6 +21,8 @@ import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
+
+import jersey.repackaged.com.google.common.collect.Lists;
 
 public class CompatibilityChecker {
   

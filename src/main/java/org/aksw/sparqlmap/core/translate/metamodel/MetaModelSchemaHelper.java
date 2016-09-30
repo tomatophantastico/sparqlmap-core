@@ -3,19 +3,17 @@ package org.aksw.sparqlmap.core.translate.metamodel;
 import java.util.List;
 import java.util.ListIterator;
 
-import jersey.repackaged.com.google.common.collect.Lists;
-
 import org.aksw.sparqlmap.core.r2rml.QuadMap.LogicalTable;
 import org.aksw.sparqlmap.core.r2rml.TermMap;
 import org.aksw.sparqlmap.core.r2rml.TermMapColumn;
-import org.aksw.sparqlmap.core.r2rml.TermMapReferencing;
 import org.aksw.sparqlmap.core.r2rml.TermMapTemplate;
 import org.aksw.sparqlmap.core.r2rml.TermMapTemplateTuple;
-import org.apache.hadoop.hdfs.server.datanode.dataNodeHome_jsp;
 import org.apache.metamodel.DataContext;
 import org.apache.metamodel.query.FromItem;
 import org.apache.metamodel.query.SelectItem;
 import org.apache.metamodel.schema.Column;
+
+import jersey.repackaged.com.google.common.collect.Lists;
 
 
 /**

@@ -2,10 +2,6 @@ package org.aksw.sparqlmap.core.mapper;
 
 import java.util.Iterator;
 
-import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.WithItem;
-import net.sf.jsqlparser.util.deparser.SelectDeParser;
-
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.TranslationContextJDBC;
 import org.aksw.sparqlmap.core.db.DBAccess;
@@ -14,6 +10,10 @@ import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 import org.aksw.sparqlmap.core.translate.jdbc.ExpressionConverter;
 import org.aksw.sparqlmap.core.translate.jdbc.FilterUtil;
 import org.aksw.sparqlmap.core.translate.jdbc.QueryBuilderVisitor;
+
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.WithItem;
+import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 public class JDBCTranslator {
   

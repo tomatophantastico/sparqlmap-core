@@ -1,13 +1,11 @@
 package org.aksw.sparqlmap.core;
 
-import static org.junit.Assert.*;
-
-import org.elasticsearch.common.collect.Lists;
-import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.engine.iterator.QueryIterProcessBinding;
+import org.junit.Test;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;

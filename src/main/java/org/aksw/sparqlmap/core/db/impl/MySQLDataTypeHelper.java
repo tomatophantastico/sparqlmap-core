@@ -1,13 +1,11 @@
 package org.aksw.sparqlmap.core.db.impl;
 
-import java.util.List;
+import org.aksw.sparqlmap.core.UntranslatableQueryException;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.StringExpression;
-
-import org.aksw.sparqlmap.core.UntranslatableQueryException;
-import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 
 public class MySQLDataTypeHelper extends DataTypeHelper {
 	

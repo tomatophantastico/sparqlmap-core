@@ -1,23 +1,18 @@
 package org.aksw.sparqlmap.core.r2rml.jdbc;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import net.sf.jsqlparser.expression.DateValue;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.StringValue;
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.schema.Table;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import org.apache.jena.rdf.model.RDFNode;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
 
 
 public class JDBCColumnHelper {

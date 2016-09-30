@@ -1,8 +1,5 @@
 package org.aksw.sparqlmap.core.r2rml;
 
-import org.apache.metamodel.schema.Column;
-
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 

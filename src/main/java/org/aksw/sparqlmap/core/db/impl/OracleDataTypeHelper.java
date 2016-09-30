@@ -1,16 +1,14 @@
 package org.aksw.sparqlmap.core.db.impl;
 
-import java.util.List;
+import org.aksw.sparqlmap.core.UntranslatableQueryException;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
+
+import com.google.common.collect.Lists;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-
-import org.aksw.sparqlmap.core.UntranslatableQueryException;
-import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
-
-import com.google.common.collect.Lists;
 
 public class OracleDataTypeHelper extends DataTypeHelper {
 	

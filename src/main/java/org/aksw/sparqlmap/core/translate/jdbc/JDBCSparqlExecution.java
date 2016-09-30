@@ -15,9 +15,6 @@ import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.TranslationContextJDBC;
 import org.aksw.sparqlmap.core.db.DBAccess;
-import org.apache.jena.riot.Lang;
-import org.slf4j.LoggerFactory;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
@@ -28,10 +25,12 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.syntax.Template;
 import org.apache.jena.sparql.util.Context;
+import org.slf4j.LoggerFactory;
 
 public class JDBCSparqlExecution implements QueryExecution{
   

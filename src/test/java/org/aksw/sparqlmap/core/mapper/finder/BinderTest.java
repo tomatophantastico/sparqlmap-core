@@ -1,14 +1,11 @@
 package org.aksw.sparqlmap.core.mapper.finder;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 import java.util.List;
 
-import jersey.repackaged.com.google.common.collect.Lists;
-
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.mapper.Mapper;
 import org.aksw.sparqlmap.core.normalizer.QueryNormalizer;
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
 import org.aksw.sparqlmap.core.r2rml.QuadMap.LogicalTable;
@@ -19,16 +16,13 @@ import org.aksw.sparqlmap.core.r2rml.TermMapColumn;
 import org.aksw.sparqlmap.core.r2rml.TermMapConstant;
 import org.aksw.sparqlmap.core.r2rml.TermMapTemplate;
 import org.aksw.sparqlmap.core.r2rml.TermMapTemplateTuple;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.algebra.AlgebraGenerator;
-import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.core.Quad;
-import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.Multimap;
+import jersey.repackaged.com.google.common.collect.Lists;
 
 public class BinderTest {
   

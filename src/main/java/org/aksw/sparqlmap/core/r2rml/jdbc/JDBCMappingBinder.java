@@ -1,29 +1,21 @@
 package org.aksw.sparqlmap.core.r2rml.jdbc;
 
 import java.sql.SQLException;
-import java.util.List;
-
-
-
 import java.util.Map;
-
-import jersey.repackaged.com.google.common.collect.Lists;
-import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.select.FromItem;
-import net.sf.jsqlparser.statement.select.SelectBodyString;
-import net.sf.jsqlparser.statement.select.SubSelect;
 
 import org.aksw.sparqlmap.core.BindingException;
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.db.DBAccess;
-import org.aksw.sparqlmap.core.mapper.compatibility.CompatibilityChecker;
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
-import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
 import org.aksw.sparqlmap.core.r2rml.QuadMap.LogicalTable;
-import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
+import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
+
+import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.select.FromItem;
+import net.sf.jsqlparser.statement.select.SelectBodyString;
+import net.sf.jsqlparser.statement.select.SubSelect;
 
 /**
  * connects an R2RML representation of an mapping to a database.

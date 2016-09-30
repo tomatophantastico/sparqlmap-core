@@ -2,17 +2,15 @@ package org.aksw.sparqlmap.core.db.impl;
 
 import java.util.Arrays;
 
-import net.sf.jsqlparser.expression.CastExpression;
+import org.aksw.sparqlmap.core.UntranslatableQueryException;
+import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
+
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionWithString;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.StringExpression;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-
-import org.aksw.sparqlmap.core.UntranslatableQueryException;
-import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 
 
 public class PostgreSQLDataTypeHelper extends DataTypeHelper {

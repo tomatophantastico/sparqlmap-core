@@ -1,12 +1,10 @@
 package org.aksw.sparqlmap.core.r2rml;
 
 import java.util.List;
-import java.util.Map;
 
 import org.aksw.sparqlmap.core.util.QuadPosition;
 
 import jersey.repackaged.com.google.common.collect.Lists;
-import jersey.repackaged.com.google.common.collect.Maps;
 import lombok.Builder;
 import lombok.Data;
 @Data

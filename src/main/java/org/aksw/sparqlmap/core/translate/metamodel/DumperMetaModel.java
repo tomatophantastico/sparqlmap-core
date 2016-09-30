@@ -2,24 +2,11 @@ package org.aksw.sparqlmap.core.translate.metamodel;
 
 import java.io.OutputStream;
 import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import org.aksw.sparqlmap.core.ContextConfiguration;
 import org.aksw.sparqlmap.core.Dumper;
-import org.aksw.sparqlmap.core.r2rml.QuadMap;
-import org.aksw.sparqlmap.core.r2rml.QuadMap.LogicalTable;
 import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
-import org.apache.metamodel.DataContext;
-import org.elasticsearch.common.collect.Lists;
-
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.riot.writer.NQuadsWriter;
 import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.core.Quad;
 
 public class DumperMetaModel implements Dumper{

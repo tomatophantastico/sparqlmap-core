@@ -4,6 +4,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
+import org.aksw.sparqlmap.core.mapper.finder.QueryInformation;
+import org.apache.jena.query.Query;
+import org.apache.jena.sparql.algebra.Op;
+
+import com.google.common.base.Stopwatch;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,13 +18,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
-import org.aksw.sparqlmap.core.mapper.finder.QueryInformation;
-import org.apache.jena.query.Query;
-import org.apache.jena.sparql.algebra.Op;
-
-import com.google.common.base.Stopwatch;
 
 
 /**

@@ -1,14 +1,7 @@
 package org.aksw.sparqlmap.core.r2rml.jdbc;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.aksw.sparqlmap.core.mapper.compatibility.CompatibilityChecker;
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
 import org.aksw.sparqlmap.core.util.QuadPosition;
-
-import net.sf.jsqlparser.statement.select.FromItem;
 /**
  * This representation of a quad map is bound to the underlying JDBC model.
  * Therefore it is bound to a live database.

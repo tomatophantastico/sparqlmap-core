@@ -5,32 +5,26 @@ import java.sql.Driver;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
-
-import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.select.FromItem;
-import net.sf.jsqlparser.statement.select.FromItemVisitor;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sf.jsqlparser.statement.select.SubJoin;
-import net.sf.jsqlparser.statement.select.SubSelect;
-import net.sf.jsqlparser.util.deparser.AnsiQuoteExpressionDeParser;
-import net.sf.jsqlparser.util.deparser.AnsiQuoteSelectDeparser;
-import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.TranslationContextJDBC;
 import org.aksw.sparqlmap.core.r2rml.R2RMLValidationException;
 import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.jolbox.bonecp.BoneCPDataSource;
+
+import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.select.FromItem;
+import net.sf.jsqlparser.statement.select.FromItemVisitor;
+import net.sf.jsqlparser.statement.select.SubJoin;
+import net.sf.jsqlparser.statement.select.SubSelect;
+import net.sf.jsqlparser.util.deparser.AnsiQuoteExpressionDeParser;
+import net.sf.jsqlparser.util.deparser.AnsiQuoteSelectDeparser;
+import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 /**
  * A small wrapper around the connection pool that provides allows the execution of the translated SQL.

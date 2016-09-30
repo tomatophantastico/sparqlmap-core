@@ -1,7 +1,5 @@
 package org.aksw.sparqlmap.core.r2rml;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import lombok.Builder;

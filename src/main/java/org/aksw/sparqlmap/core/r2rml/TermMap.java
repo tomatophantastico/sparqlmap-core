@@ -1,12 +1,7 @@
 package org.aksw.sparqlmap.core.r2rml;
 
-import java.util.Objects;
-
 import org.aksw.sparqlmap.core.ImplementationException;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeVisitor;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data

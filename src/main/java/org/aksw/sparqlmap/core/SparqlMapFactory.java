@@ -10,13 +10,13 @@ import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
 import org.aksw.sparqlmap.core.r2rml.R2RMLModelLoader;
 import org.aksw.sparqlmap.core.spring.DBAccessConfigurator;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.util.FileManager;
 import org.apache.metamodel.jdbc.JdbcDataContext;
 import org.apache.metamodel.mongodb.mongo3.MongoDbDataContext;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.util.FileManager;
 import com.jolbox.bonecp.BoneCPConfig;
 import com.jolbox.bonecp.BoneCPDataSource;
 import com.mongodb.MongoClient;

@@ -4,6 +4,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.aksw.sparqlmap.core.r2rml.R2RML;
+import org.apache.jena.atlas.lib.IRILib;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDFS;
 import org.apache.metamodel.schema.Column;
 import org.apache.metamodel.schema.MutableColumn;
 import org.apache.metamodel.schema.Relationship;
@@ -13,12 +18,6 @@ import org.apache.metamodel.schema.Table;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-
-import org.apache.jena.atlas.lib.IRILib;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.RDFS;
 
 /**
  * Creates a Direct Mapping for the given schema

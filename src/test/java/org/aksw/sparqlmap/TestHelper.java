@@ -6,18 +6,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
 
 import org.aksw.sparqlmap.core.SparqlMap;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.junit.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -27,13 +17,15 @@ import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.resultset.ResultSetCompare;
 import org.apache.jena.tdb.TDBFactory;
-
-import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.DockerException;
+import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestHelper {
   

@@ -1,6 +1,5 @@
 package org.aksw.sparqlmap.core;
 
-import java.sql.SQLException;
 /**
  * Indicates a problem binding the R2RML model to the underlying database.
  * 

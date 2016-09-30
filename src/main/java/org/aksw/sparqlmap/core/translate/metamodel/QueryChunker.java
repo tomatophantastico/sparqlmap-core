@@ -4,15 +4,9 @@ import java.util.List;
 import java.util.Stack;
 
 import org.aksw.sparqlmap.core.ImplementationException;
-import org.elasticsearch.common.collect.Lists;
-
-import org.apache.jena.query.Query;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpVisitorByType;
-import org.apache.jena.sparql.algebra.OpVisitorByTypeBase;
 import org.apache.jena.sparql.algebra.OpWalker;
-import org.apache.jena.sparql.algebra.TransformCopy;
-import org.apache.jena.sparql.algebra.Transformer;
 import org.apache.jena.sparql.algebra.Transformer.ApplyTransformVisitor;
 import org.apache.jena.sparql.algebra.op.Op0;
 import org.apache.jena.sparql.algebra.op.Op1;
@@ -21,7 +15,7 @@ import org.apache.jena.sparql.algebra.op.OpExt;
 import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpLeftJoin;
 import org.apache.jena.sparql.algebra.op.OpN;
-import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.elasticsearch.common.collect.Lists;
 
 /**
  * The query chunker

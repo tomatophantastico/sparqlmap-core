@@ -1,7 +1,5 @@
 package org.aksw.sparqlmap.core.db;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,19 +14,13 @@ import org.aksw.sparqlmap.core.TranslationContext;
 import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCColumnHelper;
 import org.aksw.sparqlmap.core.translate.jdbc.DataTypeHelper;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.jena.iri.IRIException;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
-import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.iri.IRIException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.core.ResultBinding;
 import org.apache.jena.sparql.core.Var;
@@ -36,6 +28,11 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.engine.binding.BindingMap;
 import org.apache.jena.vocabulary.RDFS;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 
 public class SQLResultSetWrapper implements org.apache.jena.query.ResultSet {
 

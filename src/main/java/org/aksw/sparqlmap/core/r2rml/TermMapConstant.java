@@ -1,8 +1,5 @@
 package org.aksw.sparqlmap.core.r2rml;
 
-import org.aksw.sparqlmap.core.ImplementationException;
-import org.apache.jena.graph.Node;
-
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
