@@ -20,6 +20,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.metamodel.DataContext;
 import org.apache.metamodel.data.DataSet;
 import org.apache.metamodel.data.Row;
+import org.apache.metamodel.query.FromItem;
 import org.apache.metamodel.query.Query;
 import org.apache.metamodel.schema.Column;
 import org.apache.metamodel.schema.MutableColumn;
@@ -69,7 +70,12 @@ public class MetaModelSelectiveDump {
     
     Query query = new Query();
     if(ltable.getTablename()==null){
-      query.from(ltable.getQuery());
+
+      
+      FromItem fi = new FromItem( ltable.getQuery());
+      fi.setAlias("sq");
+      
+      query.from(fi);
     }else{
       query.from(dcontext.getTableByQualifiedLabel(ltable.getTablename()));
     }
@@ -94,8 +100,14 @@ public class MetaModelSelectiveDump {
     }
     
     for(String col:cols){
- 
-      Column column = new MutableColumn(col);
+      Column column;
+      if(ltable.getTablename()==null){
+        column = new MutableColumn(col);
+      }else{
+        column = dcontext.getTableByQualifiedLabel(ltable.getTablename()).getColumnByName(col);
+      }
+      
+      
       
       colnameSelectItem.put(col, column);
       query.select(column);
