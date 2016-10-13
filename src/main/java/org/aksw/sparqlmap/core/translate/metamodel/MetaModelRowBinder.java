@@ -62,7 +62,7 @@ public class MetaModelRowBinder {
     if(termMap.getTermTypeIRI().equals(R2RML.IRI_STRING)){
       result = NodeFactory.createURI(termMap.getConstantIRI());
     }else if(termMap.getTermTypeIRI().equals(R2RML.BLANKNODE_STRING)) {
-      result = NodeFactory.createAnon(new AnonId(Integer.toString(termMap.hashCode())));
+      result = NodeFactory.createBlankNode(Integer.toString(termMap.hashCode()));
     }else {
     
         result = NodeFactory.createLiteral(
@@ -93,7 +93,7 @@ public class MetaModelRowBinder {
       
     }else if(termMap.getTermTypeIRI().equals(R2RML.BLANKNODE_STRING)) {
 
-      result = NodeFactory.createAnon(new AnonId(content.toString()));
+      result = NodeFactory.createBlankNode(content.toString());
     }else{
       
       NodeFactory.createLiteral(
@@ -116,8 +116,8 @@ public class MetaModelRowBinder {
     
     StringBuilder contentSb = new StringBuilder();
     for(TermMapTemplateTuple sc: termMap.getTemplate()){
-      if(sc.getString()!=null){
-        contentSb.append(sc.getString());
+      if(sc.getPrefix()!=null){
+        contentSb.append(sc.getPrefix());
       }
       if(sc.getColumn()!=null){
         contentSb.append(contentIter.next());
@@ -139,7 +139,7 @@ public class MetaModelRowBinder {
       
     }else if(termMap.getTermTypeIRI().equals(R2RML.BLANKNODE_STRING)) {
 
-      result = NodeFactory.createAnon(new AnonId(content));
+      result = NodeFactory.createBlankNode(content);
     }else{
       
       NodeFactory.createLiteral(
@@ -156,7 +156,7 @@ public class MetaModelRowBinder {
     
     
     
-    return bind(selects,termMap.getParent(),row);
+    return bind(selects,termMap.getParent().getSubject(),row);
     
   }
 

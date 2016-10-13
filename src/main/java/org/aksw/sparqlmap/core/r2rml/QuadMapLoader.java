@@ -147,7 +147,7 @@ public class QuadMapLoader {
         if (tm instanceof TermMapReferencing) {
           TermMapReferencing tmf = (TermMapReferencing) tm;
           
-          TermMap parent =  quadMaps.get(tmf.getParentMapUri()).iterator().next().getSubject();          
+          QuadMap parent =  quadMaps.get(tmf.getParentMapUri()).iterator().next();          
           tmf.setParent(parent);
         }
       }

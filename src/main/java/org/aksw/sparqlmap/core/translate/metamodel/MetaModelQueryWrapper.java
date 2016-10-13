@@ -117,7 +117,7 @@ public class MetaModelQueryWrapper {
        if(termMap instanceof TermMapReferencing){
          TermMapReferencing tmf = (TermMapReferencing) termMap;
      
-         FromItem newFi = mcontext.getSchemaHelper().getFromItem(tmf.getParent().getQuadMap().getLogicalTable(),selfJoinAlias);
+         FromItem newFi = mcontext.getSchemaHelper().getFromItem(tmf.getParent().getLogicalTable(),selfJoinAlias);
          
          
          // get the old join (which might just be a single item)
@@ -135,7 +135,7 @@ public class MetaModelQueryWrapper {
          
          
          fi = newFi;
-         termMap = tmf.getParent();
+         termMap = tmf.getParent().getSubject();
        }
        
               

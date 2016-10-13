@@ -10,14 +10,14 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public class TermMapReferencing extends TermMap {
 
-  private TermMap parent;
+  private QuadMap parent;
   
   private String parentMapUri;
 
   private List<JoinOn> conditions;
   
   @Builder
-  public TermMapReferencing(String lang, String datatypIRI, String termTypeIRI,  TermMap parent,
+  public TermMapReferencing(String lang, String datatypIRI, String termTypeIRI,  QuadMap parent,
       String parentMapUri, List<JoinOn> conditions) {
     super(lang, datatypIRI, termTypeIRI);
     this.parent = parent;

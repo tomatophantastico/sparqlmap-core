@@ -142,11 +142,11 @@ public class CompatibilityChecker {
   }
 
   private boolean _isCompatible(TermMapReferencing termMap1, TermMapTemplate termMap2) {
-    return isCompatible(termMap1.getParent(),termMap2);
+    return isCompatible(termMap1.getParent().getSubject(),termMap2);
   }
 
   private boolean _isCompatible(TermMapReferencing termMap1, TermMapReferencing termMap2) {
-    return isCompatible(termMap1.getParent(),termMap2.getParent());
+    return isCompatible(termMap1.getParent().getSubject(),termMap2.getParent().getSubject());
   }
 
   private boolean _isCompatible(TermMapColumn termMap1, TermMapTemplate termMap2) {
@@ -155,7 +155,7 @@ public class CompatibilityChecker {
   }
 
   private boolean _isCompatible(TermMapColumn termMap1, TermMapReferencing termMap2) {
-    return isCompatible(termMap1, termMap2.getParent());
+    return isCompatible(termMap1, termMap2.getParent().getSubject());
   }
 
   private boolean _isCompatible(TermMapColumn termMap1, TermMapColumn termMap2) {
@@ -172,7 +172,7 @@ public class CompatibilityChecker {
   }
 
   private boolean _isCompatible(TermMapConstant termMap1, TermMapReferencing termMap2) {
-    return isCompatible(termMap1, termMap2.getParent());
+    return isCompatible(termMap1, termMap2.getParent().getSubject());
   }
 
   private boolean _isCompatible(TermMapConstant termMap1, TermMapColumn termMap2) {
