@@ -2,14 +2,11 @@ package org.aksw.sparqlmap.core;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.aksw.sparqlmap.core.db.DBAccess;
 import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
 import org.aksw.sparqlmap.core.r2rml.R2RMLModelLoader;
-import org.aksw.sparqlmap.core.spring.DBAccessConfigurator;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFDataMgr;
@@ -17,8 +14,6 @@ import org.apache.jena.util.FileManager;
 import org.apache.metamodel.jdbc.JdbcDataContext;
 import org.apache.metamodel.mongodb.mongo3.MongoDbDataContext;
 
-import com.jolbox.bonecp.BoneCPConfig;
-import com.jolbox.bonecp.BoneCPDataSource;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 
@@ -52,21 +47,7 @@ public class SparqlMapFactory {
   
   
   
-  public SparqlMapFactory connectToRelational(String user, String password, String jdbcUrl){
-    
-    BoneCPConfig bcpconf = new BoneCPConfig();
-    bcpconf.setJdbcUrl(jdbcUrl);
-    bcpconf.setUsername(user);
-    bcpconf.setPassword(password);
-    
-    BoneCPDataSource dataSource = new BoneCPDataSource(bcpconf);
-    
-    
-    JdbcDataContext context = new JdbcDataContext(dataSource);
-    
-    sparqlMap.setDataContext(context);
-    return this;
-  }
+  
   
   public SparqlMapFactory connectToMongoDb3(String host, String dbname){
     MongoClient client = new MongoClient(host);
@@ -98,14 +79,7 @@ public class SparqlMapFactory {
   }
   
   
-  
-  public SparqlMapFactory connectJDBCBackend(String user, String password, String jdbcUrl, int poolminconnections, int poolmaxconnections ) throws SQLException{
-    
-    DBAccess dba = DBAccessConfigurator.getDBAccess(jdbcUrl, user, password, poolminconnections, poolmaxconnections);
-    sparqlMap.setSqlAccess(dba);
-    
-    return this;
-  }
+
   
   
   
@@ -135,10 +109,7 @@ public class SparqlMapFactory {
       throw new SystemInitializationError("No mapping loaded");
     }
     
-    if(!(sparqlMap.getJdbcAccess()==null^sparqlMap.getDataContext()==null)){
-      throw new SystemInitializationError("Provide exactly one Backend");
-    }
-    
+  
     if(sparqlMap.getContextConf()==null){
       sparqlMap.setContextConf(new ContextConfiguration());
     }

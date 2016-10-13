@@ -89,21 +89,23 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.5'
     compile "org.apache.jena:jena-arq:3.1.0"
     compile "com.google.guava:guava:18.0"
-    compile "net.sf.jsqlparser:jsqlparser:0.8.1.SPARQLMAP-SNAPSHOT"
-    compile 'org.hsqldb:hsqldb:2.3.3'
-    compile 'org.postgresql:postgresql:9.2-1002-jdbc4'
-    compile 'org.springframework:spring-context:4.1.5.RELEASE'
-    compile 'org.springframework:spring-jdbc:4.1.5.RELEASE'
-    compile 'com.jolbox:bonecp:0.8.0.RELEASE'
     compile 'net.sf.supercsv:super-csv:2.1.0'
     compile 'joda-time:joda-time:2.1'
     compile 'com.aol.simplereact:cyclops-react:1.0.0-RC4'
     compile ('org.apache.metamodel:MetaModel-full:4.5.4') { changing = true}
+    compile 'org.eobjects.metamodel-extras:MetaModel-extras:4.4.0'
+
     compileOnly "org.projectlombok:lombok:1.16.10"
+    
     testCompile 'com.spotify:docker-client:2.7.7'
     testCompile 'junit:junit:4.11'
-    testCompile 'org.hsqldb:sqltool:2.3.3'
+    testCompile 'org.hsqldb:sqltool:2.3.4'
+    testCompile 'org.hsqldb:hsqldb:2.3.4'
     testCompile "org.apache.jena:jena-tdb:3.1.0"
-    testCompile 'mysql:mysql-connector-java:5.1.36'
+    testCompile 'org.springframework:spring-context:4.1.5.RELEASE'
+    testCompile 'org.springframework:spring-jdbc:4.1.5.RELEASE'
+    testCompile "com.zaxxer:HikariCP:2.4.7"
+
+
 }
 

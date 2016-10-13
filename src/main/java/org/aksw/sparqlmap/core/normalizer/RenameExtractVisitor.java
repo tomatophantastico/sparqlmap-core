@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.aksw.sparqlmap.core.TranslationContext;
-import org.aksw.sparqlmap.core.r2rml.jdbc.JDBCColumnHelper;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.algebra.Op;
@@ -43,6 +42,8 @@ import com.google.common.collect.Lists;
  */
 public class RenameExtractVisitor extends TransformCopy {
 
+  private static final String INT_PREFIX = "int_";
+  
 	private int i = 0;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RenameExtractVisitor.class); 
@@ -109,7 +110,7 @@ public class RenameExtractVisitor extends TransformCopy {
 	  
 	  if(graph.equals(Quad.defaultGraphNodeGenerated)
 	       && ! context.getQuery().getGraphURIs().isEmpty() ){
-	    Node nNew  = Var.alloc(i++ + JDBCColumnHelper.COL_NAME_INTERNAL);
+	    Node nNew  = Var.alloc(i++ + INT_PREFIX);
         termToVariable.put(graph.toString(), nNew);
    
 	      List<String> graphuris = context.getQuery().getGraphURIs();
@@ -175,7 +176,7 @@ public class RenameExtractVisitor extends TransformCopy {
 		
 		for(Node quadNode: quadNodes){
 			if(quadNode.isVariable()&&uniqeNodes.contains(quadNode)){
-				Var var_new = Var.alloc(i++ + JDBCColumnHelper.COL_NAME_INTERNAL);
+				Var var_new = Var.alloc(i++ + INT_PREFIX);
 				uniqeNodes.add(var_new);
 				exprList.add(new E_Equals(new ExprVar(quadNode),new ExprVar(var_new)));
 
@@ -195,7 +196,7 @@ public class RenameExtractVisitor extends TransformCopy {
 
 			Node nNew = termToVariable.get(n.toString()); 
 			if(nNew==null){
-				nNew = Var.alloc(i++ + JDBCColumnHelper.COL_NAME_INTERNAL);
+				nNew = Var.alloc(i++ + INT_PREFIX);
 				termToVariable.put(n.toString(), nNew);
 			}
 

@@ -8,8 +8,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.aksw.sparqlmap.core.db.DBAccess;
-import org.aksw.sparqlmap.core.mapper.Mapper;
 import org.aksw.sparqlmap.core.mapper.finder.Binder;
 import org.aksw.sparqlmap.core.mapper.finder.FilterFinder;
 import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
@@ -53,15 +51,9 @@ public class SparqlMap {
   private Integer querycount = 0;
   
   private ContextConfiguration contextConf;
-  
-  private Mapper mapper;
-  
+    
   private R2RMLMapping mapping;
- 
-  /**
-   * the pure sql data access
-   */
-  private DBAccess jdbcAccess;
+
   
   /**
    * the meta model access
@@ -69,15 +61,6 @@ public class SparqlMap {
   private DataContext dataContext;
   
      
-
-
-  public DBAccess getJdbcAccess() {
-    return jdbcAccess;
-  }
-
-  public void setSqlAccess(DBAccess jdbcAccess) {
-    this.jdbcAccess = jdbcAccess;
-  }
 
   public DataContext getDataContext() {
     return dataContext;
@@ -95,10 +78,7 @@ public class SparqlMap {
     return mapping;
   }
   
-  protected Mapper getMapper() {
-    return mapper;
-  }
-  
+ 
   public ContextConfiguration getContextConf() {
     return contextConf;
   }
@@ -429,14 +409,11 @@ public class SparqlMap {
     return execute(context).execSelect();
   }
   
-public void close(){
-  
-    if(jdbcAccess!=null){
-      jdbcAccess.close();
-    }
+  public void close(){
     
   
-  }
+    
+    }
 
   
 

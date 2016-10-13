@@ -8,7 +8,10 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
+import org.apache.metamodel.DataContext;
 import org.apache.metamodel.UpdateableDataContext;
 import org.apache.metamodel.drop.DropTable;
 import org.apache.metamodel.jdbc.JdbcDataContext;
@@ -96,11 +99,11 @@ public class DBHelper {
    * @param dbconf
    * @return
    */
-  public static boolean waitAndConnect(DBConnConfig dbconf) {
+  public static boolean waitAndConnect(DataContext datacontext) {
     boolean success = false;
     for( int i =0;i<20;i++){
       try {
-        DBHelper.getConnection(dbconf).close();
+        datacontext.getSchemas();
         success = true;
         log.debug("connection acquired");
         break;
@@ -126,7 +129,7 @@ public class DBHelper {
    * @param sqlfile
    * @return
    */
-  public static boolean initDb(DBConnConfig dbconf, String dsname, File sqlfile) {
+  public static boolean initDb(DataSource dbconf, String dsname, File sqlfile) {
     String tablename = "sparqlmaptest_" + dsname;
     String queryForTestTable = String.format("select 1 from \"%s\" limit 1;",
         tablename);
@@ -135,7 +138,7 @@ public class DBHelper {
     // to wait till the db has started
 
 
-    try (Connection conn = DBHelper.getConnection(dbconf);
+    try (Connection conn = dbconf.getConnection();
         java.sql.Statement stmt = conn.createStatement();) {
       boolean createNew = false;
       try (
