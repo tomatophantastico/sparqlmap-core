@@ -31,6 +31,7 @@ public class BinderTest {
   private static AlgebraGenerator gen = new AlgebraGenerator();
   
   private static Query querypersonName = QueryFactory.create("PREFIX : <http://example.org/> \n SELECT * {?s :name ?name} ");
+  private static Query querypersonIdName = QueryFactory.create("PREFIX : <http://example.org/> \n SELECT * {?s :name ?name.?s :id ?id} ");
 
   private static List<QuadMap> personMap;
       
@@ -84,5 +85,26 @@ public class BinderTest {
     
     assertEquals(1,bindingTp1.size()); 
   }
+  @Test
+  public void testJoin(){
+    R2RMLMapping r2rmapping = new R2RMLMapping();
+    r2rmapping.addQuadMaps(personMap);
+    
+    
+    TranslationContext tc = new TranslationContext();
+    tc.setQuery(querypersonIdName);
+    QueryNormalizer.normalize(tc);
+    
+    tc.setQueryInformation(FilterFinder.getQueryInformation(tc.getBeautifiedQuery()));
+
+    
+    Binder binder = new Binder(r2rmapping);
+    MappingBinding binding = binder.bind(tc);
+    
+    Collection<QuadMap> bindingTp1 = binding.getBindingMap().asMap().values().iterator().next();
+    
+    assertEquals(1,bindingTp1.size()); 
+  }
+  
 
 }

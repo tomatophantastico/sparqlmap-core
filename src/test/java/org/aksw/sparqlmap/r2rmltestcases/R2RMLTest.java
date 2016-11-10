@@ -43,6 +43,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+
 import jersey.repackaged.com.google.common.collect.Lists;
 
 @RunWith(value = Parameterized.class)
@@ -51,7 +54,6 @@ public abstract class R2RMLTest {
 	public static String baseUri = "http://example.com/base/";
 	
 	
-	static DBConnConfig dbconf;
 	
 	String testCaseName;
 	String r2rmlLocation;
@@ -60,7 +62,7 @@ public abstract class R2RMLTest {
 	String dbFileLocation;
 	boolean createDM;
 	
-	
+	private DataContext dcon;
 	
 	
 	private static Logger log = LoggerFactory.getLogger(R2RMLTest.class);
@@ -105,21 +107,12 @@ public abstract class R2RMLTest {
 	      String dbs = value.split(":")[0];
 	      Assume.assumeFalse(value.split(":")[1], 
 	              dbs.equals("ALL")
-	              || Lists.newArrayList(dbs.split(",")).contains(getDataTypeHelper().getDBName().toLowerCase()));
+	              || Lists.newArrayList(dbs.split(",")).contains(getDBName().toLowerCase()));
 
 	  }
-	  
-	    
-	    
-	  if(dbIsReachable==null){
-      dbIsReachable = DBHelper.waitAndConnect(dbconf);
-	  }
-	  Assume.assumeTrue("Database not reachable in previous test, skipping: ",dbIsReachable);
 	 
-	  
-	
-    
-	  
+
+
 	  flushDatabase();
 		loadFileIntoDB(dbFileLocation);
 		
@@ -127,6 +120,8 @@ public abstract class R2RMLTest {
 		if(createDM){
 			createDM(r2rmlLocation);
 		}
+		
+		
 		
 		//let the mapper run.
 		
@@ -137,6 +132,8 @@ public abstract class R2RMLTest {
 		
 	}
 	
+	 public abstract String getDBName();
+	
 	
 	
 	 
@@ -144,30 +141,19 @@ public abstract class R2RMLTest {
 	
 
 	private void map() throws SQLException, FileNotFoundException {
-		AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
-		Properties sm = new Properties();
-		sm.put("sm.baseuri", baseUri);
-		//sm.put("sm.r2rmlvocablocation", new File("./src/main/resources/vocabularies/r2rml.ttl").getAbsolutePath());
-		sm.put("sm.mappingfile", r2rmlLocation);
-		
-		ctxt.getEnvironment().getPropertySources().addFirst(new PropertiesPropertySource("sm", sm));
-		ctxt.getEnvironment().getPropertySources().addFirst(new PropertiesPropertySource("db", getDBProperties()));
-		
-		ctxt.scan("org.aksw.sparqlmap.core");
-		ctxt.refresh();
-		
-		SparqlMap r2r = ctxt.getBean(SparqlMap.class);
+
+		SparqlMap r2r = getSparqlMap();
 		r2r.getDumpExecution().streamDump(new FileOutputStream(new File(outputLocation)));
-		ctxt.close();
+		r2r.close();
 	}
 	
 	
-	public static Collection<Object[]> data(String tcFolder) {
+	public static Collection<Object[]> data(File tcFolder) {
 		Collection<Object[]> testCases = new ArrayList<Object[]>();
 
 		try {
-			log.info("Reading testcases from folder: " + new File(tcFolder).getAbsolutePath());
-			for(File folder: new File(tcFolder).listFiles()){
+			log.info("Reading testcases from folder: " + tcFolder);
+			for(File folder:tcFolder.listFiles()){
 				if(folder.isDirectory()&&!folder.isHidden()){ 
 
 				Model manifest = ModelFactory.createDefaultModel();
@@ -260,15 +246,17 @@ public abstract class R2RMLTest {
 	
 	
 	public void createDM(String wheretowrite) throws ClassNotFoundException, SQLException, FileNotFoundException, UnsupportedEncodingException, MetaModelException{
-		Connection conn = DBHelper.getConnection(dbconf);
 		
 		
 		
-		MappingGenerator db2r2rml = new MappingGenerator( "http://example.com/base/", "http://example.com/base/", "http://example.com/base/",";",getDataTypeHelper().getRowIdTemplate());
+		MappingGenerator db2r2rml = new MappingGenerator( "http://example.com/base/", 
+		    "http://example.com/base/", 
+		    
+		    "http://example.com/base/", 
+		    "+",
+		    null);
 		
-		DataContext con = new JdbcDataContext(conn);
-		Model mapping = db2r2rml.generateMapping(con.getDefaultSchema());
-		conn.close();
+		Model mapping = db2r2rml.generateMapping(getDatacontext());
 		mapping.write(new FileOutputStream(new File(wheretowrite)), "TTL", null);
 		
 		
@@ -288,15 +276,7 @@ public abstract class R2RMLTest {
 
 
 	
-	 public Properties getDBProperties() {
-	    Properties props = new Properties();
-	    // replicating the values from initDatabase
-	    props.put("jdbc.url",dbconf.jdbcString);
-	    props.put("jdbc.username",dbconf.username);
-	    props.put("jdbc.password",dbconf.password);
-	    
-	    return props;
-	  }
+	
 	
 	/**
 	 * closes the connection
@@ -321,20 +301,7 @@ public abstract class R2RMLTest {
 	 * @throws ClassNotFoundException 
 	 * @throws IOException 
 	 */
-	public void loadFileIntoDB(String file) throws ClassNotFoundException, SQLException, IOException{
-	  
-	  log.info(String.format("Loading %s into the database",file));
-	  
-	   Connection conn = DBHelper.getConnection(dbconf);
-	   DBHelper.loadSqlFile(conn, file);
-	   
-	   conn.close();
-
-//		String sql2Execute = FileUtils.readFileToString(new File(file));
-//		loadStringIntoDb(sql2Execute);
-
-		
-	}
+	public abstract void loadFileIntoDB(String file) throws ClassNotFoundException, SQLException, IOException;
 
 
 	/**
@@ -343,14 +310,8 @@ public abstract class R2RMLTest {
 	 * @throws SQLException 
 	 * @throws ClassNotFoundException 
 	 */
-	public void flushDatabase() throws ClassNotFoundException, SQLException{
-		Connection conn = DBHelper.getConnection(dbconf);
-
-		DBHelper.flushDb(conn);
-
-		conn.close();
-		
-	}
+	public abstract void flushDatabase() throws ClassNotFoundException, SQLException;
+	
 	
 
 
@@ -359,13 +320,12 @@ public abstract class R2RMLTest {
 	 * @param outputLocation2
 	 * @param referenceOutput2
 	 * @return true if they are equal
-	 * @throws FileNotFoundException 
 	 * @throws SQLException 
+	 * @throws IOException 
 	 */
 	
-	public void assertAreEqual(String outputLocation, String referenceOutput) throws FileNotFoundException, SQLException {
+	public void assertAreEqual(String outputLocation, String referenceOutput) throws SQLException, IOException {
 		
-	  boolean result = false;
 	  
 		Model m1 = ModelFactory.createDefaultModel();
 		String fileSuffixout = outputLocation.substring(outputLocation.lastIndexOf(".")+1).toUpperCase();
@@ -374,7 +334,7 @@ public abstract class R2RMLTest {
 			DatasetGraph dsgout = RDFDataMgr.loadDatasetGraph(outputLocation);
 			DatasetGraph dsdref = RDFDataMgr.loadDatasetGraph(referenceOutput);
 			
-			Assert.assertFalse("One result is empty, the other not.",dsgout.isEmpty() != dsdref .isEmpty());
+			Assert.assertFalse("Empty result, should have been:"+ Files.toString(new File(referenceOutput), Charsets.UTF_8) ,dsgout.isEmpty() && !dsdref .isEmpty());
 
 			
 			Iterator<Node> iout = dsgout.listGraphNodes();
@@ -400,11 +360,9 @@ public abstract class R2RMLTest {
 	    }
 	    if(!iref.isEmpty()){
 	      log.info("not all reference graphs were created"  + iref.toString());
-	      result = false;
 	    }
 	    
 	    
-	    result =  true;
 			    
 		}else {
 		//if(fileSuffixout.equals("TTL")){
@@ -415,6 +373,9 @@ public abstract class R2RMLTest {
 			TestHelper.assertModelAreEqual(m1, m2);
 		}	
 	}
+
+	abstract DataContext getDatacontext();
+	abstract SparqlMap getSparqlMap();
 	
-	 abstract DataTypeHelper getDataTypeHelper();
+
 }

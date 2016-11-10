@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
-import jersey.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 /**
  * contains classes which deal with R2RML constructs and their mapping onto the SparqlMap classes.
  * 

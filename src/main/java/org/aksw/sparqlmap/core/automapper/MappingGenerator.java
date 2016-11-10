@@ -2,18 +2,25 @@ package org.aksw.sparqlmap.core.automapper;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Set;
 
 import org.aksw.sparqlmap.core.r2rml.R2RML;
 import org.apache.jena.atlas.lib.IRILib;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDFS;
+import org.apache.metamodel.DataContext;
 import org.apache.metamodel.schema.Column;
+import org.apache.metamodel.schema.ColumnType;
 import org.apache.metamodel.schema.MutableColumn;
 import org.apache.metamodel.schema.Relationship;
 import org.apache.metamodel.schema.Schema;
 import org.apache.metamodel.schema.Table;
+import org.elasticsearch.common.collect.Sets;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -26,6 +33,12 @@ import com.google.common.collect.Lists;
  *
  */
 public class MappingGenerator {
+  
+  private static Set<ColumnType> intTypes = Sets.newHashSet(ColumnType.BIGINT,ColumnType.INTEGER,ColumnType.TINYINT);
+  private static Set<ColumnType> doubleTypes = Sets.newHashSet(ColumnType.DECIMAL,ColumnType.DOUBLE,ColumnType.FLOAT,ColumnType.NUMBER,ColumnType.NUMERIC,ColumnType.REAL);
+  private static Set<ColumnType> boolTypes = Sets.newHashSet(ColumnType.BIT,ColumnType.BOOLEAN);
+  private static Set<ColumnType> binaryTypes = Sets.newHashSet(ColumnType.BINARY, ColumnType.VARBINARY,ColumnType.LONGVARBINARY,ColumnType.BLOB);
+  private static Set<ColumnType> dateTypes = Sets.newHashSet(ColumnType.DATE,ColumnType.TIME,ColumnType.TIMESTAMP);
   
   
   private String mappingPrefix;
@@ -53,11 +66,25 @@ public class MappingGenerator {
     this.rowidtemplate = rowidtemplate;
   }
   
+  public MappingGenerator(String prefix){
+    super();
+    this.mappingPrefix = prefix + "mapping/";
+    this.instancePrefix = prefix + "instance/";
+    this.vocabularyPrefix = prefix + "vocabulary/";
+    this.primaryKeySeparator = "+";
+    this.rowidtemplate = null;
+
+    
+  }
+  
+  public Model generateMapping(DataContext context){
+    
+    return generateMapping(context.getDefaultSchema());
+  }
   
   
   
-  
-  public Model generateMapping(Schema schema) throws UnsupportedEncodingException{
+  public Model generateMapping(Schema schema){
    Model r2r = initMappingModel();
 
    for(Table table: schema.getTables()){
@@ -140,18 +167,24 @@ public class MappingGenerator {
        Resource objectMap = r2r.createResource();
        pomap.addProperty(R2RML.HASOBJECTMAP, objectMap);
        objectMap.addProperty(R2RML.HASCOLUMN, escapeName(column.getName()));
-     }
-    
-     
-     
-     
+       if(intTypes.contains(column.getType())){ 
+         objectMap.addProperty(R2RML.HASDATATYPE, 
+             r2r.createResource(XSDDatatype.XSDinteger.getURI()));
+       }else if(dateTypes.contains(column.getType())){
+         objectMap.addProperty(R2RML.HASDATATYPE, 
+             r2r.createResource(XSDDatatype.XSDdateTime.getURI()));
+       }else if(doubleTypes.contains(column.getType())){
+         objectMap.addProperty(R2RML.HASDATATYPE, 
+             r2r.createResource(XSDDatatype.XSDdouble.getURI()));
+       }else if(boolTypes.contains(column.getType())){
+         objectMap.addProperty(R2RML.HASDATATYPE, 
+             r2r.createResource(XSDDatatype.XSDboolean.getURI()));
+       }else if(binaryTypes.contains(column.getType())){
+         objectMap.addProperty(R2RML.HASDATATYPE, 
+             r2r.createResource(XSDDatatype.XSDbase64Binary.getURI()));
+       }
+     } 
    }
-    
-    
-    
-    
-    
-    
     return r2r;
   }
   

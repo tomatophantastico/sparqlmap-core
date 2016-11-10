@@ -4,8 +4,14 @@ apply plugin: 'maven-publish'
 apply plugin: 'jacoco'
 
 
+//
+ext {
+    sparqlMapVersion = '0.7.0-SNAPSHOT'
+}
+
+
 //basics
-group 'org.aksw.sparqlmap.sparqlmap-core'
+group 'org.aksw.sparqlmap'
 version '0.7.0-SNAPSHOT'
 
 configurations.all {
@@ -27,12 +33,16 @@ publishing {
             artifact testJar{
                 classifier "test"
             }
+            artifact sourceJar {
+                classifier "sources"
+            }
         }
        
     }
    
     if(shouldPublish()){
         repositories {
+            mavenLocal()
             maven {
                 credentials {
                     username (project.hasProperty('aksw_archiva_user') != null ? aksw_archiva_user : "")
@@ -83,20 +93,27 @@ task testJar(type: Jar) {
     from sourceSets.test.output
 }
 
+task sourceJar(type: Jar) {
+    classifier = 'source'
+    from sourceSets.main.java
+}
 
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.5'
-    compile "org.apache.jena:jena-arq:3.1.0"
+    compile ("org.apache.jena:jena-arq:3.1.1-SNAPSHOT") { changing = true}
     compile "com.google.guava:guava:18.0"
     compile 'net.sf.supercsv:super-csv:2.1.0'
     compile 'joda-time:joda-time:2.1'
     compile 'com.aol.simplereact:cyclops-react:1.0.0-RC4'
     compile ('org.apache.metamodel:MetaModel-full:4.5.4') { changing = true}
-    compile 'org.eobjects.metamodel-extras:MetaModel-extras:4.4.0'
+    compile ('org.eobjects.metamodel-extras:MetaModel-extras:4.4.0') { changing = true}
+    // this is only here because gradle fails to resolve the parent pom
+    compile ('org.eobjects.metamodel-extras:MetaModel-extras-access:4.4.0') { changing = true}
+
 
     compileOnly "org.projectlombok:lombok:1.16.10"
-    
+
     testCompile 'com.spotify:docker-client:2.7.7'
     testCompile 'junit:junit:4.11'
     testCompile 'org.hsqldb:sqltool:2.3.4'
@@ -105,6 +122,7 @@ dependencies {
     testCompile 'org.springframework:spring-context:4.1.5.RELEASE'
     testCompile 'org.springframework:spring-jdbc:4.1.5.RELEASE'
     testCompile "com.zaxxer:HikariCP:2.4.7"
+    testCompile "io.dropwizard.metrics:metrics-core:3.1.0"
 
 
 }

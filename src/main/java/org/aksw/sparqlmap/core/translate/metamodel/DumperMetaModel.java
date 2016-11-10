@@ -5,6 +5,9 @@ import java.util.Iterator;
 
 import org.aksw.sparqlmap.core.Dumper;
 import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.writer.NQuadsWriter;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Quad;
@@ -80,11 +83,20 @@ public class DumperMetaModel implements Dumper{
 
   @Override
   public void streamDump(OutputStream stream) {
+    
+    
 
     NQuadsWriter.write(stream, streamDump());
     
   }
   
+  
+  
+  public void dump(OutputStream out, Lang format){
+    
+    RDFDataMgr.write(out, dumpDatasetGraph(), format);
+    
+  }
   
   
   

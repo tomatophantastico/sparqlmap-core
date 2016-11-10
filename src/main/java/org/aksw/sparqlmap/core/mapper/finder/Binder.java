@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.aksw.sparqlmap.core.ImplementationException;
 import org.aksw.sparqlmap.core.TranslationContext;
@@ -72,15 +73,15 @@ public class Binder {
 		@Override
 		public void visit(OpJoin opJoin) {
 			log.debug("Visiting opJoin " + opJoin);
-			Collection<Quad> rightSideTriples = quads.pop();
+			Collection<Quad> rightQuads = quads.pop();
 
-			Collection<Quad> leftSideTriples = quads.pop();
+			Collection<Quad> leftQuads = quads.pop();
 			
 			
 			//we now merge the bindings for each and every triple we got here.
 			
-			boolean changed = binding.mergeBinding(partitionBindings(leftSideTriples), partitionBindings(rightSideTriples));
-			changed = changed || binding.mergeBinding(partitionBindings(rightSideTriples), partitionBindings(leftSideTriples));
+			boolean changed = binding.preLeftJoin(leftQuads,rightQuads);
+			changed = changed | binding.preLeftJoin(rightQuads, leftQuads);
 
 			//if we modified any binding, we have to walk this part of the Op-Tree again.
 			
@@ -88,7 +89,7 @@ public class Binder {
 				OpWalker.walk(opJoin, this);
 
 			}
-			mergeAndPutOnStack(leftSideTriples, rightSideTriples);
+			putOnStack(leftQuads, rightQuads);
 		}
 
 		@Override
@@ -99,18 +100,18 @@ public class Binder {
 				//leftjoin without triples. do nothing
 				
 			}else{
-				Collection<Quad> rightSideTriples = quads.pop();
-				Collection<Quad> leftSideTriples = quads.pop();
+				Collection<Quad> leftQuads = quads.pop();
+				Collection<Quad> rightQuads = quads.pop();
 				//we now merge the bindings for each and every triple we got here.
 				
-				boolean changed =  binding.mergeBinding(partitionBindings(rightSideTriples), partitionBindings(leftSideTriples));
+				boolean changed =  binding.preLeftJoin(leftQuads, rightQuads);
 	
 				//if we modified any binding, we have to walk this part of the Op-Tree again.
 				
 				if(changed){
 					OpWalker.walk(opLeftJoin, this);
 				}
-				mergeAndPutOnStack(leftSideTriples, rightSideTriples);
+				putOnStack(rightQuads, leftQuads);
 			}
 		}
 		
@@ -123,12 +124,12 @@ public class Binder {
 			Collection<Quad> rightSideTriples = quads.pop();
 			Collection<Quad> leftSideTriples = quads.pop();
 			
-			mergeAndPutOnStack(leftSideTriples, rightSideTriples);
+			putOnStack(leftSideTriples, rightSideTriples);
 			
 			
 		}
 
-		private void mergeAndPutOnStack(Collection<Quad> leftSideTriples,
+		private void putOnStack(Collection<Quad> leftSideTriples,
 				Collection<Quad> rightSideTriples) {
 			//do not nothing to the triples but put them together, so they can be merged by a later join
 			Collection<Quad> combined = new HashSet<Quad>();
@@ -149,13 +150,16 @@ public class Binder {
 			
 			}
 			
-			// now merge them
-			boolean hasMerged = false;
-			do{
-				hasMerged = binding.mergeBinding(partitionBindings(opQuadBlock.getPattern().getList()), partitionBindings(opQuadBlock.getPattern().getList()));
-			}while(hasMerged);
+			
+			
+			binding.preLeftJoin(opQuadBlock.getPattern().getList(), opQuadBlock.getPattern().getList());
+			
+		
 			
 		}
+		
+		
+	
 		
 		
 		/**creates a subset of the bindings

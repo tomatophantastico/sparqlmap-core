@@ -3,6 +3,7 @@ package org.aksw.sparqlmap.core.translate.metamodel;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
 import org.aksw.sparqlmap.core.r2rml.QuadMap.LogicalTable;
@@ -18,63 +19,73 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.metamodel.DataContext;
+import org.apache.metamodel.MetaModelException;
 import org.apache.metamodel.data.DataSet;
 import org.apache.metamodel.data.Row;
+import org.apache.metamodel.jdbc.JdbcDataContext;
 import org.apache.metamodel.query.FromItem;
 import org.apache.metamodel.query.Query;
+import org.apache.metamodel.query.parser.QueryParser;
 import org.apache.metamodel.schema.Column;
 import org.apache.metamodel.schema.MutableColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.aol.cyclops.data.async.Queue;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-import jersey.repackaged.com.google.common.collect.Maps;
+import com.google.common.collect.Maps;
 
 /**
  * 
  * @author joerg
  *
  */
-public class MetaModelSelectiveDump {
+public class MetaModelSelectiveDump implements Runnable{
   
-  public MetaModelSelectiveDump(LogicalTable ltable, Collection<QuadMap> quadmaps, DataContext dcontext) {
+  private AtomicInteger threadCount;
+  
+  private static final Logger LOGGER = LoggerFactory.getLogger(MetaModelSelectiveDump.class);
+
+  public MetaModelSelectiveDump(LogicalTable ltable, Collection<QuadMap> quadmaps, DataContext dcontext, Queue<Multimap<Node,Triple>> queue, AtomicInteger threadCount) {
     super();
     this.ltable = ltable;
     this.quadmaps = quadmaps;
     this.dcontext = dcontext;
+    this.queue = queue;
+    this.threadCount = threadCount;
+    prepare();
   }
 
 
   private LogicalTable ltable;
   private Collection<QuadMap> quadmaps;
   private DataContext dcontext;
+  private Queue<Multimap<Node,Triple>> queue;
   
+  private Query query;
   
   
   private Map<String,Column> colnameSelectItem = Maps.newHashMap();
   
-  public Multimap<Node,Triple> getDump(){
-    
-    Query query = prepare();
-    
-    
-    Multimap<Node,Triple> dump  = execute(query);
-    
-    return dump;
-  }
-  
-  
-  private Query prepare(){
-    
-    
-    Query query = new Query();
-    if(ltable.getTablename()==null){
 
+  
+  
+
+  
+  
+  
+  private void prepare(){
+     
+    query = new Query();
+    if(ltable.getTablename()==null){
       
-      FromItem fi = new FromItem( ltable.getQuery());
-      fi.setAlias("sq");
-      
+      QueryParser qp = new QueryParser(dcontext, ltable.getQuery().replaceAll("\"", ""));
+      Query subQuery = qp.parse();
+      FromItem fi = new FromItem( subQuery);
+      fi.setAlias("sq");  
       query.from(fi);
     }else{
       query.from(dcontext.getTableByQualifiedLabel(ltable.getTablename()));
@@ -102,7 +113,13 @@ public class MetaModelSelectiveDump {
     for(String col:cols){
       Column column;
       if(ltable.getTablename()==null){
-        column = new MutableColumn(col);
+        
+        MutableColumn mcolumn = new MutableColumn(col);
+        if(dcontext instanceof JdbcDataContext){
+          mcolumn.setQuote(
+          ((JdbcDataContext) dcontext).getIdentifierQuoteString());
+        }
+        column = mcolumn;
       }else{
         column = dcontext.getTableByQualifiedLabel(ltable.getTablename()).getColumnByName(col);
       }
@@ -113,28 +130,43 @@ public class MetaModelSelectiveDump {
       query.select(column);
     }
     
-    return query;
   }
   
   
   
-  private Multimap<Node,Triple> execute(Query query){
-    Multimap<Node,Triple>  result = HashMultimap.create();
-    DataSet ds =  dcontext.executeQuery(query);
-    while(ds.next()){
-      Row row = ds.getRow();
-      for(QuadMap qm: quadmaps){
-        Node graph = materialize(row,qm.getGraph());
-        Node subject = materialize(row, qm.getSubject());
-        Node predicate = materialize(row, qm.getPredicate());
-        Node object = materialize(row, qm.getObject());
-        if(graph!=null&& subject!=null&&predicate!=null &&object!=null){
-          result.put(graph, new Triple(subject, predicate, object));      
+  public void dump(){
+    int count = 0;
+    try(DataSet ds =  dcontext.executeQuery(query)){
+      while(ds.next()){
+        Row row = ds.getRow();
+        count++;
+        Multimap<Node,Triple> rowTriples = HashMultimap.create();
+        for(QuadMap qm: quadmaps){
+          Node graph = materialize(row,qm.getGraph());
+          Node subject = materialize(row, qm.getSubject());
+          Node predicate = materialize(row, qm.getPredicate());
+          Node object = materialize(row, qm.getObject());
+          if(graph!=null&& subject!=null&&predicate!=null &&object!=null){
+            rowTriples.put(graph, new Triple(subject, predicate, object));      
+          }
+        }
+        queue.offer(rowTriples);
+      }
+    }catch(MetaModelException e){
+    LOGGER.error("Error executing: "+ query.toSql() ,e);
+    }finally{
+      synchronized (threadCount) {
+        if(threadCount.get()>1){
+          threadCount.decrementAndGet();
+        }else{
+          queue.close();
+
         }
       }
+      LOGGER.debug("Query {} executed \n with {} results", query.toSql(),count);
     }
-    return result;
-    
+
+   
     
   }
   
@@ -151,8 +183,9 @@ public class MetaModelSelectiveDump {
           result = NodeFactory.createLiteral(cfString, tm.getLang());
         }else if(tm.getDatatypIRI()!=null){
           result = NodeFactory.createLiteral(cfString, new BaseDatatype(tm.getDatatypIRI()));
+        }else{
+          result = NodeFactory.createLiteral(cfString);
         }
-        result = NodeFactory.createLiteral(cfString);
       }
     }
     return result;
@@ -182,6 +215,13 @@ public class MetaModelSelectiveDump {
       
     }
     return result;
+  }
+
+
+
+  @Override
+  public void run() {
+    dump();
   }
   
   

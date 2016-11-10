@@ -68,6 +68,7 @@ public class TermMapLoader {
       if(column!=null&&template==null&&constant==null&&parentMap==null){
         result = TermMapColumn.builder()
             .column(R2RMLHelper.unescape(column))
+            .datatypIRI(datatype!=null?datatype.getURI():null)
             .termTypeIRI(termType)
             .build();
         

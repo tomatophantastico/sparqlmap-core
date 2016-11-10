@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.aksw.sparqlmap.core.util.QuadPosition;
 
-import jersey.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 import lombok.Builder;
 import lombok.Data;
 @Data
@@ -51,11 +51,12 @@ public class QuadMap {
     private String query;
     
     
+    public final static LogicalTable NULLTABLE = LogicalTable.builder().build();
 
-    
-    
   }
   
+  
+  public static QuadMap NULLQUADMAP = QuadMap.builder().graph(TermMap.NULLTERMMAP).subject(TermMap.NULLTERMMAP).predicate(TermMap.NULLTERMMAP).object(TermMap.NULLTERMMAP).triplesMapUri(SM.NULLQUADMAPSTRING).logicalTable(LogicalTable.NULLTABLE).build(); 
   
   
 }

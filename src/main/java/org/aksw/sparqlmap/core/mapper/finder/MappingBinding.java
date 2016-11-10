@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.aksw.sparqlmap.core.mapper.compatibility.CompatibilityChecker;
 import org.aksw.sparqlmap.core.r2rml.QuadMap;
@@ -20,9 +21,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import jersey.repackaged.com.google.common.collect.Lists;
-import jersey.repackaged.com.google.common.collect.Maps;
-import jersey.repackaged.com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Provides a fluent api for performing operations on triple bindings is a wrapper around the quad bindings
@@ -80,7 +81,8 @@ public class MappingBinding {
 	  boolean isEmpty = true;
 	  
 	  for(Quad quad: bindingMap.keySet()){
-	    if(!bindingMap.get(quad).isEmpty()){
+	    if(bindingMap.get(quad).size()==1
+	        &&bindingMap.get(quad).iterator().next()!=QuadMap.NULLQUADMAP){
 	      isEmpty = false;
 	      break;
 	    }
@@ -108,7 +110,7 @@ public class MappingBinding {
     Collection<Expr> oxprs = var2exps.get(oname);
     Collection<Expr> gxprs = var2exps.get(gname);
   
-    // iterate over the subjects and remove them if they are not
+    // iterate over the nodes and remove them if they are not
     // compatible
     for (QuadMap quadmap: quadMaps) {
       boolean allCompatible = true;
@@ -131,71 +133,71 @@ public class MappingBinding {
 	}
 	
 	
+	 public boolean preLeftJoin(Collection<Quad> lefts, Collection<Quad> rights){
+	   
+	 
+	   
+	    //now compare each with each 
+	      AtomicBoolean result = new AtomicBoolean(false);
+	      lefts.forEach((left) -> {
+	        Collection<QuadMap> leftMaps = bindingMap.get(left);
+	        rights.forEach((right)->{
+	          Collection<QuadMap> rightMaps = bindingMap.get(right);
+	          boolean hasMerged = false;
+	          if(!left.equals(right)){
+	            hasMerged = prejoinIndivudualQuad(left, leftMaps, right, rightMaps);
+	          }
+	          if(hasMerged==true){
+	            result.set(hasMerged);
+	          }
+	          
+	        });
+	      });
+	      
+	      return result.get();
+	    }
+	
 	
 	/**
-   * merges the bindings. performs the join 
+   * merges the bindings,  pre-evaluates the left join 
    */
-  public boolean mergeBinding(Map<Quad, Collection<QuadMap>> binding1,
-      Map<Quad, Collection<QuadMap>> binding2) {
-    
+  private boolean prejoinIndivudualQuad(Quad quadLeft, Collection<QuadMap> quadLeftBinding, Quad quadRight,
+      Collection<QuadMap> quadRightBinding) {
 
     boolean wasmerged = false;
 
-    // <PO> toBeRemoved = new ArrayList<TripleMap.PO>();
-    boolean wasmergedthisrun = false;
-    do {
-      wasmergedthisrun = false;
-      for (Quad quad1 : new HashSet<Quad>(binding1.keySet())) {
-        for (Quad quad2 : binding2.keySet()) {
-          if (!(quad1 == quad2)) {
-            for (QuadPosition f1 : QuadPosition.values()) {
-              for (QuadPosition f2 : QuadPosition.values()) {
-          
-                Node n1 = getField(quad1, f1);
-                Node n2 = getField(quad2, f2);
-                Collection<QuadMap> triplemaps1 = binding1
-                    .get(quad1);
-                Collection<QuadMap> triplemaps1_copy= null;
-                if(log.isDebugEnabled()){
-                  triplemaps1_copy = new HashSet<QuadMap>(binding1
-                      .get(quad1));
-                }
-                    
-                
-                Collection<QuadMap> triplemaps2 = binding2
-                    .get(quad2);
-                if (matches(n1, n2)) {
-                  wasmergedthisrun = mergeTripleMaps(f1, f2,
-                      triplemaps1, triplemaps2);
-                  if (wasmergedthisrun) {
-                    wasmerged = true;
-                  }
-                  if(log.isDebugEnabled()){
-                    if(wasmergedthisrun){
-                      log.debug("Merged on t1: " + quad1.toString() + " x t2:" + quad2.toString());
-                      log.debug("Removed the following triple maps:");
-                      
-                      triplemaps1_copy.removeAll(triplemaps1);
-                      for (QuadMap tripleMap : triplemaps1_copy) {
-                        log.debug("" +  tripleMap);
-                      }
-                    }else{
-                      log.debug("All compatible on t1: " + quad1.toString() + " x t2:" + quad2.toString());
+    for (QuadPosition f1 : QuadPosition.values()) {
+      for (QuadPosition f2 : QuadPosition.values()) {
 
-                    }
-                    
-                  }
-                  
-                  
-                }
+        Node n1 = getField(quadLeft, f1);
+        Node n2 = getField(quadRight, f2);
+
+        if (matches(n1, n2)) {
+
+          Collection<QuadMap> quadLeftBinding_copy = null;
+
+          if (log.isDebugEnabled()) {
+            quadLeftBinding_copy = new HashSet<QuadMap>(quadLeftBinding);
+          }
+
+          wasmerged = mergeTripleMaps(f1, f2, quadLeftBinding, quadRightBinding);
+
+          if (log.isDebugEnabled()) {
+            if (wasmerged) {
+              log.debug("Merged on t1: " + quadLeft.toString() + " LJ t2:" + quadRight.toString());
+              log.debug("Removed the following triple maps:");
+
+              quadLeftBinding_copy.removeAll(quadLeftBinding);
+              for (QuadMap tripleMap : quadLeftBinding) {
+                log.debug("" + tripleMap);
               }
+            } else {
+              log.debug("All compatible on t1: " + quadLeft.toString() + " LJ t2:" + quadRight.toString());
             }
           }
-          //the triple shares no variables.
-          //we add the triple 
         }
       }
-    } while (wasmergedthisrun);
+    }
 
     return wasmerged;
 
@@ -217,17 +219,27 @@ public class MappingBinding {
       Collection<QuadMap> triplemaps1, Collection<QuadMap> triplemaps2) {
     // we keep track if a modification was performed. Needed later to notify
     // the siblings.
-    
+    boolean removed = false;
     Set<QuadMap> toRemove1 = Sets.newHashSet(); 
     for(QuadMap qmc1: triplemaps1){
-      
-      for(QuadMap qmc2: triplemaps2){
-        if(!(cchecker.isCompatible(qmc1.get(f1),qmc2.get(f2)))){
-         toRemove1.add(qmc1);
+      if(qmc1 != QuadMap.NULLQUADMAP){
+        for(QuadMap qmc2: triplemaps2){
+          if(qmc1 != QuadMap.NULLQUADMAP){
+            if(!(cchecker.isCompatible(qmc1.get(f1),qmc2.get(f2)))){
+             toRemove1.add(qmc1);
+            }
+          }
         }
       }
+     
     }
-    return triplemaps1.removeAll(toRemove1);
+    removed = triplemaps1.removeAll(toRemove1);
+    if(triplemaps1.isEmpty()){
+      triplemaps1.add(QuadMap.NULLQUADMAP);
+    }
+    
+    
+    return removed;
   }
   
 

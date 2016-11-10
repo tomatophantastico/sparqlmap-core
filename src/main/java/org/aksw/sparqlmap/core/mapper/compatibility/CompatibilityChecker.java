@@ -22,7 +22,7 @@ import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
-import jersey.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 
 public class CompatibilityChecker {
   
@@ -35,8 +35,9 @@ public class CompatibilityChecker {
 	
   public boolean isCompatible(TermMap termMap1, TermMap termMap2) {
     boolean isCompatible = true;
-    
-    
+    if(termMap1==TermMap.NULLTERMMAP || termMap2 == TermMap.NULLTERMMAP){
+      isCompatible = false;
+    }else 
     //do basic checking on TermMap attributes
     if(!(Objects.equals(termMap1.getTermTypeIRI(), termMap2.getTermTypeIRI())
         &&  Objects.equals(termMap1.getDatatypIRI(), termMap2.getDatatypIRI())
@@ -271,7 +272,9 @@ public class CompatibilityChecker {
 	  }else if(termMap instanceof TermMapColumn){
 	  // column based IRI TermMaps are always compatible, so no check here
 	  // last option is template based TermMap
-	  }else {
+	  }else if(termMap instanceof TermMapReferencing){
+	    result = isCompatible(((TermMapReferencing)termMap).getParent().getSubject(), n);
+	  }else{
 	    String nodeUri = n.getURI();
 	    TermMapTemplate tmt = (TermMapTemplate) termMap;
 	    

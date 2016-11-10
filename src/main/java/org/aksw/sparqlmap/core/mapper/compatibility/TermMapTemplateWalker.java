@@ -6,7 +6,7 @@ import org.aksw.sparqlmap.core.r2rml.TermMapTemplateTuple;
 
 import com.google.common.collect.PeekingIterator;
 
-import jersey.repackaged.com.google.common.collect.Maps;
+import com.google.common.collect.Maps;
 
 class TermMapTemplateWalker{
   

@@ -15,8 +15,8 @@ import org.apache.jena.vocabulary.RDF;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import jersey.repackaged.com.google.common.collect.Lists;
-import jersey.repackaged.com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class QuadMapLoader {
 

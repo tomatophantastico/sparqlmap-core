@@ -1,2 +1,2 @@
 #fails: aggregates not implemented 
-SELECT count(distinct ?p) { ?s ?p ?o }
+SELECT (count(distinct ?p) as ?no) { ?s ?p ?o }

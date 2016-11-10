@@ -13,7 +13,6 @@ import org.aksw.sparqlmap.core.r2rml.TermMapTemplateTuple;
 import org.apache.jena.datatypes.BaseDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.riot.system.IRIResolver;
 import org.apache.metamodel.data.Row;
 import org.apache.metamodel.query.SelectItem;

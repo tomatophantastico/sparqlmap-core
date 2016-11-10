@@ -1,2 +1,2 @@
 #fails: aggregates not implemented 
-SELECT COUNT(distinct ?s) AS ?no { ?s a []  }
+SELECT (COUNT(distinct ?s) AS ?no) { ?s a []  }

@@ -13,7 +13,7 @@ import org.apache.metamodel.query.FromItem;
 import org.apache.metamodel.query.SelectItem;
 import org.apache.metamodel.schema.Column;
 
-import jersey.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 
 
 /**

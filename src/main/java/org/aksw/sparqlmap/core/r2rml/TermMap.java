@@ -42,7 +42,28 @@ public abstract class TermMap {
   
  
 
-  
-
+ 
+  public final static  TermMap NULLTERMMAP = new TermMap(null,null,SM.NULLRESOURCE_STRING) {
+    
+    @Override
+    public boolean isTemplate() {
+      return false;
+    }
+    
+    @Override
+    public boolean isReferencing() {
+      return false;
+    }
+    
+    @Override
+    public boolean isConstant() {
+      return false;
+    }
+    
+    @Override
+    public boolean isColumn() {
+      return false;
+    }
+  };
 
 }

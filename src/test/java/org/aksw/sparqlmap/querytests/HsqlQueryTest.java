@@ -50,7 +50,7 @@ public class HsqlQueryTest extends QueryBaseTest {
     cp.setPassword("");
    
     
-    sparqlMap = SparqlMapFactory.create().connectJdbcBackend(cp).mappedBy(RDFDataMgr.loadModel(mappingFile.getAbsolutePath())).finish();
+    sparqlMap = SparqlMapFactory.newSparqlMap().connectJdbcBackend(cp).mappedBy(RDFDataMgr.loadModel(mappingFile.getAbsolutePath())).create();
   }
 
   @Override

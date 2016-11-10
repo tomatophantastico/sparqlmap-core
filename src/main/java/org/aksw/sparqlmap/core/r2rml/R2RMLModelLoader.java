@@ -19,7 +19,7 @@ import org.apache.jena.vocabulary.RDF;
 
 import com.google.common.collect.Maps;
 
-import jersey.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 
 /**
  * 

@@ -1,6 +1,8 @@
 package org.aksw.sparqlmap.core;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.LangBuilder;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.sparql.resultset.ResultsFormat;
@@ -60,7 +63,12 @@ public class SparqlMap {
    */
   private DataContext dataContext;
   
-     
+  /**
+   * if sth. should be closed when shutting down sparqlmap
+   */
+  private Closeable closeable;
+
+  
 
   public DataContext getDataContext() {
     return dataContext;
@@ -86,6 +94,13 @@ public class SparqlMap {
   public void setContextConf(ContextConfiguration contextConf) {
     this.contextConf = contextConf;
   }
+  
+  
+  public void setCloseable(Closeable closeable) {
+    this.closeable = closeable;
+  }
+  
+
 
   public org.apache.jena.query.QueryExecution execute(String query){
     TranslationContext tcontext = new  TranslationContext();
@@ -148,6 +163,14 @@ public class SparqlMap {
     return result;
     
   }
+  
+  @Deprecated
+  public void dump(OutputStream out, Lang format){
+    new DumperMetaModel(new MetaModelContext(this.dataContext, this.contextConf), mapping).dump(out,format);
+   
+    
+  }
+  
   
   
   
@@ -410,10 +433,15 @@ public class SparqlMap {
   }
   
   public void close(){
-    
-  
-    
+    if(closeable!=null){
+      try {
+        closeable.close();
+      } catch (IOException e) {
+        log.error("Problem closing the object backing the datasource:",e);
+      }
     }
+
+  }
 
   
 
