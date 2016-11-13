@@ -4,7 +4,7 @@ addons:
   postgresql: '9.3'
 
 jdk:
-- openjdk7
+- oraclejdk8
 
 before_script:
 - psql -c 'create database sparqlmap;' -U postgres
