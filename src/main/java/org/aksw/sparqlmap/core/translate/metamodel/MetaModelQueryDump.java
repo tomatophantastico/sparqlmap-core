@@ -3,6 +3,7 @@ package org.aksw.sparqlmap.core.translate.metamodel;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,10 +44,10 @@ public class MetaModelQueryDump {
 
   }
   
-  public static Stream<Multimap<Node,Triple>> streamFast(Collection<QuadMap> quadmaps, DataContext context){
+  public static Stream<Multimap<Node,Triple>> streamFast(Collection<QuadMap> quadmaps, DataContext context, ExecutorService exec){
     Multimap<LogicalTable,QuadMap> bucketedMaps = bucketFilterNonNullMaps(new HashSet<QuadMap>(quadmaps));
     Queue<Multimap<Node,Triple>> queue =  new Queue<Multimap<Node,Triple>>(new  LinkedBlockingQueue<Multimap<Node,Triple>>(1000));
-    Executor exec = Executors.newWorkStealingPool();
+    
     AtomicInteger jobCount = new AtomicInteger(bucketedMaps.keySet().size());
     if(jobCount.get()>0){
       for (LogicalTable ltab : bucketedMaps.keySet()) {
@@ -63,9 +64,16 @@ public class MetaModelQueryDump {
   public static DatasetGraph assembleDs(Collection<QuadMap> quadmaps, DataContext context) {
     final Multimap<Node,Triple> graphs = HashMultimap.create();
 
-    Stream<Multimap<Node,Triple>> stream = streamFast(quadmaps, context);
+    Stream<Multimap<Node,Triple>> stream = streamFast(quadmaps, context,Executors.newWorkStealingPool());
     stream.forEach(iresult-> graphs.putAll(iresult));
     
+    DatasetGraphMapLink dsgml = convert(graphs);
+
+    
+    return dsgml;
+  }
+
+  public static DatasetGraphMapLink convert(final Multimap<Node, Triple> graphs) {
     DatasetGraphMapLink dsgml;
     if(graphs.containsKey(Quad.defaultGraphNodeGenerated)){
       dsgml = new DatasetGraphMapLink(new CollectionGraph(graphs.get(Quad.defaultGraphNodeGenerated)));
@@ -79,7 +87,6 @@ public class MetaModelQueryDump {
         dsgml.addGraph(graph, new CollectionGraph(graphs.get(Quad.defaultGraphNodeGenerated)));
       }
     }
-    
     return dsgml;
   }
   

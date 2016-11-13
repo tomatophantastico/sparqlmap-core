@@ -1,7 +1,7 @@
 package org.aksw.sparqlmap.querytests;
 
 import org.aksw.sparqlmap.core.SparqlMap;
-import org.aksw.sparqlmap.core.SparqlMapFactory;
+import org.aksw.sparqlmap.core.SparqlMapBuilder;
 import org.aksw.sparqlmap.core.automapper.MappingGenerator;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.core.DatasetGraph;
@@ -59,7 +59,7 @@ public class AccessQueryTest {
   
   @Test
   public void testPfarrerbuch(){
-    SparqlMap sm = SparqlMapFactory.newSparqlMap().connectToAccess(PFARRERBUCHLOCATION).mappedByDefaultMapping().create();
+    SparqlMap sm = SparqlMapBuilder.newSparqlMap(null).connectToAccess(PFARRERBUCHLOCATION).mappedByDefaultMapping().create();
     
     DatasetGraph dsg = sm.getDumpExecution().dumpDatasetGraph();
     

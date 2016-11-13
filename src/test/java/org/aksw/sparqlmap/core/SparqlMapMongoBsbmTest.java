@@ -23,7 +23,7 @@ public class SparqlMapMongoBsbmTest {
 
     // assertTrue(Lists.newArrayList(mdb.listCollectionNames().iterator()).size()>0);
 
-    SparqlMap sm = SparqlMapFactory.newSparqlMap().connectToMongoDb3(mdb)
+    SparqlMap sm = SparqlMapBuilder.newSparqlMap(null).connectToMongoDb3(mdb)
         .mappedBy("./src/test/resources/mongo-test/bsbm/mapping.ttl").create();
     
     return sm;

@@ -1,16 +1,26 @@
 package org.aksw.sparqlmap.core.translate.metamodel;
 
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.aksw.sparqlmap.core.Dumper;
+import org.aksw.sparqlmap.core.r2rml.QuadMap;
 import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.writer.NQuadsWriter;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Quad;
+
+import com.google.common.collect.Multimap;
 
 public class DumperMetaModel implements Dumper{
 
@@ -81,7 +91,6 @@ public class DumperMetaModel implements Dumper{
 
 
 
-  @Override
   public void streamDump(OutputStream stream) {
     
     
@@ -91,10 +100,47 @@ public class DumperMetaModel implements Dumper{
   }
   
   
-  
+  /**
+   * Currently materializes the data in memory before: beware!
+   * @param out
+   * @param format
+   */
   public void dump(OutputStream out, Lang format){
     
     RDFDataMgr.write(out, dumpDatasetGraph(), format);
+    
+  }
+  
+  /**
+   * Opens a stream from a queue for backpressure handling.
+   * @param fast if set to false, the tables are iterated sequentially, if true parallel querying is enabled
+   * @param mappingfilters 
+   * @return
+   */
+  public Stream<Multimap<Node, Triple>> dump(Collection<String> mappingfilters, boolean fast){
+    
+    this.r2rmlMapping.getQuadMaps();
+    ExecutorService execService = null;
+    if(fast){
+      execService = Executors.newWorkStealingPool();
+    }else{
+      execService = Executors.newSingleThreadExecutor();
+    }
+    
+    Collection<QuadMap> qms;
+    if(mappingfilters!=null){
+      qms = r2rmlMapping.getQuadMaps().values().stream().filter(
+          qm-> mappingfilters.stream().anyMatch(
+              filterString->qm.getTriplesMapUri().contains(filterString))
+          ).collect(Collectors.toList());
+    }else{
+      qms = r2rmlMapping.getQuadMaps().values();
+    }
+    
+     
+    
+    
+    return MetaModelQueryDump.streamFast(qms, mcontext.getDataContext(), execService);
     
   }
   

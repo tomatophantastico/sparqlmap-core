@@ -33,6 +33,8 @@ public class R2RMLModelLoader {
   public static final String BNODE_RESOLV_PREFIX = "http://aksw.org/Projects/SparqlMap/bnodeResolv/";
   
   public static R2RMLMapping loadModel(Model toLoad, Model r2rmlspec, String baseIri){
+    Model original = ModelFactory.createDefaultModel();
+    original.add(toLoad.listStatements().toList());
     
     toLoad = ModelFactory.createRDFSModel(r2rmlspec, toLoad);
     
@@ -49,8 +51,9 @@ public class R2RMLModelLoader {
     resolveBlankNodes(toLoad);
     
     //load the triples maps
-    R2RMLMapping mapping = new R2RMLMapping();
-    mapping.setQuadMaps(QuadMapLoader.load(toLoad, baseIri));
+    
+    R2RMLMapping mapping = new R2RMLMapping(QuadMapLoader.load(toLoad, baseIri),original);
+
     
       
     return mapping;

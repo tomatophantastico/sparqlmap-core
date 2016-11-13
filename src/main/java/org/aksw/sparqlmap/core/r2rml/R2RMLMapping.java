@@ -2,8 +2,16 @@ package org.aksw.sparqlmap.core.r2rml;
 
 import java.util.Collection;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 
 /**
@@ -11,15 +19,15 @@ import com.google.common.collect.Multimap;
  * @author joerg
  *
  */
+@Data
+@AllArgsConstructor
 public class R2RMLMapping {
   
   // term maps indexed by the iris
-  private Multimap<String,QuadMap> quadMaps = HashMultimap.create();
+  private Multimap<String,QuadMap> quadMaps;
+  private Model r2rmlMapping;
   
-  
-  public Multimap<String,QuadMap> getQuadMaps() {
-    return quadMaps;
-  }
+
   
   public void addQuadMap(QuadMap quadMap) {
     this.quadMaps.put(quadMap.getTriplesMapUri(), quadMap);
@@ -30,9 +38,6 @@ public class R2RMLMapping {
      addQuadMap(qm);
    }
     
-  }
-  public void setQuadMaps(Multimap<String, QuadMap> quadMaps) {
-    this.quadMaps = quadMaps;
   }
 
 }

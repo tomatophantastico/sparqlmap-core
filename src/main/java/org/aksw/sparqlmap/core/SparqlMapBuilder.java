@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 import javax.sql.DataSource;
 
@@ -24,6 +25,8 @@ import org.apache.metamodel.mongodb.mongo3.MongoDbDataContext;
 import org.eobjects.metamodel.access.AccessDataContext;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
 
 /**
@@ -33,37 +36,36 @@ import com.mongodb.client.MongoDatabase;
  * @author joerg
  *
  */
-public class SparqlMapFactory {
+public class SparqlMapBuilder {
   
   private String baseIri;
   
   private SparqlMap sparqlMap;
   
-  public static SparqlMapFactory  newSparqlMap(){
-    String genIri;
-    try {
-      genIri = "http://" + InetAddress.getLocalHost().getHostName() + "/baseiri/";
-    } catch (UnknownHostException e) {
-      genIri = "http://localhost /baseiri/";
+
+  
+  
+  public static SparqlMapBuilder newSparqlMap(String baseIRI){
+    if(baseIRI==null){
+      try {
+        baseIRI = "http://" + InetAddress.getLocalHost().getHostName() + "/baseiri/";
+      } catch (UnknownHostException e) {
+        baseIRI = "http://localhost/baseiri/";
+      }
     }
-    return new SparqlMapFactory(genIri);
     
-  }
-  
-  
-  public static SparqlMapFactory newSparqlMap(String baseIRI){
-    return new SparqlMapFactory(baseIRI);
+    return new SparqlMapBuilder(baseIRI);
 
   }
   
   
-  public SparqlMapFactory(String baseIri) {
+  public SparqlMapBuilder(String baseIri) {
     sparqlMap = new SparqlMap();
     this.baseIri = baseIri;
   }
   
 
-  public SparqlMapFactory connectTo(DataContext dcon){
+  public SparqlMapBuilder connectTo(DataContext dcon){
     sparqlMap.setDataContext(dcon);
     
     return this;
@@ -71,63 +73,82 @@ public class SparqlMapFactory {
   }
   
   
-  public SparqlMapMappingFactory connectToCsv(String location){
+  public SparqlMapMappingBuilder connectToCsv(String location){
     UpdateableDataContext dc = new CsvDataContext(new File(location));
     
     sparqlMap.setDataContext(dc);
     
-    return new SparqlMapMappingFactory();
+    return new SparqlMapMappingBuilder();
   }
   
-  public SparqlMapMappingFactory connectToAccess(String location){
+  public SparqlMapMappingBuilder connectToAccess(String location){
     DataContext dc = new AccessDataContext(new File(location));
     
     sparqlMap.setDataContext(dc);
     
-    return new SparqlMapMappingFactory();
+    return new SparqlMapMappingBuilder();
   }
   
   
-  public SparqlMapMappingFactory connectToMongoDb3(String host, String dbname){
-    MongoClient client = new MongoClient(host);
+  public SparqlMapMappingBuilder connectToMongoDb3(String host, String dbname){
+    return connectToMongoDb3(host, dbname, null, null);
+    
+  }
+  
+  public SparqlMapMappingBuilder connectToMongoDb3(String host, String dbname, String username, String password){
+    
+    
+    MongoClient client = null;
+    
+    if(username==null){
+      client  =  new MongoClient(host);
+    }else{
+      MongoCredential mcred = MongoCredential.createCredential(username, dbname, password.toCharArray());
+      ServerAddress sAddr = new ServerAddress(host);
+      client = new MongoClient(sAddr,Arrays.asList(mcred));
+    }
+    
+   
+    
+   
     
     MongoDbDataContext m3dbdc = new MongoDbDataContext(client.getDatabase(dbname));
     sparqlMap.setDataContext(m3dbdc);
     sparqlMap.setCloseable(client);
     
-    return new SparqlMapMappingFactory();
+    return new SparqlMapMappingBuilder();
     
   }
   
   
-  public SparqlMapMappingFactory connectToMongoDb3(MongoDatabase mdb){
+  public SparqlMapMappingBuilder connectToMongoDb3(MongoDatabase mdb){
     sparqlMap.setDataContext(new MongoDbDataContext(mdb));
-    return new SparqlMapMappingFactory();
+    return new SparqlMapMappingBuilder();
   }
   
   
-  public SparqlMapMappingFactory connectJdbcBackend(DataSource ds){
+  public SparqlMapMappingBuilder connectJdbcBackend(DataSource ds){
     JdbcDataContext context = new JdbcDataContext(ds);
     
     
     sparqlMap.setDataContext(context);
     
-    return new SparqlMapMappingFactory();
+    return new SparqlMapMappingBuilder();
   }
   
   
-  public class SparqlMapMappingFactory{
+  public class SparqlMapMappingBuilder{
     
 
     
-    public SparqlMapMappingFactory mappedByDefaultMapping(){
+    public SparqlMapMappingBuilder mappedByDefaultMapping(){
       
       return mappedByDefaultMapping(baseIri);
       
     }
    
     
-    public SparqlMapMappingFactory mappedByDefaultMapping(String prefix){
+    public SparqlMapMappingBuilder mappedByDefaultMapping(String prefix){
       MappingGenerator gen = new MappingGenerator(prefix);
       Model mapping = gen.generateMapping(sparqlMap.getDataContext().getDefaultSchema());
       sparqlMap.setMapping(loadMapping(mapping));
@@ -135,12 +156,22 @@ public class SparqlMapFactory {
       return this;
     }
     
+    public SparqlMapMappingBuilder mappedByDefaultMapping(String prefix, String mappingPrefix,
+      String instancePrefix, String vocabularyPrefix, String primaryKeySeparator){
+    
+      MappingGenerator gen = new MappingGenerator(prefix,mappingPrefix,instancePrefix,vocabularyPrefix,primaryKeySeparator,null);
+      Model mapping = gen.generateMapping(sparqlMap.getDataContext().getDefaultSchema());
+
+      sparqlMap.setMapping(loadMapping(mapping));
+      return this;
+    }
     
     
     
     
     
-    public SparqlMapMappingFactory mappedBy(String location){
+    
+    public SparqlMapMappingBuilder mappedBy(String location){
       Model r2rmlModel = RDFDataMgr.loadModel(location);
           
       sparqlMap.setMapping(loadMapping(r2rmlModel));
@@ -148,7 +179,7 @@ public class SparqlMapFactory {
       return this;
     }
     
-    public SparqlMapMappingFactory mappedBy(Model model){
+    public SparqlMapMappingBuilder mappedBy(Model model){
       
       sparqlMap.setMapping(loadMapping(model));
 
@@ -171,6 +202,7 @@ public class SparqlMapFactory {
       
       return sparqlMap;
     }
+    
     
     
     

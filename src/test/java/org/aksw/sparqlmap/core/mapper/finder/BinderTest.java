@@ -22,6 +22,9 @@ import org.apache.jena.sparql.algebra.AlgebraGenerator;
 import org.apache.jena.sparql.core.Quad;
 import org.junit.Test;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimaps;
+
 import jersey.repackaged.com.google.common.collect.Lists;
 
 public class BinderTest {
@@ -67,7 +70,7 @@ public class BinderTest {
   @Test
   public void test() {
     
-    R2RMLMapping r2rmapping = new R2RMLMapping();
+    R2RMLMapping r2rmapping = new R2RMLMapping(HashMultimap.create(),null);
     r2rmapping.addQuadMaps(personMap);
     
     
@@ -87,7 +90,7 @@ public class BinderTest {
   }
   @Test
   public void testJoin(){
-    R2RMLMapping r2rmapping = new R2RMLMapping();
+    R2RMLMapping r2rmapping = new R2RMLMapping(HashMultimap.create(),null);
     r2rmapping.addQuadMaps(personMap);
     
     

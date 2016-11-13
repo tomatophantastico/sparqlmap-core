@@ -20,11 +20,12 @@ import org.apache.metamodel.schema.MutableColumn;
 import org.apache.metamodel.schema.Relationship;
 import org.apache.metamodel.schema.Schema;
 import org.apache.metamodel.schema.Table;
-import org.elasticsearch.common.collect.Sets;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 
 /**
  * Creates a Direct Mapping for the given schema
@@ -63,6 +64,18 @@ public class MappingGenerator {
     this.instancePrefix = instancePrefix;
     this.vocabularyPrefix = vocabularyPrefix;
     this.primaryKeySeparator = primaryKeySeparator;
+    this.rowidtemplate = rowidtemplate;
+  }
+  public MappingGenerator(String baseprefix, String mappingPrefix, String instancePrefix,
+      String vocabularyPrefix, String primaryKeySeparator,String rowidtemplate) {
+    super();
+    if(baseprefix==null){
+      baseprefix = "http://localhost/baseiri/";
+    }
+    this.mappingPrefix = mappingPrefix!=null?mappingPrefix:baseprefix + "mapping/";
+    this.instancePrefix = instancePrefix!=null?mappingPrefix:baseprefix + "instance/";
+    this.vocabularyPrefix = vocabularyPrefix!=null?mappingPrefix:baseprefix + "vocab/";
+    this.primaryKeySeparator = primaryKeySeparator!=null?mappingPrefix:"+";
     this.rowidtemplate = rowidtemplate;
   }
   

@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import org.aksw.sparqlmap.DBHelper;
 import org.aksw.sparqlmap.DockerHelper.DBConnConfig;
 import org.aksw.sparqlmap.core.SparqlMap;
-import org.aksw.sparqlmap.core.SparqlMapFactory;
+import org.aksw.sparqlmap.core.SparqlMapBuilder;
 import org.apache.jena.riot.RDFDataMgr;
 import org.hsqldb.Server;
 import org.junit.BeforeClass;
@@ -50,7 +50,7 @@ public class HsqlQueryTest extends QueryBaseTest {
     cp.setPassword("");
    
     
-    sparqlMap = SparqlMapFactory.newSparqlMap().connectJdbcBackend(cp).mappedBy(RDFDataMgr.loadModel(mappingFile.getAbsolutePath())).create();
+    sparqlMap = SparqlMapBuilder.newSparqlMap(null).connectJdbcBackend(cp).mappedBy(RDFDataMgr.loadModel(mappingFile.getAbsolutePath())).create();
   }
 
   @Override
