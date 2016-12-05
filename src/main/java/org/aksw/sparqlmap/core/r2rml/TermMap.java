@@ -1,6 +1,11 @@
 package org.aksw.sparqlmap.core.r2rml;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.aksw.sparqlmap.core.ImplementationException;
+
+import com.google.common.collect.Lists;
 
 import lombok.Data;
 
@@ -65,5 +70,23 @@ public abstract class TermMap {
       return false;
     }
   };
+  
+  public static Collection<String> getCols(TermMap tm){
+ 
+    List<String> cols = Lists.newArrayList();
+    
+    if(tm instanceof TermMapColumn){
+      cols.add(((TermMapColumn) tm).getColumn());
+    }else if (tm instanceof TermMapTemplate){
+      for(TermMapTemplateTuple tmtt : ((TermMapTemplate) tm).getTemplate()){
+        if(tmtt.getColumn()!=null){
+          cols.add(tmtt.getColumn());
+        }
+       
+      }
+    }
+    
+    return cols;
+  }
 
 }

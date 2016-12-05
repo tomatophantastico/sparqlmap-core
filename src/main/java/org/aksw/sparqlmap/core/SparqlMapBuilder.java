@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -24,6 +25,7 @@ import org.apache.metamodel.jdbc.JdbcDataContext;
 import org.apache.metamodel.mongodb.mongo3.MongoDbDataContext;
 import org.eobjects.metamodel.access.AccessDataContext;
 
+import com.google.common.base.Joiner;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
@@ -198,6 +200,13 @@ public class SparqlMapBuilder {
     
       if(sparqlMap.getContextConf()==null){
         sparqlMap.setContextConf(new ContextConfiguration());
+      }
+      
+      
+      List<String> warnins = sparqlMap.validateMapping();
+      
+      if(!warnins.isEmpty()){
+        throw new SystemInitializationError(Joiner.on(System.lineSeparator()).join(warnins));
       }
       
       return sparqlMap;

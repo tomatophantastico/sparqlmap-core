@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,11 +16,16 @@ import org.aksw.sparqlmap.core.mapper.finder.FilterFinder;
 import org.aksw.sparqlmap.core.mapper.finder.MappingBinding;
 import org.aksw.sparqlmap.core.mapper.finder.QueryInformation;
 import org.aksw.sparqlmap.core.normalizer.QueryNormalizer;
+import org.aksw.sparqlmap.core.r2rml.QuadMap;
+import org.aksw.sparqlmap.core.r2rml.QuadMap.LogicalTable;
 import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
+import org.aksw.sparqlmap.core.r2rml.TermMap;
 import org.aksw.sparqlmap.core.translate.metamodel.DumperMetaModel;
 import org.aksw.sparqlmap.core.translate.metamodel.MetaModelContext;
 import org.aksw.sparqlmap.core.translate.metamodel.MetaModelQueryExecution;
 import org.aksw.sparqlmap.core.translate.metamodel.TranslationContextMetaModel;
+import org.aksw.sparqlmap.core.util.QuadPosition;
+import org.apache.jena.ext.com.google.common.collect.Sets;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
@@ -37,8 +43,14 @@ import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 import org.apache.jena.sparql.syntax.Template;
 import org.apache.metamodel.DataContext;
+import org.apache.metamodel.query.Query;
+import org.apache.metamodel.query.parser.QueryParser;
+import org.apache.metamodel.schema.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
+
 
 /**
  *  The main class of Sparqlmap.
@@ -444,6 +456,48 @@ public class SparqlMap {
   }
 
   
+  public List<String> validateMapping(){
+    List<String> warnings = Lists.newArrayList();
+    if(mapping==null){
+      throw new SparqlMapException("Mapping not set");
+    }
+    if(dataContext==null){
+      throw new SparqlMapException("Data source not set");
+    }
+    
+    // now we check if every mapping col exists
+    
+    for(QuadMap qm: mapping.getQuadMaps().values()){
+      LogicalTable lt =  qm.getLogicalTable();
+      Set<Table> tables = Sets.newHashSet();
+      if(lt.getTablename()!=null ){
+        
+        Table ltTab = dataContext.getTableByQualifiedLabel(lt.getTablename());
+        if(ltTab != null){
+          tables.add(ltTab);
+        }else {
+          warnings.add("Cannot link tablename to actual table in mapping" + qm.getTriplesMapUri()  );
+        }
+          
+      }else{
+        try{
+        Query query = new QueryParser(dataContext,lt.getQuery()).parse();
+        query.getFromClause().getItems().iterator().forEachRemaining(fi -> tables.add( fi.getTable()));
+        }catch (Exception e) {
+          warnings.add("Cannot parse view query of triplesmap: " + qm.getTriplesMapUri() );
+        }
+      }
 
+      for(QuadPosition pos: QuadPosition.values()){
+        TermMap tm =  qm.get(pos);
+        TermMap.getCols(tm).stream().filter( 
+            col-> tables.stream().noneMatch(
+                tab-> null != tab.getColumnByName(col)))
+        .forEach(col->
+          warnings.add("Cannot bind col named " + col +" in mapping " + qm.getTriplesMapUri()));
 
+      }
+    }
+    return warnings;
+  }
 }

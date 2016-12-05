@@ -99,14 +99,7 @@ public class MetaModelSelectiveDump implements Runnable{
       
       for(QuadPosition pos: QuadPosition.values()){
         TermMap tm = qm.get(pos);
-        if(tm instanceof TermMapColumn){
-          cols.add(((TermMapColumn) tm).getColumn());
-        }else if (tm instanceof TermMapTemplate){
-          for(TermMapTemplateTuple tmtt : ((TermMapTemplate) tm).getTemplate()){
-            cols.add(tmtt.getColumn());
-           
-          }
-        }
+        cols.addAll(TermMap.getCols(tm));
       }
     }
     
