@@ -21,6 +21,7 @@ import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Quad;
 
 import com.google.common.collect.Multimap;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class DumperMetaModel implements Dumper{
 
@@ -122,9 +123,11 @@ public class DumperMetaModel implements Dumper{
     this.r2rmlMapping.getQuadMaps();
     ExecutorService execService = null;
     if(fast){
-      execService = Executors.newWorkStealingPool();
+      execService = Executors.newFixedThreadPool(
+          Runtime.getRuntime().availableProcessors(), 
+          new ThreadFactoryBuilder().setDaemon(true).build());
     }else{
-      execService = Executors.newSingleThreadExecutor();
+      execService = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setDaemon(true).build());
     }
     
     Collection<QuadMap> qms;
