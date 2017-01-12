@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.aksw.sparqlmap.core.SparqlMapBuilder.SparqlMapMappingBuilder;
 import org.aksw.sparqlmap.core.automapper.MappingGenerator;
 import org.aksw.sparqlmap.core.r2rml.R2RMLMapping;
 import org.aksw.sparqlmap.core.r2rml.R2RMLModelLoader;
@@ -67,10 +68,10 @@ public class SparqlMapBuilder {
   }
   
 
-  public SparqlMapBuilder connectTo(DataContext dcon){
+  public SparqlMapMappingBuilder connectTo(DataContext dcon){
     sparqlMap.setDataContext(dcon);
     
-    return this;
+    return new SparqlMapMappingBuilder();
     
   }
   

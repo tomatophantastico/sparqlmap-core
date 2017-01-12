@@ -70,7 +70,7 @@ public class BinderTest {
   @Test
   public void test() {
     
-    R2RMLMapping r2rmapping = new R2RMLMapping(HashMultimap.create(),null);
+    R2RMLMapping r2rmapping = new R2RMLMapping(HashMultimap.create(),null,null);
     r2rmapping.addQuadMaps(personMap);
     
     
@@ -90,7 +90,7 @@ public class BinderTest {
   }
   @Test
   public void testJoin(){
-    R2RMLMapping r2rmapping = new R2RMLMapping(HashMultimap.create(),null);
+    R2RMLMapping r2rmapping = new R2RMLMapping(HashMultimap.create(),null,null);
     r2rmapping.addQuadMaps(personMap);
     
     

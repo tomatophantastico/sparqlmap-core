@@ -26,6 +26,7 @@ public class R2RMLMapping {
   // term maps indexed by the iris
   private Multimap<String,QuadMap> quadMaps;
   private Model r2rmlMapping;
+  private String description;
   
 
   

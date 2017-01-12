@@ -1,5 +1,0 @@
-org.aksw.sparqlmap.core.db.impl.HSQLDBDataTypeHelper
-org.aksw.sparqlmap.core.db.impl.PostgreSQLDataTypeHelper
-org.aksw.sparqlmap.core.db.impl.MySQLDataTypeHelper
-org.aksw.sparqlmap.core.db.impl.OracleDataTypeHelper
-org.aksw.sparqlmap.core.db.impl.SqlServerDataTypeHelper

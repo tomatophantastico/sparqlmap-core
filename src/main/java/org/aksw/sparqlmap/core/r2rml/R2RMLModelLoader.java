@@ -15,7 +15,9 @@ import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.update.GraphStoreFactory;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.VOID;
 
 import com.google.common.collect.Maps;
 
@@ -50,9 +52,11 @@ public class R2RMLModelLoader {
     //convert all blank nodes into non-anonymous resources.
     resolveBlankNodes(toLoad);
     
+    String desc = loadDescription(toLoad);
+    
     //load the triples maps
     
-    R2RMLMapping mapping = new R2RMLMapping(QuadMapLoader.load(toLoad, baseIri),original);
+    R2RMLMapping mapping = new R2RMLMapping(QuadMapLoader.load(toLoad, baseIri),original,desc);
 
     
       
@@ -62,6 +66,18 @@ public class R2RMLModelLoader {
     
   }
   
+  private static String loadDescription(Model toLoad) {
+    
+    List<String> labels = Lists.newArrayList();
+    //check if we got a baseuri-resource
+    toLoad.listResourcesWithProperty(
+        RDF.type,VOID.Dataset).forEachRemaining(
+            res -> toLoad.listObjectsOfProperty(DCTerms.title)
+            .filterKeep(n -> n.isLiteral()).forEachRemaining(n->labels.add(n.toString())));
+    
+    return labels.isEmpty()?"Unlabeled Mapping":labels.iterator().next();
+  }
+
   private static void resolveBlankNodes(Model r2rmlModel) {
     Map<Resource,Resource> bndoe2Resoure = Maps.newHashMap(); 
     List<Statement> toAdd =  Lists.newArrayList();
